@@ -32,8 +32,9 @@ Manual Test Plan
 ### Run Without
 
 - [x] Rebuild solution.
-- [x] `Output` shows `JJ.AutoIncrementVersion.Test.4.2.0.nupkg` 
-      at least ends with `.0.nupkg`
+- [x] `Output` shows
+      `Successfully created package .. JJ.AutoIncrementVersion.Test.4.2.0.nupkg` 
+      ending with `.0.nupkg`
 
 ### Install
 
@@ -48,22 +49,35 @@ Manual Test Plan
 
 ### First Use
 
-- [x] Prepare [Initial State](#initial-state) again
+- [ ] Prepare [Initial State](#initial-state) again
 - [ ] Install `JJ.AutoIncrementVersion` package.
+- [ ] Open `JJ.AutoIncrementVersion.Test.csproj`
 - [ ] Use `$(BuildNum)` in `<Version>`.
-- [ ] 1st build should fail
-- [ ] But should auto-create `BuildNum.xml` and `Directory.Build.props`.
+- [ ] 1st rebuild should fail:
+      `Invalid NuGet version string: '4.2.'`
+- [ ] But auto-creates `Directory.Build.props` content:
+      `<Project><PropertyGroup><BuildNum>0</BuildNum></PropertyGroup><Import Project="BuildNum.xml" Condition="Exists('BuildNum.xml')" /></Project>`
 - [ ] 2nd build should succeed.
-- [ ] Version should auto-increment
+- [ ] And auto-creates `BuildNum.xml`
+- [ ] Subsequent builds should auto-increment
+- [ ] `Output` shows
+      `Successfully created package .. JJ.AutoIncrementVersion.Test.4.2.1.nupkg` 
+      where `.1.nupkg` increments each time you .
 
-### Other Steps
+### Uninstall
 
 - [ ] Uninstall package
 - [ ] .xml and .Build.props should remain
 - [ ] Build should succeed
 - [ ] Ver should stay frozen
+
+### Reinstall
+
 - [ ] Reinstall package
 - [ ] Build should succeed, with incremented ver.
+
+### Auto-Create
+
 - [ ] Delete `Directory.Build.props`
 - [ ] Build
 - [ ] Should so generic error
@@ -73,8 +87,16 @@ Manual Test Plan
 - [ ] Build
 - [ ] `BuildNum.xml` should be recreated
 - [ ] Versions will start at BuildNum 0 or 1 again.
+
+### Edit BuildNum
+
 - [ ] Rerstore original `BuildNum.xml`
 - [ ] Versions should continue to increment where it left off.
+
+### Conditional Inclusion
+
+- [ ] Test compiling for `Release` (increments `BuildNum`) or `Debug` (uses `BuildNum` `0`) which tests conditional `BuildNum.xml` inclusion from the `Directory.Build.props`.
+
+### Upgrade Regression
+
 - [ ] Test what happens if `BuildNumWasFromXmljj` is removed from `BuildNum.xml` (simulating upgrade path)
-- [ ] Test compiling for `Release` (increments `BuildNum`) or `Debug` (uses `BuildNum` `0`)
-      which tests conditional `BuildNum.xml` inclusion from the `Directory.Build.props`.
