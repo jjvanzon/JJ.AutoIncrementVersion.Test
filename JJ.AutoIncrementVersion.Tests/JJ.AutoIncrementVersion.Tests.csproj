@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <TargetFrameworks>net10.0;net9.0;net8.0;net7.0;net6.0;net5.0;net461</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Version>4.2.$(BuildNum)</Version>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+  </PropertyGroup>
+    
+  <ItemGroup>
+    <None Remove="Dummy.txt" />
+  </ItemGroup>
+    
+  <ItemGroup>
+    <Content Include="Dummy.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+    
+  <ItemGroup>
+    <PackageReference Include="JJ.AutoIncrementVersion" Version="3.6.4597" />
+  </ItemGroup>
+
+</Project>
