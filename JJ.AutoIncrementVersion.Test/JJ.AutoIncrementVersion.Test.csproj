@@ -25,7 +25,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
+    
   <ItemGroup>
     <PackageReference Include="JJ.AutoIncrementVersion" Version="4.2.5745" />
   </ItemGroup>
