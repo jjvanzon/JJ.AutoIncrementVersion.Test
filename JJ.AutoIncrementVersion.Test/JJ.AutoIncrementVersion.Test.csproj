@@ -20,7 +20,7 @@
   </ItemGroup>
     
   <ItemGroup>
-    <PackageReference Include="JJ.AutoIncrementVersion" Version="3.6.4597" />
+    <PackageReference Include="JJ.AutoIncrementVersion" Version="4.2.5744" />
   </ItemGroup>
 
 </Project>

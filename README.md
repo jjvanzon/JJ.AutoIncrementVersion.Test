@@ -70,36 +70,42 @@ Manual Test Plan
       `Successfully created package .. JJ.AutoIncrementVersion.Test.4.2.1.nupkg`  
       `Successfully created package .. JJ.AutoIncrementVersion.Test.4.2.2.nupkg` etc.
 
-### Uninstall
+### [x] Uninstall
 
-- [ ] Uninstall package
-- [ ] .xml and .Build.props should remain
-- [ ] Build should succeed
-- [ ] Ver should stay frozen
+- [x] Uninstall package
+- [x] .xml and .Build.props should remain
+- [x] Build should succeed
+- [x] Ver should stay frozen
 
-### Reinstall
+### [x] Reinstall
 
-- [ ] Reinstall package
-- [ ] Build should succeed, with incremented ver.
+- [x] Reinstall package
+- [x] Build should succeed, incrementing ver each time.
 
-### Auto-Create
+### [x] Recreate
 
-- [ ] Delete `Directory.Build.props`
-- [ ] Build
-- [ ] Should so generic error
-- [ ] Build again
-- [ ] `Directory.Build.props` should be recreated
-- [ ] Delete `BuildNum.xml`
-- [ ] Build
-- [ ] `BuildNum.xml` should be recreated
-- [ ] Versions will start at BuildNum 0 or 1 again.
+- [x] Delete `Directory.Build.props`
+- [x] Build should fail with error:  
+      `NETSDK1018: Invalid NuGet version string: '4.2.'.`
+- [x] But recreated `Directory.Build.props`
+- [x] Subsequent builds succeed, incrementing ver each time.
+- [x] Delete `BuildNum.xml`
+- [x] Build
+- [x] `BuildNum.xml` should be recreated
+- [x] Versions will start at BuildNum 0 or 1 again.
+- [x] Deleting both shows similar effect.
 
-### Edit BuildNum
+### [x] Edit
 
-- [ ] Rerstore original `BuildNum.xml`
-- [ ] Versions should continue to increment where it left off.
+- [x] Rerstore original `BuildNum.xml`
+- [x] Build
+- [x] Versions should continue to increment where it left off.
+- [x] Edit BuildNum.xml, setting the BuildNum value manually.
+- [x] Build
+- [x] Versions start counting at new BuildNum
+- [x] And they increment each build.
 
-### Conditional Inclusion
+### Conditions
 
 - [ ] Test compiling for `Release` (increments `BuildNum`) or `Debug` (uses `BuildNum` `0`) which tests conditional `BuildNum.xml` inclusion from the `Directory.Build.props`.
 
