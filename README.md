@@ -10,21 +10,22 @@ Things might be configured so that when you compile for `Debug` you get `BuildNu
 You can mess around with the project when you test, and then just undo the changes with git and be all clean again.
 
 - [Manual Test Plan](#manual-test-plan)
-      - [Initial State](#initial-state)
-      - [Run Without](#run-without)
-      - [Install](#install)
-      - [First Use](#first-use)
-      - [Uninstall](#uninstall)
-      - [Reinstall](#reinstall)
-      - [Auto-Create](#auto-create)
-      - [Edit BuildNum](#edit-buildnum)
-      - [Conditional Inclusion](#conditional-inclusion)
-      - [Upgrade Regression](#upgrade-regression)
+    - [Set Initial State](#set-initial-state)
+    - [Run Without Package](#run-without-package)
+    - [Install](#install)
+    - [First Use](#first-use)
+    - [Uninstall](#uninstall)
+    - [Reinstall](#reinstall)
+    - [Auto-Recreates Files](#auto-recreates-files)
+    - [Manual Edit](#manual-edit)
+    - [Conditionals](#conditionals)
+    - [Command Line Build](#command-line-build)
+    - [Upgrade Regression](#upgrade-regression)
 
 Manual Test Plan
 ----------------
 
-### [x] Initial State
+### Set Initial State
 
 - [x] Uninstall existing `JJ.AutoIncrementVersion` package.
 - [x] Go to File Explorer, not Solution Explorer.
@@ -34,14 +35,14 @@ Manual Test Plan
 - [x] Open `JJ.AutoIncrementVersion.Test.csproj`
 - [x] Replace `$(BuildNum)` with `0`
 
-### [x] Run Without
+### Run Without Package
 
 - [x] Rebuild solution.
 - [x] `Output` shows
       `Successfully created package .. JJ.AutoIncrementVersion.Test.4.2.0.nupkg` 
       ending with `.0.nupkg`
 
-### [x] Install
+### Install
 
 - [x] Install `JJ.AutoIncrementVersion` package.
 - [x] Rebuild solution
@@ -52,7 +53,7 @@ Manual Test Plan
 - [x] Auto-creates `Directory.Build.props` with content:  
       `<Project><PropertyGroup><BuildNum>0</BuildNum></PropertyGroup><Import Project="BuildNum.xml" Condition="Exists('BuildNum.xml')" /></Project>`
 
-### [x] First Use
+### First Use
 
 - [x] Prepare [Initial State](#initial-state) again
 - [x] Install `JJ.AutoIncrementVersion` package.
@@ -70,19 +71,19 @@ Manual Test Plan
       `Successfully created package .. JJ.AutoIncrementVersion.Test.4.2.1.nupkg`  
       `Successfully created package .. JJ.AutoIncrementVersion.Test.4.2.2.nupkg` etc.
 
-### [x] Uninstall
+### Uninstall
 
 - [x] Uninstall package
 - [x] .xml and .Build.props should remain
 - [x] Build should succeed
 - [x] Ver should stay frozen
 
-### [x] Reinstall
+### Reinstall
 
 - [x] Reinstall package
 - [x] Build should succeed, incrementing ver each time.
 
-### [x] Recreate
+### Auto-Recreates Files
 
 - [x] Delete `Directory.Build.props`
 - [x] Build should fail with error:  
@@ -95,7 +96,7 @@ Manual Test Plan
 - [x] Versions will start at BuildNum 0 or 1 again.
 - [x] Deleting both shows similar effect.
 
-### [x] Edit
+### Manual Edit
 
 - [x] Rerstore original `BuildNum.xml`
 - [x] Build
@@ -105,7 +106,7 @@ Manual Test Plan
 - [x] Versions start counting at new BuildNum
 - [x] And they increment each build.
 
-### [x] Conditions
+### Conditionals
 
 This tests conditional `BuildNum.xml` inclusion from the `Directory.Build.props`.
 
@@ -124,15 +125,14 @@ This tests conditional `BuildNum.xml` inclusion from the `Directory.Build.props`
 - [x] Test compiling for `Release` increments `BuildNum`.
 - [x] Test compiling for `Debug` uses `BuildNum` `0`.
 
-### [x] Upgrade Regression
-
-- [x] Test what happens if `BuildNumWasFromXmljj` is removed from `BuildNum.xml` (simulating upgrade path)
-- [x] Restores `BuildNumWasFromXmljj`
-- [x] Continues to increment build numbers.
-
-### [x] Build Command Line
+### Command Line Build
 
 - [x] Adding `/p:BuildNum=9999` to `dotnet build` outputs package with version ending with `9999`.
 - [x] It saved `9999 + 1 = 10000` back to `BuildNum.xml`.
 - [x] This is ok for now, but it might not need to save that back in the future in this case.
 
+### Upgrade Regression
+
+- [x] Test what happens if `BuildNumWasFromXmljj` is removed from `BuildNum.xml` (simulating upgrade path)
+- [x] Restores `BuildNumWasFromXmljj`
+- [x] Continues to increment build numbers.
