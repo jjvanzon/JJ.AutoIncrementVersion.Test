@@ -7,6 +7,7 @@
     <Nullable>enable</Nullable>
     <Version>4.2.$(BuildNum)</Version>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
     
   <ItemGroup>
@@ -17,10 +18,16 @@
     <Content Include="Dummy.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+
+    <Content Include="$(SolutionDir)\README.md" Visible="False">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
-    
+
   <ItemGroup>
-    <PackageReference Include="JJ.AutoIncrementVersion" Version="4.2.5744" />
+    <PackageReference Include="JJ.AutoIncrementVersion" Version="4.2.5745" />
   </ItemGroup>
 
 </Project>
