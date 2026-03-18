@@ -130,7 +130,9 @@ This tests conditional `BuildNum.xml` inclusion from the `Directory.Build.props`
 - [x] Restores `BuildNumWasFromXmljj`
 - [x] Continues to increment build numbers.
 
-### [ ] Build Command Line
+### [x] Build Command Line
 
-
+- [x] Adding `/p:BuildNum=9999` to `dotnet build` outputs package with version ending with `9999`.
+- [x] It saved `9999 + 1 = 10000` back to `BuildNum.xml`.
+- [x] This is ok for now, but it might not need to save that back in the future in this case.
 
