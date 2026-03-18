@@ -16,12 +16,13 @@ You can mess around with the project when you test, and then just undo the chang
     - [First Use](#first-use)
     - [Uninstall](#uninstall)
     - [Reinstall](#reinstall)
-    - [Auto-Recreates Files](#auto-recreates-files)
+    - [Auto-Recreate Files](#auto-recreate-files)
     - [Manual Edit](#manual-edit)
     - [Conditionals](#conditionals)
     - [Command Line Build](#command-line-build)
     - [Upgrade Regression](#upgrade-regression)
     - [CI Integration](#ci-integration)
+    - [Real-Life Test](#real-life-test)
 
 Manual Test Plan
 ----------------
@@ -29,7 +30,7 @@ Manual Test Plan
 ### Set Initial State
 
 - [x] Uninstall existing `JJ.AutoIncrementVersion` package.
-- [x] Go to File Explorer, not Solution Explorer.
+- [x] Go to File Explorer (not Solution Explorer).
 - [x] Go to the repository folder 
       (`D:\Repositories\JJ.AutoIncrementVersion.Test`)
 - [x] Delete `BuildNum.xml` and `Directory.Build.props`
@@ -63,10 +64,10 @@ Manual Test Plan
 - [x] 1st rebuild should fail:
       `Invalid NuGet version string: '4.2.'`
 - [x] 2nd build succeeds.
-- [x] Auto-creates `Directory.Build.props` with content:  
-      `<Project><PropertyGroup><BuildNum>0</BuildNum></PropertyGroup><Import Project="BuildNum.xml" Condition="Exists('BuildNum.xml')" /></Project>`
 - [x] Auto-creates `BuildNum.xml` with content:  
       `<Project><PropertyGroup><BuildNum>1</BuildNum><DisableFastUpToDateCheck>True</DisableFastUpToDateCheck><BuildNumWasFromXmljj>True</BuildNumWasFromXmljj></PropertyGroup></Project>`
+- [x] Auto-creates `Directory.Build.props` with content:  
+      `<Project><PropertyGroup><BuildNum>0</BuildNum></PropertyGroup><Import Project="BuildNum.xml" Condition="Exists('BuildNum.xml')" /></Project>`
 - [x] `Output` shows `Successfully created package .. JJ.AutoIncrementVersion.Test.4.2.0.nupkg` 
 - [x] Subsequent builds should auto-increment with output showing:  
       `Successfully created package .. JJ.AutoIncrementVersion.Test.4.2.1.nupkg`  
@@ -84,7 +85,7 @@ Manual Test Plan
 - [x] Reinstall package
 - [x] Build should succeed, incrementing ver each time.
 
-### Auto-Recreates Files
+### Auto-Recreate Files
 
 - [x] Delete `Directory.Build.props`
 - [x] Build should fail with error:  
@@ -130,7 +131,7 @@ This tests conditional `BuildNum.xml` inclusion from the `Directory.Build.props`
 
 - [x] Adding `/p:BuildNum=9999` to `dotnet build` outputs package with version ending with `9999`.
 - [x] It saved `9999 + 1 = 10000` back to `BuildNum.xml`.
-- [x] This is ok for now, but it might not need to save that back in the future in this case.
+- [x] ~ This is ok for now, but it might not need to save that back in the future in this case.
 
 ### Upgrade Regression
 
@@ -141,7 +142,11 @@ This tests conditional `BuildNum.xml` inclusion from the `Directory.Build.props`
 ### CI Integration
 
 - [ ] Build project(s) (preferably in parallel) in CI
-- [ ] See what the version numbersd do.
-- [ ] Currently it may flip between current and next BuildNum arbitrarily.
-- [ ] It's worse in parallel build.
-- [ ] Should fix in the future.
+- [ ] See what the version numbers do.
+- [ ] ~ Currently it may flip between current and next BuildNum arbitrarily.
+- [ ] ~ It's worse in parallel build.
+- [ ] ~ Should fix in the future.
+
+### Real-Life Test
+
+- [x] Check if it functions in real-life projects before publishing to NuGet.
