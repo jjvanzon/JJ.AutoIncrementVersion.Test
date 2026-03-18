@@ -109,7 +109,7 @@ Manual Test Plan
 
 This tests conditional `BuildNum.xml` inclusion from the `Directory.Build.props`.
 
-- [x] Open Director.Build.props.
+- [x] Open `Director.Build.props`.
 - [x] Find the `Condition` attribute on the `Import` element.
 - [x] Extend it with ` And $(Configuration)=='Release'`
 - [x] Example `Directory.Build.props` content:  
@@ -121,9 +121,16 @@ This tests conditional `BuildNum.xml` inclusion from the `Directory.Build.props`
                         And $(Configuration)=='Release'" />
      </Project>
      ```
-- [ ] Test compiling for `Release` (increments `BuildNum`).
-- [ ] Test compiling for `Debug` (uses `BuildNum` `0`).
+- [x] Test compiling for `Release` increments `BuildNum`.
+- [x] Test compiling for `Debug` uses `BuildNum` `0`.
 
-### Upgrade Regression
+### [x] Upgrade Regression
 
-- [ ] Test what happens if `BuildNumWasFromXmljj` is removed from `BuildNum.xml` (simulating upgrade path)
+- [x] Test what happens if `BuildNumWasFromXmljj` is removed from `BuildNum.xml` (simulating upgrade path)
+- [x] Restores `BuildNumWasFromXmljj`
+- [x] Continues to increment build numbers.
+
+### [ ] Build Command Line
+
+
+
