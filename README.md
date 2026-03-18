@@ -105,9 +105,24 @@ Manual Test Plan
 - [x] Versions start counting at new BuildNum
 - [x] And they increment each build.
 
-### Conditions
+### [x] Conditions
 
-- [ ] Test compiling for `Release` (increments `BuildNum`) or `Debug` (uses `BuildNum` `0`) which tests conditional `BuildNum.xml` inclusion from the `Directory.Build.props`.
+This tests conditional `BuildNum.xml` inclusion from the `Directory.Build.props`.
+
+- [x] Open Director.Build.props.
+- [x] Find the `Condition` attribute on the `Import` element.
+- [x] Extend it with ` And $(Configuration)=='Release'`
+- [x] Example `Directory.Build.props` content:  
+     ```xml
+     <Project>
+     <PropertyGroup><BuildNum>0</BuildNum></PropertyGroup>
+     <Import Project="BuildNum.xml" 
+             Condition="Exists('BuildNum.xml') 
+                        And $(Configuration)=='Release'" />
+     </Project>
+     ```
+- [ ] Test compiling for `Release` (increments `BuildNum`).
+- [ ] Test compiling for `Debug` (uses `BuildNum` `0`).
 
 ### Upgrade Regression
 

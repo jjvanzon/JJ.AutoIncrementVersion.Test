@@ -1,4 +1,6 @@
 <Project>
   <PropertyGroup><BuildNum>0</BuildNum></PropertyGroup>
-  <Import Project="BuildNum.xml" Condition="Exists('BuildNum.xml') And $(Configuration)=='Release'" />
+  <Import Project="BuildNum.xml" 
+          Condition="Exists('BuildNum.xml') 
+                     And $(Configuration)=='Release'" />
 </Project>
