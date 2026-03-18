@@ -14,12 +14,17 @@ You can mess around with the project when you test, and then just undo the chang
       - [Run Without](#run-without)
       - [Install](#install)
       - [First Use](#first-use)
-      - [Other Steps](#other-steps)
+      - [Uninstall](#uninstall)
+      - [Reinstall](#reinstall)
+      - [Auto-Create](#auto-create)
+      - [Edit BuildNum](#edit-buildnum)
+      - [Conditional Inclusion](#conditional-inclusion)
+      - [Upgrade Regression](#upgrade-regression)
 
 Manual Test Plan
 ----------------
 
-### Initial State
+### [x] Initial State
 
 - [x] Uninstall existing `JJ.AutoIncrementVersion` package.
 - [x] Go to File Explorer, not Solution Explorer.
@@ -29,40 +34,41 @@ Manual Test Plan
 - [x] Open `JJ.AutoIncrementVersion.Test.csproj`
 - [x] Replace `$(BuildNum)` with `0`
 
-### Run Without
+### [x] Run Without
 
 - [x] Rebuild solution.
 - [x] `Output` shows
       `Successfully created package .. JJ.AutoIncrementVersion.Test.4.2.0.nupkg` 
       ending with `.0.nupkg`
 
-### Install
+### [x] Install
 
 - [x] Install `JJ.AutoIncrementVersion` package.
 - [x] Rebuild solution
 - [x] `Output` shows `JJ.AutoIncrementVersion.Test.4.2.0.nupkg`
       at least ends with `.0.nupkg`
-- [x] Auto-creates `BuildNum.xml` content:  
+- [x] Auto-creates `BuildNum.xml` with content:  
       `<Project><PropertyGroup><BuildNum>1</BuildNum><DisableFastUpToDateCheck>True</DisableFastUpToDateCheck><BuildNumWasFromXmljj>True</BuildNumWasFromXmljj></PropertyGroup></Project>`
-- [x] Auto-creates `Directory.Build.props` content:  
+- [x] Auto-creates `Directory.Build.props` with content:  
       `<Project><PropertyGroup><BuildNum>0</BuildNum></PropertyGroup><Import Project="BuildNum.xml" Condition="Exists('BuildNum.xml')" /></Project>`
 
-### First Use
+### [x] First Use
 
-- [ ] Prepare [Initial State](#initial-state) again
-- [ ] Install `JJ.AutoIncrementVersion` package.
-- [ ] Open `JJ.AutoIncrementVersion.Test.csproj`
-- [ ] Use `$(BuildNum)` in `<Version>`.
-- [ ] 1st rebuild should fail:
+- [x] Prepare [Initial State](#initial-state) again
+- [x] Install `JJ.AutoIncrementVersion` package.
+- [x] Open `JJ.AutoIncrementVersion.Test.csproj`
+- [x] Use `$(BuildNum)` in `<Version>` e.g. `<Version>4.2.$(BuildNum)</Version>`
+- [x] 1st rebuild should fail:
       `Invalid NuGet version string: '4.2.'`
-- [ ] But auto-creates `Directory.Build.props` content:
+- [x] But auto-creates `Directory.Build.props` with content:  
       `<Project><PropertyGroup><BuildNum>0</BuildNum></PropertyGroup><Import Project="BuildNum.xml" Condition="Exists('BuildNum.xml')" /></Project>`
-- [ ] 2nd build should succeed.
-- [ ] And auto-creates `BuildNum.xml`
-- [ ] Subsequent builds should auto-increment
-- [ ] `Output` shows
-      `Successfully created package .. JJ.AutoIncrementVersion.Test.4.2.1.nupkg` 
-      where `.1.nupkg` increments each time you .
+- [x] 2nd build succeeds.
+- [x] And auto-creates `BuildNum.xml` with content:  
+      `<Project><PropertyGroup><BuildNum>1</BuildNum><DisableFastUpToDateCheck>True</DisableFastUpToDateCheck><BuildNumWasFromXmljj>True</BuildNumWasFromXmljj></PropertyGroup></Project>`
+- [x] `Output` shows `Successfully created package .. JJ.AutoIncrementVersion.Test.4.2.0.nupkg` 
+- [x] Subsequent builds should auto-increment with output showing:  
+      `Successfully created package .. JJ.AutoIncrementVersion.Test.4.2.1.nupkg`  
+      `Successfully created package .. JJ.AutoIncrementVersion.Test.4.2.2.nupkg` etc.
 
 ### Uninstall
 
