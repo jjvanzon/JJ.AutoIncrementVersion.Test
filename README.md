@@ -41,14 +41,14 @@ Manual Test Plan
 
 - [ ] Rebuild solution.
 - [ ] `Output` shows
-      `Successfully created package {...} JJ.AutoIncrementVersion.Test.4.2.0.nupkg` 
+      `Successfully created package {...} JJ.AutoIncrementVersion.Test.4.3.0.nupkg` 
       ending with `.0.nupkg`
 
 ### Install
 
 - [ ] Install `JJ.AutoIncrementVersion` package.
 - [ ] Rebuild solution
-- [ ] `Output` shows `JJ.AutoIncrementVersion.Test.4.2.0.nupkg`
+- [ ] `Output` shows `JJ.AutoIncrementVersion.Test.4.3.0.nupkg`
       at least ends with `.0.nupkg`
 - [ ] Auto-creates `BuildNum.xml` with content:  
       `<Project><PropertyGroup><BuildNum>1</BuildNum><DisableFastUpToDateCheck>True</DisableFastUpToDateCheck><BuildNumWasFromXmljj>True</BuildNumWasFromXmljj></PropertyGroup></Project>`
@@ -60,18 +60,18 @@ Manual Test Plan
 - [ ] Prepare [Initial State](#set-initial-state) again
 - [ ] Install `JJ.AutoIncrementVersion` package.
 - [ ] Open `JJ.AutoIncrementVersion.Test.csproj`
-- [ ] Use `$(BuildNum)` in `<Version>` e.g. `<Version>4.2.$(BuildNum)</Version>`
+- [ ] Use `$(BuildNum)` in `<Version>` e.g. `<Version>4.3.$(BuildNum)</Version>`
 - [ ] 1st rebuild should fail:
-      `Invalid NuGet version string: '4.2.'`
+      `Invalid NuGet version string: '4.3.'`
 - [ ] 2nd build succeeds.
 - [ ] Auto-creates `BuildNum.xml` with content:  
       `<Project><PropertyGroup><BuildNum>1</BuildNum><DisableFastUpToDateCheck>True</DisableFastUpToDateCheck><BuildNumWasFromXmljj>True</BuildNumWasFromXmljj></PropertyGroup></Project>`
 - [ ] Auto-creates `Directory.Build.props` with content:  
       `<Project><PropertyGroup><BuildNum>0</BuildNum></PropertyGroup><Import Project="BuildNum.xml" Condition="Exists('BuildNum.xml')" /></Project>`
-- [ ] `Output` shows `Successfully created package .. JJ.AutoIncrementVersion.Test.4.2.0.nupkg` 
+- [ ] `Output` shows `Successfully created package .. JJ.AutoIncrementVersion.Test.4.3.0.nupkg` 
 - [ ] Subsequent builds should auto-increment with output showing:  
-      `Successfully created package .. JJ.AutoIncrementVersion.Test.4.2.1.nupkg`  
-      `Successfully created package .. JJ.AutoIncrementVersion.Test.4.2.2.nupkg` etc.
+      `Successfully created package .. JJ.AutoIncrementVersion.Test.4.3.1.nupkg`  
+      `Successfully created package .. JJ.AutoIncrementVersion.Test.4.3.2.nupkg` etc.
 
 ### Uninstall
 
@@ -89,7 +89,7 @@ Manual Test Plan
 
 - [ ] Delete `Directory.Build.props`
 - [ ] Build should fail with error:  
-      `NETSDK1018: Invalid NuGet version string: '4.2.'.`
+      `NETSDK1018: Invalid NuGet version string: '4.3.'.`
 - [ ] But recreated `Directory.Build.props`
 - [ ] Subsequent builds succeed, incrementing ver each time.
 - [ ] Delete `BuildNum.xml`
