@@ -87,9 +87,9 @@ All TODOs by File
 Grouped by Theme
 ----------------
 
-### 1. Broken: `$(SolutionDir)` / README.md not found
+### ~~1. Broken: `$(SolutionDir)` / README.md not found~~
 
-Builds fail when running `.csproj` standalone because `$(SolutionDir)` isn't set.
+- [x] Builds fail when running `.csproj` standalone because `$(SolutionDir)` isn't set.
 *(TestHelper.cs line 154)*
 
 ### 2. Broken: `UninstallPackage` errors out
