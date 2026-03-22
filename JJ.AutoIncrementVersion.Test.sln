@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JJ.AutoIncrementVersion.Test", "JJ.AutoIncrementVersion.Test\JJ.AutoIncrementVersion.Test.csproj", "{42C4FE8D-E848-6FCA-D083-3D3856E51B48}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JJ.AutoIncrementVersion.TestSuite", "JJ.AutoIncrementVersion.TestSuite\JJ.AutoIncrementVersion.TestSuite.csproj", "{43D62504-2448-7C08-FD08-1C064385ED90}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{42C4FE8D-E848-6FCA-D083-3D3856E51B48}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42C4FE8D-E848-6FCA-D083-3D3856E51B48}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{42C4FE8D-E848-6FCA-D083-3D3856E51B48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43D62504-2448-7C08-FD08-1C064385ED90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43D62504-2448-7C08-FD08-1C064385ED90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43D62504-2448-7C08-FD08-1C064385ED90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43D62504-2448-7C08-FD08-1C064385ED90}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
