@@ -8,7 +8,7 @@ public class ConditionalsTests
     private TestHelper _h = null!;
 
     [TestInitialize]
-    public void Init() => _h = new TestHelper(TestContext);
+    public void Init() => _h = new TestHelper(TestContext); // TODO: Init and CleanUp may as well be put in the test code iteself.
 
     [TestCleanup]
     public void Cleanup() => _h.Cleanup();
@@ -34,12 +34,13 @@ public class ConditionalsTests
     {
         // ── Restore committed state (which already has the conditional) ──
         _h.LogStep("Restore committed state");
-        _h.GitRestoreAll();
+        _h.GitRestoreAll(); // Git reset mid-test is a no. Either set up initial state explicitly, or follow a sequential plan to get to that state in the formerly manual test. By the way: tests can't run in parallel which they are assumed to be able to, so they have to be forced to be sequential.
 
         // ── Verify Directory.Build.props has the conditional ──
         _h.LogStep("Verify Directory.Build.props has Release condition");
         string propsContent = _h.ReadDirectoryBuildProps();
         _h.LogResult($"Directory.Build.props: {propsContent.Trim()}");
+        // Assert can fail because the Release condition is not guaranteed as an initial state.
         Assert.IsTrue(
             propsContent.Contains("$(Configuration)=='Release'", StringComparison.OrdinalIgnoreCase),
             "Directory.Build.props should have the Release condition.");

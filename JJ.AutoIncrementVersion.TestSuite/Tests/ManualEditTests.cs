@@ -8,7 +8,7 @@ public class ManualEditTests
     private TestHelper _h = null!;
 
     [TestInitialize]
-    public void Init() => _h = new TestHelper(TestContext);
+    public void Init() => _h = new TestHelper(TestContext); // TODO: Init and CleanUp may as well be put in the test code iteself.
 
     [TestCleanup]
     public void Cleanup() => _h.Cleanup();
@@ -30,7 +30,7 @@ public class ManualEditTests
     {
         // ── Restore original state ──
         _h.LogStep("Restore original BuildNum.xml via git");
-        _h.GitRestoreAll();
+        _h.GitRestoreAll(); // Doing a git restore of our work mid-test automatically is a big no no.
 
         int originalBuildNum = _h.GetBuildNumFromXml();
         _h.LogResult($"Original BuildNum from XML: {originalBuildNum}");
@@ -38,8 +38,9 @@ public class ManualEditTests
         // ── Build – should increment from the restored value ──
         _h.LogStep("Build – should use restored BuildNum");
         var build1 = _h.Build();
+        // TODO: Assertion not clear (build1.Error doesn't contain error. It's embedded in build1.Output).
         Assert.AreEqual(0, build1.ExitCode, $"Build failed.\n{build1.Error}");
-
+        
         int? nupkgNum1 = _h.ExtractBuildNumFromNupkg(build1.Output);
         _h.LogResult($"Build 1 nupkg num: {nupkgNum1}");
 

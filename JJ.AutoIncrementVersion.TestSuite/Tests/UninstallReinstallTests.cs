@@ -8,7 +8,7 @@ public class UninstallReinstallTests
     private TestHelper _h = null!;
 
     [TestInitialize]
-    public void Init() => _h = new TestHelper(TestContext);
+    public void Init() => _h = new TestHelper(TestContext); // TODO: Init and CleanUp may as well be put in the test code iteself.
 
     [TestCleanup]
     public void Cleanup() => _h.Cleanup();
@@ -30,7 +30,7 @@ public class UninstallReinstallTests
     {
         // ── Establish working state ──
         _h.LogStep("Establish working state with package installed");
-        _h.GitRestoreAll();
+        //_h.GitRestoreAll(); // Do not do this. It's undoes our edits. Ensure state explicitly.
         // The committed state already has the package and $(BuildNum) in version.
         // Do a build to ensure BuildNum.xml/props exist.
         _h.Build();
@@ -40,7 +40,7 @@ public class UninstallReinstallTests
 
         // ── Uninstall ──
         _h.LogStep("Uninstall package");
-        _h.UninstallPackage();
+        _h.UninstallPackage(); // TODO: Failure is ignored, which is not good.
         _h.LogResult($"Package uninstalled. Has reference: {_h.CsprojHasPackageReference()}");
 
         // ── Verify files remain ──
@@ -68,6 +68,7 @@ public class UninstallReinstallTests
         _h.LogResult("PASS – Uninstall: files remain, build succeeds, version frozen");
     }
 
+    // TODO: One test has one step. This test has 2. Split. But also: all tests use same dependency, so can't run in parallel. Enforce that.
     /// <summary>
     /// Manual Test Plan → "Reinstall"
     ///
@@ -81,10 +82,10 @@ public class UninstallReinstallTests
         // ── Establish working state, uninstall, then reinstall ──
         _h.LogStep("Start from committed state and build once");
         _h.GitRestoreAll();
-        _h.Build();
+        _h.Build(); // TODO: Swallowed error.
 
         _h.LogStep("Uninstall package");
-        _h.UninstallPackage();
+        _h.UninstallPackage(); // TODO: Failure is ignored.
 
         _h.LogStep("Reinstall package");
         _h.InstallPackage();

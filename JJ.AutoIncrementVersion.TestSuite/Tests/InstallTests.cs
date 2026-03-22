@@ -8,7 +8,7 @@ public class InstallTests
     private TestHelper _h = null!;
 
     [TestInitialize]
-    public void Init() => _h = new TestHelper(TestContext);
+    public void Init() => _h = new TestHelper(TestContext); // TODO: Init and CleanUp may as well be put in the test code iteself.
 
     [TestCleanup]
     public void Cleanup() => _h.Cleanup();
@@ -42,6 +42,8 @@ public class InstallTests
 
         string? nupkg = _h.ExtractNupkgName(buildResult.Output);
         _h.LogResult($"Nupkg: {nupkg ?? "(none)"}");
+
+        // TODO: Use AssertCore (global using static) from JJ.Framework.Testing.Core (from JJs-Dev-Package-Feed)
 
         Assert.AreEqual(0, buildResult.ExitCode, $"Build failed.\n{buildResult.Error}");
         Assert.IsTrue(

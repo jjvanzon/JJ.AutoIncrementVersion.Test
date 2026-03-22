@@ -8,7 +8,7 @@ public class AutoRecreateFilesTests
     private TestHelper _h = null!;
 
     [TestInitialize]
-    public void Init() => _h = new TestHelper(TestContext);
+    public void Init() => _h = new TestHelper(TestContext); // TODO: Init and CleanUp may as well be put in the test code iteself.
 
     [TestCleanup]
     public void Cleanup() => _h.Cleanup();
@@ -37,7 +37,7 @@ public class AutoRecreateFilesTests
         _h.DeleteDirectoryBuildProps();
         Assert.IsFalse(_h.DirectoryBuildPropsExists());
 
-        // ── Build should fail ──
+        // ── Build should fail ── // TODO: Assertion code could be made reusable.
         _h.LogStep("Build – expect failure (NETSDK1018 / Invalid NuGet version)");
         var failBuild = _h.Build();
         _h.LogResult($"Exit code: {failBuild.ExitCode}");
@@ -65,13 +65,16 @@ public class AutoRecreateFilesTests
         // ── Subsequent builds succeed and increment ──
         _h.LogStep("Subsequent builds – succeed and increment");
         int? prev = null;
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++) // TODO: I like the retry loop and that it checks for increments.
         {
             var r = _h.Build();
+            // TODO: ExitCode can indicate error, withotu Error text being filled in (error shows up in r.Output instead).
             Assert.AreEqual(0, r.ExitCode, $"Build {i + 1} failed.\n{r.Error}");
 
             int? cur = _h.ExtractBuildNumFromNupkg(r.Output);
             _h.LogResult($"Build {i + 1}: nupkg={_h.ExtractNupkgName(r.Output)} BuildNum={cur}");
+
+            // WOuld be nice if it checked for increments by exactly 1.
 
             if (prev is not null && cur is not null)
                 Assert.IsTrue(cur > prev, $"Expected increment: prev={prev}, cur={cur}");
@@ -96,7 +99,7 @@ public class AutoRecreateFilesTests
         // ── Start from working state ──
         _h.LogStep("Establish working state");
         _h.GitRestoreAll();
-        _h.Build();
+        _h.Build(); // TODO: Working state was not checked, because error is swallowed.
 
         // ── Delete BuildNum.xml ──
         _h.LogStep("Delete BuildNum.xml");
@@ -127,11 +130,13 @@ public class AutoRecreateFilesTests
     {
         _h.LogStep("Establish working state");
         _h.GitRestoreAll();
-        _h.Build();
+        _h.Build(); // TODO: Working state was not checked, because error is swallowed.
 
         _h.LogStep("Delete both BuildNum.xml and Directory.Build.props");
         _h.DeleteBuildNumXml();
         _h.DeleteDirectoryBuildProps();
+
+        // TODO: Build success should be asserted.
 
         _h.LogStep("Build – may fail first time");
         var first = _h.Build();

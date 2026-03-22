@@ -8,7 +8,7 @@ public class CommandLineAndUpgradeTests
     private TestHelper _h = null!;
 
     [TestInitialize]
-    public void Init() => _h = new TestHelper(TestContext);
+    public void Init() => _h = new TestHelper(TestContext); // TODO: Init and CleanUp may as well be put in the test code iteself.
 
     [TestCleanup]
     public void Cleanup() => _h.Cleanup();
@@ -63,13 +63,15 @@ public class CommandLineAndUpgradeTests
     public void UpgradeRegression_RestoresBuildNumWasFromXmljjAndIncrements()
     {
         _h.LogStep("Restore committed state and build once");
-        _h.GitRestoreAll();
+        _h.GitRestoreAll(); // Ensure initial state otherwise.
         _h.Build();
 
         // ── Remove BuildNumWasFromXmljj ──
         _h.LogStep("Remove BuildNumWasFromXmljj from BuildNum.xml");
         string xml = _h.ReadBuildNumXml();
         _h.LogResult($"Before: {xml.Trim()}");
+
+        // TODO: Assert it was in there before.
 
         string modified = xml.Replace(
             "<BuildNumWasFromXmljj>True</BuildNumWasFromXmljj>", "");
@@ -82,6 +84,7 @@ public class CommandLineAndUpgradeTests
         // ── Build ──
         _h.LogStep("Build – should restore BuildNumWasFromXmljj");
         var build1 = _h.Build();
+        // TODO: Error is not in build1.Error It's embedded in build1.Output.
         Assert.AreEqual(0, build1.ExitCode, $"Build failed.\n{build1.Error}");
 
         _h.LogStep("Verify BuildNumWasFromXmljj was restored");

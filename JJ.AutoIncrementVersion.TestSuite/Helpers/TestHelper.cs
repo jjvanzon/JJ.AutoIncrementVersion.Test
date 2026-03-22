@@ -18,9 +18,11 @@ public sealed class TestHelper
     public string BuildNumXmlPath { get; }
     public string DirectoryBuildPropsPath { get; }
 
+    // TODO: Only used for logging. Might Debug and Console be enough? Saves us a dependency/init/cleanup/property.
     private readonly TestContext _ctx;
 
     private const string PackageId = "JJ.AutoIncrementVersion";
+    // TODO: Fixed version number not good. Latest from Pre-Release-Package-Feed is better. Kinda bad, because if we keep this, we'd assume the tests test the latest, which it never would.
     private const string PackageVersion = "4.2.5746";
     private const string TestProjectName = "JJ.AutoIncrementVersion.Test";
 
@@ -28,6 +30,10 @@ public sealed class TestHelper
     public TestHelper(TestContext ctx)
     {
         _ctx = ctx;
+
+        // TODO: Do once (static)
+        // TODO: sln file isn't even there in an NCrunch context.
+        // TODO: No need to walk up dir tree. We can make assumptions about (relative) locations.
 
         // Walk up from the test assembly's location to find the repo root.
         // The repo root contains Directory.Build.props / BuildNum.xml.
@@ -48,8 +54,10 @@ public sealed class TestHelper
     // ── logging ────────────────────────────────────────────────────────
     public void Log(string message)
     {
+        // TODO: Maybe only one is needed.
         _ctx.WriteLine(message);
         Console.WriteLine(message);
+        Debug.WriteLine(message); // Added for now
     }
 
     public void LogStep(string step) => Log($"── STEP: {step}");
@@ -57,45 +65,48 @@ public sealed class TestHelper
     public void LogWarning(string warning) => Log($"   ⚠ {warning}");
 
     // ── process execution ──────────────────────────────────────────────
-    public record CommandResult(int ExitCode, string Output, string Error);
+    public record CommandResult(int ExitCode, string Output, string Error); // TODO: Maybe rename specifically to "CommandLineResult", because "Command" makes me think of more things than command line.
 
     public CommandResult RunDotnet(string arguments, int timeoutSeconds = 120)
     {
         Log($"   > dotnet {arguments}");
+
+        // TODO: Lots of ceremony could be reused for multiple ProcessStart helpers.
 
         var psi = new ProcessStartInfo
         {
             FileName = "dotnet",
             Arguments = arguments,
             WorkingDirectory = ProjectDir,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
+            RedirectStandardOutput = true, // REVIEWED: Interesting. Didn't know.
+            RedirectStandardError = true, // REVIEWED: Interesting. Didn't know.
             UseShellExecute = false,
-            CreateNoWindow = true
+            CreateNoWindow = true // REVIEWED: Interesting. Didn't know.
         };
 
         using var process = Process.Start(psi)!;
         var stdout = new StringBuilder();
         var stderr = new StringBuilder();
 
-        process.OutputDataReceived += (_, e) => { if (e.Data is not null) stdout.AppendLine(e.Data); };
-        process.ErrorDataReceived += (_, e) => { if (e.Data is not null) stderr.AppendLine(e.Data); };
+        // REVIEWED: Cool. Didn't know before how to capture output. Bit verbose from .NET, but nice that it's possible
+        process.OutputDataReceived += (_, e) => { if (e.Data is not null) stdout.AppendLine(e.Data); }; // TODO: e.Data ?? "" would prevent null pattern check.
+        process.ErrorDataReceived += (_, e) => { if (e.Data is not null) stderr.AppendLine(e.Data); }; // TODO: e.Data ?? "" would prevent null pattern check.
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
 
-        if (!process.WaitForExit(timeoutSeconds * 1000))
+        if (!process.WaitForExit(timeoutSeconds * 1000)) // TODO: Infra-specific 2 min time-out should be central variable and even from config.
         {
             process.Kill(entireProcessTree: true);
             throw new TimeoutException($"dotnet {arguments} timed out after {timeoutSeconds}s");
         }
 
-        // .NET may flush async after WaitForExit(int); call the parameterless overload.
+        // .NET may flush async after WaitForExit(int); call the parameterless overload. // REVIEWED: Cool. Didn't know.
         process.WaitForExit();
 
         var result = new CommandResult(process.ExitCode, stdout.ToString(), stderr.ToString());
-
+        // TODO: Should check exit code here already? Fail fast?
         if (result.Output.Length > 0) Log(result.Output.TrimEnd());
-        if (result.Error.Length > 0) Log($"   [stderr] {result.Error.TrimEnd()}");
+        if (result.Error.Length > 0) Log($"   [stderr] {result.Error.TrimEnd()}"); // TODO: Throw instead to stop test?
         return result;
     }
 
@@ -139,6 +150,8 @@ public sealed class TestHelper
         return result;
     }
 
+    // TODO: Build and Rebuild error out, with error "README.md does not exist", probably because the csproj references $(SolutionDir) does not exist, because wse build a csproj, not the solution. Keep buildingcsproj. $(SolutionDir) reference should change.
+
     // ── build shortcuts ────────────────────────────────────────────────
     public CommandResult Build(string configuration = "Release", string? extraArgs = null)
     {
@@ -154,6 +167,10 @@ public sealed class TestHelper
     public CommandResult InstallPackage()
         => RunDotnet($"add \"{CsprojPath}\" package {PackageId} --version {PackageVersion}");
 
+    // TODO: Command errors out hard. Note sure if it's correct:
+    // > dotnet remove "D:\Repositories\JJ.AutoIncrementVersion.Test\JJ.AutoIncrementVersion.Test\JJ.AutoIncrementVersion.Test.csproj" package JJ.AutoIncrementVersion
+   // [stderr] Found more than one project in `D:\Repositories\JJ.AutoIncrementVersion.Test\JJ.AutoIncrementVersion.Test`. Specify which one to use.
+
     public CommandResult UninstallPackage()
         => RunDotnet($"remove \"{CsprojPath}\" package {PackageId}");
 
@@ -161,13 +178,13 @@ public sealed class TestHelper
     public void DeleteBuildNumXml()
     {
         if (File.Exists(BuildNumXmlPath)) File.Delete(BuildNumXmlPath);
-        Log($"   Deleted BuildNum.xml (exists={File.Exists(BuildNumXmlPath)})");
+        Log($"   Deleted BuildNum.xml (exists={File.Exists(BuildNumXmlPath)})"); // TODO: Logs it's deleted even when it didn't evne exist.
     }
 
     public void DeleteDirectoryBuildProps()
     {
         if (File.Exists(DirectoryBuildPropsPath)) File.Delete(DirectoryBuildPropsPath);
-        Log($"   Deleted Directory.Build.props (exists={File.Exists(DirectoryBuildPropsPath)})");
+        Log($"   Deleted Directory.Build.props (exists={File.Exists(DirectoryBuildPropsPath)})"); // TODO: Logs it's deleted even when it didn't evne exist.
     }
 
     public bool BuildNumXmlExists() => File.Exists(BuildNumXmlPath);
@@ -255,6 +272,8 @@ public sealed class TestHelper
     /// </summary>
     public void GitRestoreAll()
     {
+        Log("   SKIPPED GIT RESET. THE TEST SHOULD NOT ERASE OUR EDITS!!!");
+        return; // REVIEWED: Added `return`: Not a good plan to do this. It may wipe out changes to our test code.
         Log("   Restoring repo to clean state via git...");
         var psi = new ProcessStartInfo
         {
@@ -268,6 +287,8 @@ public sealed class TestHelper
         };
         using var p = Process.Start(psi)!;
         p.WaitForExit(30_000);
+        LogResult("Repo restored to committed state"); // CHANGED: Moved from CleanUp method.
+
     }
 
     /// <summary>
@@ -279,13 +300,16 @@ public sealed class TestHelper
     {
         LogStep("Set Initial State");
         // Restore tracked files first so csproj is in its committed state.
-        GitRestoreAll();
-        UninstallPackage();
+        //GitRestoreAll(); // REVIEWED: Commented out. Not a good plan to do this. It may wipe out changes to our test code.
+
+        UninstallPackage(); // TODO: Output result is ignored. If fails it. It would just blindly continue the next steps.
         DeleteBuildNumXml();
         DeleteDirectoryBuildProps();
-        SetCsprojVersion("4.3.0");
-        LogResult("Initial state set (package removed, xml/props deleted, version=4.3.0)");
+        SetCsprojVersion("4.3.0"); // TODO: Should not assume the version will start with 4.3. Should use current value for that major/minor.
+        LogResult("Initial state set (package removed, xml/props deleted, version=4.3.0)"); // REVIEWED: Nice. Clear information in log. // TODO: False though, because errors are ignored. So package was actually not removed.
     }
+
+    // TODO: Cleanup does nothing as GitRestoreAll is omitted. Remove clean-up logic completely? 
 
     /// <summary>
     /// Restore repo back to its committed state after each test.
@@ -293,9 +317,9 @@ public sealed class TestHelper
     public void Cleanup()
     {
         Log("── CLEANUP ──");
-        GitRestoreAll();
+        //GitRestoreAll();  // REVIEWED: Commented out. Not a good plan to do this. It may wipe out changes to our test code.
         // Also restore potentially deleted untracked files? BuildNum.xml is tracked,
         // Directory.Build.props is tracked, so git checkout restores them.
-        LogResult("Repo restored to committed state");
+        //LogResult("Repo restored to committed state"); // CHANGED: Moved to GitRestoreAll method.
     }
 }

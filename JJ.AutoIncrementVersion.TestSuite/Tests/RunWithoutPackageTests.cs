@@ -1,14 +1,19 @@
+// TODO: Use global usings (in new `Using.cs`)
 using JJ.AutoIncrementVersion.TestSuite.Helpers;
 
 namespace JJ.AutoIncrementVersion.TestSuite.Tests;
 
+// TODO: Sub folder `Tests` not necessary. Move test classes up a directory.
+// TODO: None of the tests can run in parallel or must run in isolation.
+
 [TestClass]
 public class RunWithoutPackageTests
 {
+    // TODO: Rename _h to _helper or even _testHelper. No need to be obscure.
     private TestHelper _h = null!;
 
     [TestInitialize]
-    public void Init() => _h = new TestHelper(TestContext);
+    public void Init() => _h = new TestHelper(TestContext); // TODO: Init and CleanUp may as well be put in the test code iteself.
 
     [TestCleanup]
     public void Cleanup() => _h.Cleanup();
@@ -30,6 +35,8 @@ public class RunWithoutPackageTests
     {
         // ── Set Initial State ──
         _h.SetInitialState();
+
+        // TODO: Error for uninstall package is swallowed in the logic of SetInitialState, so we actually don't even know that we're running with or without the package.
 
         // ── Run Without Package ──
         _h.LogStep("Run Without Package – Rebuild");

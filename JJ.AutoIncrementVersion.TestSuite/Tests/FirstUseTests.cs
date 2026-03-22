@@ -8,7 +8,7 @@ public class FirstUseTests
     private TestHelper _h = null!;
 
     [TestInitialize]
-    public void Init() => _h = new TestHelper(TestContext);
+    public void Init() => _h = new TestHelper(TestContext); // TODO: Init and CleanUp may as well be put in the test code iteself.
 
     [TestCleanup]
     public void Cleanup() => _h.Cleanup();
@@ -57,11 +57,14 @@ public class FirstUseTests
                 first.Output.Contains("NETSDK1018", StringComparison.OrdinalIgnoreCase) ||
                 first.Error.Contains("NETSDK1018", StringComparison.OrdinalIgnoreCase);
             _h.LogResult($"First build failed as expected. Expected error present: {hasExpectedError}");
+
+            // TODO: The error does not contain "Invalid NuGet version string" The actual error is: C:\Program Files\dotnet\sdk\10.0.201\NuGet.targets(196,5): error : '4.3.' is not a valid version string. (Parameter 'value') [D:\Repositories\JJ.AutoIncrementVersion.Test\JJ.AutoIncrementVersion.Test\JJ.AutoIncrementVersion.Test.csproj]
             Assert.IsTrue(hasExpectedError,
                 "First build failed but not with the expected 'Invalid NuGet version string' error.");
         }
         else
         {
+
             _h.LogWarning("First build did NOT fail — this is acceptable if BuildNum.xml was auto-created in time.");
         }
 

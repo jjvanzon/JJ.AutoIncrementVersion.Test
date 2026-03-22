@@ -19,6 +19,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
 
+    <!-- TODO: $(SolutionDir) does not resolve in automated test, which dotnet builds just this csproj, not the full solution.-->
+
     <Content Include="$(SolutionDir)\README.md" Visible="False">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
