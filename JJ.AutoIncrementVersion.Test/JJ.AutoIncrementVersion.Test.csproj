@@ -1,11 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <TargetFrameworks>net10.0;net9.0;net8.0;net7.0;net6.0;net5.0;net461;netstandard2.1;netstandard2.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>4.3.$(BuildNum)</Version>
+    <Version>4.3.0</Version>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
@@ -19,9 +19,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
 
-    <!-- TODO: $(SolutionDir) does not resolve in automated test, which dotnet builds just this csproj, not the full solution.-->
-
-    <Content Include="$(SolutionDir)\README.md" Visible="False">
+    <Content Include="$(MSBuildThisFileDirectory)\..\README.md" Visible="False">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
