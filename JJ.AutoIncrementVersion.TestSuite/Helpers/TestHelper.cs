@@ -33,7 +33,8 @@ public sealed class TestHelper
 
         // TODO: Do once (static)
         // TODO: sln file isn't even there in an NCrunch context.
-        // TODO: No need to walk up dir tree. We can make assumptions about (relative) locations.
+        // TODO: Can we make assumptions about (relative) locations?
+        // TODO: Maybe we should copy the necessary test project files to somewhere reachable by a test. Maybe as embedded resources in the .TestSuite project, that link to the files, so that they are compiled into the .TestSuite project and then saved to disk relative to the .TestSuite.dll so all files everything resolve. That might even help us with test isolation/parallel tests.
 
         // Walk up from the test assembly's location to find the repo root.
         // The repo root contains Directory.Build.props / BuildNum.xml.
