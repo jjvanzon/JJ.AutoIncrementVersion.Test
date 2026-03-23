@@ -83,3 +83,28 @@
         // TODO: Lots of ceremony could be reused for multiple ProcessStart helpers.
 
 // TODO: Infra-specific 2 min time-out should be central variable and even from config.
+
+// TODO: Sub folder `Tests` not necessary. Move test classes up a directory.
+// TODO: None of the tests can run in parallel or must run in isolation.
+
+
+
+    public void DeleteBuildNumXml()
+    {
+        bool exists = Exists(BuildNumXmlPath);
+        if (exists) 
+        {
+            Delete(BuildNumXmlPath);
+            Log($"   Deleted BuildNum.xml ({BuildNumXmlPath}"); 
+        }
+        else
+        {
+            Log($"   Delete BuildNum.xml: Already Missing ({BuildNumXmlPath})");
+        }
+    }
+
+    public void DeleteDirectoryBuildProps()
+    {
+        if (Exists(DirectoryBuildPropsPath)) Delete(DirectoryBuildPropsPath);
+        Log($"   Deleted Directory.Build.props (exists={Exists(DirectoryBuildPropsPath)})"); // TODO: Logs it's deleted even when it didn't evne exist.
+    }

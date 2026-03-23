@@ -10,13 +10,11 @@ internal sealed class TestHelper : IDisposable
 {
     // Paths
 
-    /// <summary>Root of the isolated temp folder (contains BuildNum.xml, Directory.Build.props).</summary>
-    public string SolutionDir { get; }
-    /// <summary>Sub-folder containing the csproj (one level deeper).</summary>
-    public string ProjectDir { get; }
-    public string CsprojPath { get; }
-    public string BuildNumXmlPath { get; }
-    public string DirectoryBuildPropsPath { get; }
+    private string SolutionDir { get; }
+    private string ProjectDir { get; }
+    private string CsprojPath { get; }
+    private string BuildNumXmlPath { get; }
+    private string DirectoryBuildPropsPath { get; }
 
     private const string PackageId = "JJ.AutoIncrementVersion";
     // TODO: Fixed version number not good. Latest from Pre-Release-Package-Feed is better. Kinda bad, because if we keep this, we'd assume the tests test the latest, which it never would.
@@ -38,18 +36,8 @@ internal sealed class TestHelper : IDisposable
     public string ReadDirectoryBuildProps() => ReadAllText(DirectoryBuildPropsPath);
     public void WriteBuildNumXml(string content) => WriteAllText(BuildNumXmlPath, content);
     public void WriteDirectoryBuildProps(string content) => WriteAllText(DirectoryBuildPropsPath, content);
-
-    public void DeleteBuildNumXml()
-    {
-        if (Exists(BuildNumXmlPath)) Delete(BuildNumXmlPath);
-        Log($"   Deleted BuildNum.xml (exists={Exists(BuildNumXmlPath)})"); // TODO: Logs it's deleted even when it didn't evne exist.
-    }
-
-    public void DeleteDirectoryBuildProps()
-    {
-        if (Exists(DirectoryBuildPropsPath)) Delete(DirectoryBuildPropsPath);
-        Log($"   Deleted Directory.Build.props (exists={Exists(DirectoryBuildPropsPath)})"); // TODO: Logs it's deleted even when it didn't evne exist.
-    }
+    public void DeleteBuildNumXml() => Delete(BuildNumXmlPath);
+    public void DeleteDirectoryBuildProps() => Delete(DirectoryBuildPropsPath);
 
     // Constructor / Embedded Resource Extraction
 
@@ -245,7 +233,7 @@ internal sealed class TestHelper : IDisposable
     {
         string text = ReadAllText(CsprojPath);
         // Remove the <PackageReference Include="JJ.AutoIncrementVersion" ... /> line
-        string pattern = @"\s*<PackageReference\s+Include=""JJ\.AutoIncrementVersion""[^/]*/>\s*";
+        const string pattern = @"\s*<PackageReference\s+Include=""JJ\.AutoIncrementVersion""[^/]*/>\s*";
         text = Regex.Replace(text, pattern, "\n");
         WriteAllText(CsprojPath, text);
         Log($"   Removed {PackageId} PackageReference from csproj");
@@ -277,7 +265,7 @@ internal sealed class TestHelper : IDisposable
         return name is not null && name.EndsWith(suffix, StringComparison.OrdinalIgnoreCase);
     }
 
-    // ── restore from embedded resources ────────────────────────────────
+    // Init / Cleanup
 
     /// <summary>
     /// Re-extracts all embedded test files to the isolated folder,
