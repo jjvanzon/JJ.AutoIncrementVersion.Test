@@ -13,15 +13,15 @@ All TODOs by File
 |---------|------|
 | 21      | ~~`_ctx` (TestContext) only used for logging. `Debug`+`Console` might be enough — saves dependency/init/cleanup/property.~~
 | 25      | Fixed `PackageVersion = "4.2.5746"` is bad. Should use latest from pre-release package feed. Tests would never test the latest otherwise.
-| 34      | Constructor path-finding should run once (static), not per-test.
-| 35      | `.sln` file isn't there in an NCrunch context.
-| 36      | Can we make assumptions about relative locations?
-| 37      | Maybe copy necessary test project files as embedded resources into `.TestSuite` project, save to disk relative to assembly. Helps isolation/parallel tests.
+| 34      | ~~Constructor path-finding should run once (static), not per-test.~~
+| 35      | ~~`.sln` file isn't there in an NCrunch context.~~
+| 36      | ~~Can we make assumptions about relative locations?~~
+| 37      | ~~Maybe copy necessary test project files as embedded resources into `.TestSuite` project, save to disk relative to assembly. Helps isolation/parallel tests.~~
 | 58      | ~~Three logging sinks (`_ctx.WriteLine`, `Console`, `Debug`) — maybe only one is needed.~~
 | 69      | ~~Rename `CommandResult` → `CommandLineResult` to avoid ambiguity with non-CLI "commands."~~
-| 75      | `ProcessStartInfo` ceremony is duplicated between `RunDotnet` and `RunDotnetAtSolutionDir`.
-| 93–94   | `e.Data ?? ""` would simplify the null check pattern.
-| 98      | 2-minute timeout should be a central config variable.
+| 75      | ~~`ProcessStartInfo` ceremony is duplicated between `RunDotnet` and `RunDotnetAtSolutionDir`.~~
+| 93–94   | ~~`e.Data ?? ""` would simplify the null check pattern.~~
+| 98      | ~~2-minute timeout should be a central config variable.~~ > Better keep it hard-coded to simplify test files.
 | 108     | Should check exit code inside `RunDotnet` already? Fail fast?
 | 110     | stderr: Throw instead to stop test?
 | 154     | ~~Build/Rebuild error out with "README.md does not exist" because `$(SolutionDir)` isn't set when building a `.csproj` standalone. Need to fix.~~
@@ -31,7 +31,7 @@ All TODOs by File
 | 306     | `UninstallPackage()` result is ignored in `SetInitialState`. If it fails, next steps blindly continue.
 | 309     | Hardcoded `"4.3.0"` — should read current major/minor from csproj.
 | 310     | Log says "initial state set" but errors were ignored, so it's potentially false.
-| 313     | `Cleanup()` does nothing now since `GitRestoreAll` is disabled. Remove cleanup logic entirely?
+| 313     | ~~`Cleanup()` does nothing now since `GitRestoreAll` is disabled. Remove cleanup logic entirely?~~ > Replaced by embedded resources written and cleaned up from isolated temp dir.
 
 ### UninstallReinstallTests.cs
 
