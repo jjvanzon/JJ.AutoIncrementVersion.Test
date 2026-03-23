@@ -9,7 +9,7 @@ namespace JJ.AutoIncrementVersion.TestSuite.Helpers;
 /// Helpers for running dotnet CLI commands, manipulating project files,
 /// and inspecting build output — used by the automated test-plan tests.
 /// </summary>
-public sealed class TestHelper
+internal sealed class TestHelper
 {
     // ── paths ──────────────────────────────────────────────────────────
     public string SolutionDir { get; }
@@ -105,46 +105,6 @@ public sealed class TestHelper
         // TODO: Should check exit code here already? Fail fast?
         if (result.Output.Length > 0) Log(result.Output.TrimEnd());
         if (result.Error.Length > 0) Log($"   [stderr] {result.Error.TrimEnd()}"); // TODO: Throw instead to stop test?
-        return result;
-    }
-
-    /// <summary>Run dotnet against the solution directory (for solution-level commands).</summary>
-    public CommandLineResult RunDotnetAtSolutionDir(string arguments, int timeoutSeconds = 120)
-    {
-        Log($"   > dotnet {arguments}  (solution dir)");
-
-        var psi = new ProcessStartInfo
-        {
-            FileName = "dotnet",
-            Arguments = arguments,
-            WorkingDirectory = SolutionDir,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
-
-        using var process = Process.Start(psi)!;
-        var stdout = new StringBuilder();
-        var stderr = new StringBuilder();
-
-        process.OutputDataReceived += (_, e) => { stdout.AppendLine(e.Data ?? ""); };
-        process.ErrorDataReceived += (_, e) => { stderr.AppendLine(e.Data ?? ""); };
-        process.BeginOutputReadLine();
-        process.BeginErrorReadLine();
-
-        if (!process.WaitForExit(timeoutSeconds * 1000))
-        {
-            process.Kill(entireProcessTree: true);
-            throw new TimeoutException($"dotnet {arguments} timed out after {timeoutSeconds}s");
-        }
-
-        process.WaitForExit();
-
-        var result = new CommandLineResult(process.ExitCode, stdout.ToString(), stderr.ToString());
-
-        if (result.Output.Length > 0) Log(result.Output.TrimEnd());
-        if (result.Error.Length > 0) Log($"   [stderr] {result.Error.TrimEnd()}");
         return result;
     }
 
