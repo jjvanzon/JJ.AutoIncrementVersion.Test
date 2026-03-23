@@ -13,8 +13,8 @@ internal sealed class TestHelper
 {
     // ── paths ──────────────────────────────────────────────────────────
     public string SolutionDir { get; }
-    public string ProjectDir { get; } // = "..\\JJ.AutoIncrementVersion.Test";
-    public string CsprojPath { get; } //= ProjectDir + "\\JJ.AutoIncrementVersion.Test.csproj";
+    public string ProjectDir { get; } 
+    public string CsprojPath { get; } 
     public string BuildNumXmlPath { get; }
     public string DirectoryBuildPropsPath { get; }
 
@@ -76,10 +76,10 @@ internal sealed class TestHelper
             FileName = "dotnet",
             Arguments = arguments,
             WorkingDirectory = ProjectDir,
-            RedirectStandardOutput = true, // REVIEWED: Interesting. Didn't know.
-            RedirectStandardError = true, // REVIEWED: Interesting. Didn't know.
+            RedirectStandardOutput = true, 
+            RedirectStandardError = true,
             UseShellExecute = false,
-            CreateNoWindow = true // REVIEWED: Interesting. Didn't know.
+            CreateNoWindow = true
         };
 
         using var process = Process.Start(psi)!;
@@ -98,7 +98,7 @@ internal sealed class TestHelper
             throw new TimeoutException($"dotnet {arguments} timed out after {timeoutSeconds}s");
         }
 
-        // .NET may flush async after WaitForExit(int); call the parameterless overload. // REVIEWED: Cool. Didn't know.
+        // .NET may flush async after WaitForExit(int); call the parameterless overload.
         process.WaitForExit();
 
         var result = new CommandLineResult(process.ExitCode, stdout.ToString(), stderr.ToString());

@@ -76,3 +76,6 @@
         if (result.Error.Length > 0) Log($"   [stderr] {result.Error.TrimEnd()}");
         return result;
     }
+
+// = "..\\JJ.AutoIncrementVersion.Test";
+//= ProjectDir + "\\JJ.AutoIncrementVersion.Test.csproj";
