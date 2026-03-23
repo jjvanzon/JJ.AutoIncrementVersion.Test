@@ -13,13 +13,10 @@ public sealed class TestHelper
 {
     // ── paths ──────────────────────────────────────────────────────────
     public string SolutionDir { get; }
-    public string ProjectDir { get; }
-    public string CsprojPath { get; }
+    public string ProjectDir { get; } // = "..\\JJ.AutoIncrementVersion.Test";
+    public string CsprojPath { get; } //= ProjectDir + "\\JJ.AutoIncrementVersion.Test.csproj";
     public string BuildNumXmlPath { get; }
     public string DirectoryBuildPropsPath { get; }
-
-    // TODO: Only used for logging. Might Debug and Console be enough? Saves us a dependency/init/cleanup/property.
-    private readonly TestContext _ctx;
 
     private const string PackageId = "JJ.AutoIncrementVersion";
     // TODO: Fixed version number not good. Latest from Pre-Release-Package-Feed is better. Kinda bad, because if we keep this, we'd assume the tests test the latest, which it never would.
@@ -27,9 +24,8 @@ public sealed class TestHelper
     private const string TestProjectName = "JJ.AutoIncrementVersion.Test";
 
     // ── ctor ───────────────────────────────────────────────────────────
-    public TestHelper(TestContext ctx)
+    public TestHelper()
     {
-        _ctx = ctx;
 
         // TODO: Do once (static)
         // TODO: sln file isn't even there in an NCrunch context.
@@ -55,10 +51,11 @@ public sealed class TestHelper
     // ── logging ────────────────────────────────────────────────────────
     public void Log(string message)
     {
-        // TODO: Maybe only one is needed.
-        _ctx.WriteLine(message);
+        #if DEBUG
+        Debug.WriteLine(message);
+        #else
         Console.WriteLine(message);
-        Debug.WriteLine(message); // Added for now
+        #endif
     }
 
     public void LogStep(string step) => Log($"── STEP: {step}");
@@ -66,9 +63,9 @@ public sealed class TestHelper
     public void LogWarning(string warning) => Log($"   ⚠ {warning}");
 
     // ── process execution ──────────────────────────────────────────────
-    public record CommandResult(int ExitCode, string Output, string Error); // TODO: Maybe rename specifically to "CommandLineResult", because "Command" makes me think of more things than command line.
+    public record CommandLineResult(int ExitCode, string Output, string Error);
 
-    public CommandResult RunDotnet(string arguments, int timeoutSeconds = 120)
+    public CommandLineResult RunDotnet(string arguments, int timeoutSeconds = 120)
     {
         Log($"   > dotnet {arguments}");
 
@@ -104,7 +101,7 @@ public sealed class TestHelper
         // .NET may flush async after WaitForExit(int); call the parameterless overload. // REVIEWED: Cool. Didn't know.
         process.WaitForExit();
 
-        var result = new CommandResult(process.ExitCode, stdout.ToString(), stderr.ToString());
+        var result = new CommandLineResult(process.ExitCode, stdout.ToString(), stderr.ToString());
         // TODO: Should check exit code here already? Fail fast?
         if (result.Output.Length > 0) Log(result.Output.TrimEnd());
         if (result.Error.Length > 0) Log($"   [stderr] {result.Error.TrimEnd()}"); // TODO: Throw instead to stop test?
@@ -112,7 +109,7 @@ public sealed class TestHelper
     }
 
     /// <summary>Run dotnet against the solution directory (for solution-level commands).</summary>
-    public CommandResult RunDotnetAtSolutionDir(string arguments, int timeoutSeconds = 120)
+    public CommandLineResult RunDotnetAtSolutionDir(string arguments, int timeoutSeconds = 120)
     {
         Log($"   > dotnet {arguments}  (solution dir)");
 
@@ -144,7 +141,7 @@ public sealed class TestHelper
 
         process.WaitForExit();
 
-        var result = new CommandResult(process.ExitCode, stdout.ToString(), stderr.ToString());
+        var result = new CommandLineResult(process.ExitCode, stdout.ToString(), stderr.ToString());
 
         if (result.Output.Length > 0) Log(result.Output.TrimEnd());
         if (result.Error.Length > 0) Log($"   [stderr] {result.Error.TrimEnd()}");
@@ -152,25 +149,25 @@ public sealed class TestHelper
     }
 
     // ── build shortcuts ────────────────────────────────────────────────
-    public CommandResult Build(string configuration = "Release", string? extraArgs = null)
+    public CommandLineResult Build(string configuration = "Release", string? extraArgs = null)
     {
         string args = $"build \"{CsprojPath}\" -c {configuration}";
         if (extraArgs is not null) args += $" {extraArgs}";
         return RunDotnet(args);
     }
 
-    public CommandResult Rebuild(string configuration = "Release")
+    public CommandLineResult Rebuild(string configuration = "Release")
         => Build(configuration, "--no-incremental");
 
     // ── package management ─────────────────────────────────────────────
-    public CommandResult InstallPackage()
+    public CommandLineResult InstallPackage()
         => RunDotnet($"add \"{CsprojPath}\" package {PackageId} --version {PackageVersion}");
 
     // TODO: Command errors out hard. Note sure if it's correct:
     // > dotnet remove "D:\Repositories\JJ.AutoIncrementVersion.Test\JJ.AutoIncrementVersion.Test\JJ.AutoIncrementVersion.Test.csproj" package JJ.AutoIncrementVersion
    // [stderr] Found more than one project in `D:\Repositories\JJ.AutoIncrementVersion.Test\JJ.AutoIncrementVersion.Test`. Specify which one to use.
 
-    public CommandResult UninstallPackage()
+    public CommandLineResult UninstallPackage()
         => RunDotnet($"remove \"{CsprojPath}\" package {PackageId}");
 
     // ── file helpers ───────────────────────────────────────────────────
