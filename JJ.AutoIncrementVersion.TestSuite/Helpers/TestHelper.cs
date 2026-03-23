@@ -158,8 +158,6 @@ internal sealed class TestHelper : IDisposable
 
     // Run Processes
 
-    // TODO: Just return string Output. Error already throws. Fallout will point out excessive result processing.
-
     public string Rebuild()
     {
         Log("Rebuild");
