@@ -66,6 +66,7 @@ internal sealed class TestHelper : IDisposable
         ExtractResource(ResCsproj, CsprojPath);
         ExtractResource(ResDummyTxt, Path.Combine(ProjectDir, "Dummy.txt"));
         ExtractResource(ResReadme, Path.Combine(SolutionDir, "README.md"));
+        Log("Set up project dir.");
     }
 
     private static void ExtractResource(string logicalName, string targetPath)
@@ -101,26 +102,43 @@ internal sealed class TestHelper : IDisposable
 
     // Run Processes
 
-    public CommandLineResult Rebuild() 
-        => RunDotNet($"build \"{CsprojPath}\" -c Release --no-incremental");
+    // TODO: Just return string Output. Error already throws. Fallout will point out excessive result processing.
 
-    public CommandLineResult RebuildWithArgs(string? extraArgs = null) 
-        => RunDotNet($"build \"{CsprojPath}\" -c Release --no-incremental {extraArgs}");
+    public CommandLineResult Rebuild()
+    {
+        Log("Rebuild");
+        return RunDotNet($"build \"{CsprojPath}\" -c Release --no-incremental");
+    }
 
-    public CommandLineResult RebuildDebug() 
-        => RunDotNet($"build \"{CsprojPath}\" -c Debug --no-incremental");
+    public CommandLineResult RebuildWithArgs(string? extraArgs = null)
+    {
+        Log($"Rebuild with {extraArgs}");
+        return RunDotNet($"build \"{CsprojPath}\" -c Release --no-incremental {extraArgs}");
+    }
+
+    public CommandLineResult RebuildDebug()
+    {
+        Log("Rebuild Debug");
+        return RunDotNet($"build \"{CsprojPath}\" -c Debug --no-incremental");
+    }
 
     public void InstallPackage()
-        => RunDotNet($"add \"{CsprojPath}\" package {PackageId} --version {PackageVersion}");
+    {
+        Log("Install package");
+        RunDotNet($"add \"{CsprojPath}\" package {PackageId} --version {PackageVersion}");
+    }
 
     public void UninstallPackage()
-        => RunDotNet($"remove \"{CsprojPath}\" package {PackageId}");
-    
+    {
+        Log("Uninstall package");
+        RunDotNet($"remove \"{CsprojPath}\" package {PackageId}");
+    }
+
     private CommandLineResult RunDotNet(string arguments)
     {
-        Log($"> dotnet {arguments}");
+        //Log($"> dotnet {arguments}");
 
-        var psi = new ProcessStartInfo
+        using Process process = Process.Start(new ProcessStartInfo
         {
             FileName = "dotnet",
             Arguments = arguments,
@@ -129,13 +147,11 @@ internal sealed class TestHelper : IDisposable
             RedirectStandardError = true,
             UseShellExecute = false,
             CreateNoWindow = true
-        };
+        })!;
 
-        using var process = Process.Start(psi)!;
         var stdout = new StringBuilder();
         var stderr = new StringBuilder();
 
-        // REVIEWED: Cool. Didn't know before how to capture output. Bit verbose from .NET, but nice that it's possible
         process.OutputDataReceived += (_, e) => { stdout.AppendLine(e.Data ?? ""); };
         process.ErrorDataReceived += (_, e) => { stderr.AppendLine(e.Data ?? ""); };
         process.BeginOutputReadLine();
@@ -152,10 +168,10 @@ internal sealed class TestHelper : IDisposable
         process.WaitForExit();
 
         var result = new CommandLineResult(process.ExitCode, stdout.ToString(), stderr.ToString());
-        if (result.Output.Length > 0) Log(result.Output.TrimEnd());
-        if (result.Error.Length > 0) Log($"[stderr] {result.Error.TrimEnd()}");
+        //if (result.Output.Length > 0) Log(result.Output.TrimEnd());
+        //if (result.Error.Length > 0) Log($"[stderr] {result.Error.TrimEnd()}");
 
-        // TODO: This is still not enough. It could be exit code 0 and no error text? But error in the output?
+        // TODO: This is still not enough? It could be exit code 0 and no error text? But error in the output?
         bool hasError = result.ExitCode != 0 || !string.IsNullOrWhiteSpace(result.Error);
         if (hasError)
         {
@@ -200,7 +216,6 @@ internal sealed class TestHelper : IDisposable
         string text = ReadAllText(CsprojPath);
         text = Regex.Replace(text, @"<Version>[^<]*</Version>", $"<Version>{version}</Version>");
         WriteAllText(CsprojPath, text);
-        Log($"   Set <Version> to {version}");
     }
 
     /// <summary>
@@ -223,7 +238,6 @@ internal sealed class TestHelper : IDisposable
         const string pattern = @"\s*<PackageReference\s+Include=""JJ\.AutoIncrementVersion""[^/]*/>\s*";
         text = Regex.Replace(text, pattern, "\n");
         WriteAllText(CsprojPath, text);
-        Log($"   Removed {PackageId} PackageReference from csproj");
     }
 
     /// <summary>
@@ -249,7 +263,7 @@ internal sealed class TestHelper : IDisposable
     public bool OutputContainsNupkgEndingWith(string output, string suffix)
     {
         string? name = ExtractNupkgName(output);
-        return name is not null && name.EndsWith(suffix, StringComparison.OrdinalIgnoreCase);
+        return name is not null && name.EndsWith(suffix, OrdinalIgnoreCase);
     }
 
     // Init / Cleanup
@@ -275,7 +289,7 @@ internal sealed class TestHelper : IDisposable
         DeleteBuildNumXml();
         DeleteDirectoryBuildProps();
         SetCsprojVersion("4.3.0"); // TODO: Should not assume the version will start with 4.3. Should use current value for that major/minor.
-        LogResult("Initial state set (package removed, xml/props deleted, version=4.3.0)");
+        Log("Set uninstalled state");
     }
 
     /// <summary>

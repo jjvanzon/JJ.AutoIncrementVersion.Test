@@ -28,7 +28,5 @@ public class Case02_RunWithoutPackage
         AreEqual(0, buildResult.ExitCode);
         IsNotNull(nupkgFileName);
         IsTrue(testHelper.OutputContainsNupkgEndingWith(buildResult.Output, ".0.nupkg"));
-
-        testHelper.LogResult("PASS – Package version ends with .0.nupkg");
     }
 }
