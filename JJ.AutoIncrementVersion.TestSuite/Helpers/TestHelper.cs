@@ -188,6 +188,12 @@ internal sealed class TestHelper : IDisposable
         RunDotNet($"remove \"{CsprojPath}\" package {PackageId}");
     }
 
+    private void Restore()
+    {
+        Log("Restore");
+        RunDotNet($"restore \"{CsprojPath}\"");
+    }
+
     private string RunDotNet(string arguments)
     {
         //Log($"> dotnet {arguments}");
