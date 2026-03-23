@@ -27,7 +27,6 @@ public class Case10_CommandLineBuild
 
         IsTrue(testHelper.OutputContainsNupkgEndingWith(buildOutput, ".9999.nupkg"));
 
-        // ── Verify BuildNum.xml saved 10000 ──
         int savedNum = testHelper.GetBuildNumFromXml();
         AreEqual(10000, savedNum);
     }

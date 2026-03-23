@@ -23,11 +23,12 @@ internal sealed class TestHelper : IDisposable
     private const string TestProjectName = "JJ.AutoIncrementVersion.Test";
 
     // Embedded resource logical names
-    private const string ResCsproj = "TestFiles.JJ.AutoIncrementVersion.Test.csproj";
-    private const string ResDirectoryBuildProps = "TestFiles.Directory.Build.props";
-    private const string ResBuildNumXml = "TestFiles.BuildNum.xml";
-    private const string ResReadme = "TestFiles.README.md";
-    private const string ResDummyTxt = "TestFiles.Dummy.txt";
+    private const string CsprojResourceName = "TestFiles.JJ.AutoIncrementVersion.Test.csproj";
+    private const string DirectoryBuildPropsResourceName = "TestFiles.Directory.Build.props";
+    private const string BuildNumXmlResourceName = "TestFiles.BuildNum.xml";
+    private const string ReadMeResourceName = "TestFiles.README.md";
+    private const string DummyTxtResourceName = "TestFiles.Dummy.txt";
+    private const string NuGetConfigResourceName = "TestFiles.NuGet.config";
 
     // File Helpers
 
@@ -47,6 +48,7 @@ internal sealed class TestHelper : IDisposable
         // Create a random isolated folder in the system temp directory
         // (outside the repo tree, so MSBuild won't pick up the repo's Directory.Build.props).
         string basePath = Path.Combine(Path.GetTempPath(), "JJ.AutoIncrementVersion.TestRuns", Guid.NewGuid().ToString("N"));
+        //string basePath = Path.Combine(Environment.CurrentDirectory, Guid.NewGuid().ToString());
         SolutionDir = basePath;
         ProjectDir = Path.Combine(SolutionDir, TestProjectName);
         CsprojPath = Path.Combine(ProjectDir, $"{TestProjectName}.csproj");
@@ -61,11 +63,12 @@ internal sealed class TestHelper : IDisposable
 
     private void ExtractAllResources()
     {
-        ExtractResource(ResBuildNumXml, BuildNumXmlPath);
-        ExtractResource(ResDirectoryBuildProps, DirectoryBuildPropsPath);
-        ExtractResource(ResCsproj, CsprojPath);
-        ExtractResource(ResDummyTxt, Path.Combine(ProjectDir, "Dummy.txt"));
-        ExtractResource(ResReadme, Path.Combine(SolutionDir, "README.md"));
+        ExtractResource(BuildNumXmlResourceName, BuildNumXmlPath);
+        ExtractResource(DirectoryBuildPropsResourceName, DirectoryBuildPropsPath);
+        ExtractResource(CsprojResourceName, CsprojPath);
+        ExtractResource(DummyTxtResourceName, Path.Combine(ProjectDir, "Dummy.txt"));
+        ExtractResource(ReadMeResourceName, Path.Combine(SolutionDir, "README.md"));
+        ExtractResource(NuGetConfigResourceName, Path.Combine(SolutionDir, "NuGet.config"));
         Log("Set up project dir.");
     }
 
@@ -107,19 +110,19 @@ internal sealed class TestHelper : IDisposable
     public string Rebuild()
     {
         Log("Rebuild");
-        return RunDotNet($"build \"{CsprojPath}\" -c Release --no-incremental");
+        return RunDotNet($"build \"{CsprojPath}\" -c Release -v:Normal --no-incremental");
     }
 
     public string RebuildWithArgs(string? extraArgs = null)
     {
         Log($"Rebuild with {extraArgs}");
-        return RunDotNet($"build \"{CsprojPath}\" -c Release --no-incremental {extraArgs}");
+        return RunDotNet($"build \"{CsprojPath}\" -c Release -v:Normal --no-incremental {extraArgs}");
     }
 
     public string RebuildDebug()
     {
         Log("Rebuild Debug");
-        return RunDotNet($"build \"{CsprojPath}\" -c Debug --no-incremental");
+        return RunDotNet($"build \"{CsprojPath}\" -c Debug -v:Normal --no-incremental");
     }
 
     public void InstallPackage()
@@ -175,13 +178,7 @@ internal sealed class TestHelper : IDisposable
         bool hasError = result.ExitCode != 0 || !string.IsNullOrWhiteSpace(result.Error);
         if (hasError)
         {
-            string errorText = result.Error;
-            if (string.IsNullOrWhiteSpace(errorText))
-            {
-                errorText = result.Output;
-            }
-
-            throw new Exception($"dotnet {arguments} failed: Exit code {result.ExitCode}" + errorText);
+            throw new Exception($"dotnet {arguments} failed: Exit code {result.ExitCode} {result.Error} {result.Output}");
         }
 
         return result.Output;

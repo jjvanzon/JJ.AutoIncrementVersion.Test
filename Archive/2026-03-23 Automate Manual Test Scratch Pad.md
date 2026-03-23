@@ -119,3 +119,10 @@
 
             // TODO: ExitCode can indicate error, withotu Error text being filled in (error shows up in r.Output instead).
             AreEqual(0, result.ExitCode, $"Build {i + 1} failed.\n{result.Error}");
+
+            //string errorText = result.Error;
+            //if (string.IsNullOrWhiteSpace(errorText))
+            //{
+            //    errorText = result.Output;
+            //}
+
