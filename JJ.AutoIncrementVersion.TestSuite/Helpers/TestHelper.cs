@@ -59,6 +59,7 @@ internal sealed class TestHelper : IDisposable
         CreateDirectory(ProjectDir);
 
         ExtractAllResources();
+        Restore();
     }
 
     private void ExtractAllResources()
@@ -110,31 +111,39 @@ internal sealed class TestHelper : IDisposable
     public string Rebuild()
     {
         Log("Rebuild");
-        return RunDotNet($"build \"{CsprojPath}\" -c Release -v:Normal --no-incremental");
+        return RunDotNet($"build \"{CsprojPath}\" -c Release -v:Normal --no-incremental --no-restore");
     }
 
     public string RebuildWithArgs(string? extraArgs = null)
     {
         Log($"Rebuild with {extraArgs}");
-        return RunDotNet($"build \"{CsprojPath}\" -c Release -v:Normal --no-incremental {extraArgs}");
+        return RunDotNet($"build \"{CsprojPath}\" -c Release -v:Normal --no-incremental --no-restore {extraArgs}");
     }
 
     public string RebuildDebug()
     {
         Log("Rebuild Debug");
-        return RunDotNet($"build \"{CsprojPath}\" -c Debug -v:Normal --no-incremental");
+        return RunDotNet($"build \"{CsprojPath}\" -c Debug -v:Normal --no-incremental --no-restore");
     }
 
     public void InstallPackage()
     {
         Log("Install package");
         RunDotNet($"add \"{CsprojPath}\" package {PackageId} --version {PackageVersion}");
+        // dotnet add package includes its own restore (matching VS NuGet UI behavior).
     }
 
     public void UninstallPackage()
     {
         Log("Uninstall package");
         RunDotNet($"remove \"{CsprojPath}\" package {PackageId}");
+        Restore();
+    }
+
+    private void Restore()
+    {
+        Log("Restore");
+        RunDotNet($"restore \"{CsprojPath}\"");
     }
 
     private string RunDotNet(string arguments)
@@ -273,6 +282,7 @@ internal sealed class TestHelper : IDisposable
     public void SetInstalledState()
     {
         ExtractAllResources();
+        Restore();
     }
 
     /// <summary>
@@ -287,6 +297,7 @@ internal sealed class TestHelper : IDisposable
         DeleteBuildNumXml();
         DeleteDirectoryBuildProps();
         SetCsprojVersion("4.3.0"); // TODO: Should not assume the version will start with 4.3. Should use current value for that major/minor.
+        Restore();
         Log("Set uninstalled state");
     }
 
