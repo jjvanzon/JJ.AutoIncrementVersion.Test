@@ -48,10 +48,9 @@ public class Case07_AutoRecreateFiles
         int? previousBuildNum = null;
         for (int i = 0; i < 3; i++) // TODO: I like the retry loop and that it checks for increments.
         {
-            CommandLineResult nextBuildResult = testHelper.Rebuild();
+            string nextBuildOutput = testHelper.Rebuild();
 
-            int? nextBuildNum = testHelper.ExtractBuildNumFromNupkgName(nextBuildResult.Output);
-            testHelper.LogResult($"Build {i + 1}: nupkg={testHelper.ExtractNupkgName(nextBuildResult.Output)} BuildNum={nextBuildNum}");
+            int? nextBuildNum = testHelper.ExtractBuildNumFromNupkgName(nextBuildOutput);
 
             // WOuld be nice if it checked for increments by exactly 1.
 

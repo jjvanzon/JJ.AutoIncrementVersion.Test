@@ -17,25 +17,18 @@ public class Case10_CommandLineBuild
 
         testHelper.SetInstalledState();
 
-        testHelper.LogStep("Build with /p:BuildNum=9999");
-        var buildResult = testHelper.RebuildWithArgs("/p:BuildNum=9999");
-        AreEqual(0, buildResult.ExitCode);
+        string buildOutput = testHelper.RebuildWithArgs("/p:BuildNum=9999");
 
         // ── Verify output contains 9999 ──
         testHelper.LogStep("Verify nupkg ends with .9999.nupkg");
-        string? nupkg = testHelper.ExtractNupkgName(buildResult.Output);
+        string? nupkg = testHelper.ExtractNupkgName(buildOutput);
+        // TODO: Dpn't just log. Assert.
         testHelper.LogResult($"Nupkg: {nupkg ?? "(none)"}");
 
-        IsTrue(
-            testHelper.OutputContainsNupkgEndingWith(buildResult.Output, ".9999.nupkg"),
-            $"Expected nupkg ending with .9999.nupkg but got: {nupkg}");
+        IsTrue(testHelper.OutputContainsNupkgEndingWith(buildOutput, ".9999.nupkg"));
 
         // ── Verify BuildNum.xml saved 10000 ──
-        testHelper.LogStep("Verify BuildNum.xml was updated to 10000");
         int savedNum = testHelper.GetBuildNumFromXml();
-        testHelper.LogResult($"BuildNum in XML: {savedNum}");
-        AreEqual(10000, savedNum,  $"Expected BuildNum.xml to contain 10000 (9999+1) but got {savedNum}");
-
-        testHelper.LogResult("PASS – Command Line Build: /p:BuildNum=9999 → .9999.nupkg, saved 10000");
+        AreEqual(10000, savedNum);
     }
 }

@@ -44,7 +44,7 @@ public class Case04_FirstUse
         }
 
         // 2nd build should succeed
-        CommandLineResult buildResult2 = testHelper.Rebuild();
+        string buildOutput2 = testHelper.Rebuild();
 
         IsTrue(testHelper.BuildNumXmlExists());
         string buildNumContent = testHelper.ReadBuildNumXml();
@@ -56,22 +56,17 @@ public class Case04_FirstUse
         // TODO: Check some content
 
         // ── Subsequent builds should auto-increment ──
-        int? previousBuildNum = testHelper.ExtractBuildNumFromNupkgName(buildResult2.Output);
+        int? previousBuildNum = testHelper.ExtractBuildNumFromNupkgName(buildOutput2);
 
         for (int i = 0; i < 3; i++)
         {
-            var nextBuildNum = testHelper.Rebuild();
-            AreEqual(0, nextBuildNum.ExitCode, $"Build {i + 3} failed.\n{nextBuildNum.Error}");
-
-            int? currentBuildNum = testHelper.ExtractBuildNumFromNupkgName(nextBuildNum.Output);
-
-            if (previousBuildNum is not null && currentBuildNum is not null)
+            var nextBuildOutput = testHelper.Rebuild();
+            int? nextBuildNum = testHelper.ExtractBuildNumFromNupkgName(nextBuildOutput);
+            if (previousBuildNum is not null && nextBuildNum is not null)
             {
-                IsTrue(currentBuildNum > previousBuildNum);
+                IsTrue(nextBuildNum > previousBuildNum);
             }
-            previousBuildNum = currentBuildNum;
+            previousBuildNum = nextBuildNum;
         }
-
-        testHelper.LogResult("PASS – First Use: fail → succeed → auto-increment");
     }
 }

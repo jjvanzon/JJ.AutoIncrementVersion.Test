@@ -36,31 +36,25 @@ public class Case11_UpgradeRegression
 
         // ── Build ──
         testHelper.LogStep("Build – should restore BuildNumWasFromXmljj");
-        var build1 = testHelper.Rebuild();
-        // TODO: Error is not in build1.Error It's embedded in build1.Output.
-        AreEqual(0, build1.ExitCode, $"Build failed.\n{build1.Error}");
+        var buildOutput1 = testHelper.Rebuild();
 
         string buildNumAfterBuild = testHelper.ReadBuildNumXml();
         IsTrue(buildNumAfterBuild.Contains("BuildNumWasFromXmljj"));
 
         // ── Verify continued increment ──
         testHelper.LogStep("Verify continued increment");
-        int? previousBuildNum = testHelper.ExtractBuildNumFromNupkgName(build1.Output);
+        int? previousBuildNum = testHelper.ExtractBuildNumFromNupkgName(buildOutput1);
         for (int i = 0; i < 2; i++)
         {
-            CommandLineResult nextBuildResult = testHelper.Rebuild();
-            AreEqual(0, nextBuildResult.ExitCode, $"Build {i + 2} failed.\n{nextBuildResult.Error}");
+            string nextBuildOutput = testHelper.Rebuild();
+            int? nextBuildNum = testHelper.ExtractBuildNumFromNupkgName(nextBuildOutput);
 
-            int? currentBuildNum = testHelper.ExtractBuildNumFromNupkgName(nextBuildResult.Output);
-            testHelper.LogResult($"Build {i + 2}: nupkg num={currentBuildNum}");
-
-            if (previousBuildNum is not null && currentBuildNum is not null)
+            // TODO: Assert exact increments by 1.
+            if (previousBuildNum is not null && nextBuildNum is not null)
             {
-                IsTrue(currentBuildNum > previousBuildNum);
+                IsTrue(nextBuildNum > previousBuildNum);
             }
-            previousBuildNum = currentBuildNum;
+            previousBuildNum = nextBuildNum;
         }
-
-        testHelper.LogResult("PASS – Upgrade Regression: BuildNumWasFromXmljj restored, increments continue");
     }
 }

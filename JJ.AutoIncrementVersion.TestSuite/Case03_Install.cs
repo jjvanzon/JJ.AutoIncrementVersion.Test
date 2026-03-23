@@ -20,9 +20,9 @@ public class Case03_Install
 
         testHelper.SetUninstalledState();
         testHelper.InstallPackage();
-        CommandLineResult rebuildResult = testHelper.Rebuild();
+        string buildOutput = testHelper.Rebuild();
 
-        IsTrue(testHelper.OutputContainsNupkgEndingWith(rebuildResult.Output, ".0.nupkg"));
+        IsTrue(testHelper.OutputContainsNupkgEndingWith(buildOutput, ".0.nupkg"));
 
         IsTrue(testHelper.BuildNumXmlExists());
         string buildNumContent = testHelper.ReadBuildNumXml();

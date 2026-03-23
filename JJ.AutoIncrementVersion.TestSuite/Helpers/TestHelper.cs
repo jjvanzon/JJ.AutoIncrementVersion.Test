@@ -104,19 +104,19 @@ internal sealed class TestHelper : IDisposable
 
     // TODO: Just return string Output. Error already throws. Fallout will point out excessive result processing.
 
-    public CommandLineResult Rebuild()
+    public string Rebuild()
     {
         Log("Rebuild");
         return RunDotNet($"build \"{CsprojPath}\" -c Release --no-incremental");
     }
 
-    public CommandLineResult RebuildWithArgs(string? extraArgs = null)
+    public string RebuildWithArgs(string? extraArgs = null)
     {
         Log($"Rebuild with {extraArgs}");
         return RunDotNet($"build \"{CsprojPath}\" -c Release --no-incremental {extraArgs}");
     }
 
-    public CommandLineResult RebuildDebug()
+    public string RebuildDebug()
     {
         Log("Rebuild Debug");
         return RunDotNet($"build \"{CsprojPath}\" -c Debug --no-incremental");
@@ -134,7 +134,7 @@ internal sealed class TestHelper : IDisposable
         RunDotNet($"remove \"{CsprojPath}\" package {PackageId}");
     }
 
-    private CommandLineResult RunDotNet(string arguments)
+    private string RunDotNet(string arguments)
     {
         //Log($"> dotnet {arguments}");
 
@@ -184,7 +184,7 @@ internal sealed class TestHelper : IDisposable
             throw new Exception($"dotnet {arguments} failed: Exit code {result.ExitCode}" + errorText);
         }
 
-        return result;
+        return result.Output;
     }
 
     // Inspect/Write Values
@@ -198,6 +198,7 @@ internal sealed class TestHelper : IDisposable
 
     public void SetBuildNumInXml(int num)
     {
+        Log("Set BuildNum.xml to " + num);
         var doc = XDocument.Load(BuildNumXmlPath);
         var el = doc.Descendants("BuildNum").First();
         el.Value = num.ToString();

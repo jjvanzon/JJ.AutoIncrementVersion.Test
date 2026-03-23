@@ -17,16 +17,10 @@ public class Case02_RunWithoutPackage
     public void Case02_RunWithoutPackage_ProducesVersionEndingWithZero()
     {
         using var testHelper = new TestHelper();
-
         testHelper.SetUninstalledState();
-
-        // TODO: Error for uninstall package is swallowed in the logic of SetInitialState, so we actually don't even know that we're running with or without the package.
-        CommandLineResult buildResult = testHelper.Rebuild();
-
-        string? nupkgFileName = testHelper.ExtractNupkgName(buildResult.Output);
-
-        AreEqual(0, buildResult.ExitCode);
+        string buildOutput = testHelper.Rebuild();
+        string? nupkgFileName = testHelper.ExtractNupkgName(buildOutput);
         IsNotNull(nupkgFileName);
-        IsTrue(testHelper.OutputContainsNupkgEndingWith(buildResult.Output, ".0.nupkg"));
+        IsTrue(testHelper.OutputContainsNupkgEndingWith(buildOutput, ".0.nupkg"));
     }
 }
