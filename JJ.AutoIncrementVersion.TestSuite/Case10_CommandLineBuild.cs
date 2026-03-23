@@ -18,7 +18,7 @@ public class Case10_CommandLineBuild
         testHelper.SetInstalledState();
 
         testHelper.LogStep("Build with /p:BuildNum=9999");
-        var buildResult = testHelper.BuildWithArgs("Release", "/p:BuildNum=9999");
+        var buildResult = testHelper.RebuildWithArgs("/p:BuildNum=9999");
         AreEqual(0, buildResult.ExitCode);
 
         // ── Verify output contains 9999 ──

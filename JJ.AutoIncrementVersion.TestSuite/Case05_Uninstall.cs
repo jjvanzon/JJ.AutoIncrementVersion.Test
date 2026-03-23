@@ -22,7 +22,7 @@ public class Case05_Uninstall
         testHelper.LogStep("Establish working state with package installed");
         // The isolated folder already has the package reference and $(BuildNum) in version.
         // Do a build to ensure BuildNum.xml/props exist.
-        testHelper.Build();
+        testHelper.Rebuild();
 
         int buildNumBefore = testHelper.GetBuildNumFromXml();
         testHelper.LogResult($"BuildNum before uninstall: {buildNumBefore}");
@@ -38,14 +38,14 @@ public class Case05_Uninstall
 
         // ── Build should succeed ──
         testHelper.LogStep("Build after uninstall – should succeed");
-        var buildResult = testHelper.Build();
+        var buildResult = testHelper.Rebuild();
         AreEqual(0, buildResult.ExitCode, $"Build failed after uninstall.\n{buildResult.Error}");
         testHelper.LogResult("Build succeeded.");
 
         // ── Version should be frozen ──
         testHelper.LogStep("Build again – version should stay frozen (no increment)");
         int buildNumAfterBuild = testHelper.GetBuildNumFromXml();
-        var secondBuildResult = testHelper.Build();
+        var secondBuildResult = testHelper.Rebuild();
         int buildNumAfterSecond = testHelper.GetBuildNumFromXml();
         testHelper.LogResult($"BuildNum after 1st build: {buildNumAfterBuild}, after 2nd build: {buildNumAfterSecond}");
 

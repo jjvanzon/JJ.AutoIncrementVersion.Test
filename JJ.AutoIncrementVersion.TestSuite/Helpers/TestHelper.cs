@@ -101,7 +101,22 @@ internal sealed class TestHelper : IDisposable
 
     // Run Processes
 
-    public CommandLineResult RunDotnet(string arguments)
+    public CommandLineResult Rebuild() 
+        => RunDotnet($"build \"{CsprojPath}\" -c Release --no-incremental");
+
+    public CommandLineResult RebuildWithArgs(string? extraArgs = null) 
+        => RunDotnet($"build \"{CsprojPath}\" -c Release --no-incremental {extraArgs}");
+
+    public CommandLineResult RebuildDebug() 
+        => RunDotnet($"build \"{CsprojPath}\" -c Debug --no-incremental");
+
+    public CommandLineResult InstallPackage()
+        => RunDotnet($"add \"{CsprojPath}\" package {PackageId} --version {PackageVersion}");
+
+    public CommandLineResult UninstallPackage()
+        => RunDotnet($"remove \"{CsprojPath}\" package {PackageId}");
+    
+    private CommandLineResult RunDotnet(string arguments)
     {
         Log($"> dotnet {arguments}");
 
@@ -159,28 +174,6 @@ internal sealed class TestHelper : IDisposable
 
         return result;
     }
-
-    public CommandLineResult Build(string configuration = "Release")
-    {
-        string args = $"build \"{CsprojPath}\" -c {configuration}";
-        return RunDotnet(args);
-    }
-
-    public CommandLineResult BuildWithArgs(string configuration = "Release", string? extraArgs = null)
-    {
-        string args = $"build \"{CsprojPath}\" -c {configuration}";
-        if (extraArgs is not null) args += $" {extraArgs}";
-        return RunDotnet(args);
-    }
-
-    public CommandLineResult Rebuild(string configuration = "Release")
-        => BuildWithArgs(configuration, "--no-incremental");
-
-    public CommandLineResult InstallPackage()
-        => RunDotnet($"add \"{CsprojPath}\" package {PackageId} --version {PackageVersion}");
-
-    public CommandLineResult UninstallPackage()
-        => RunDotnet($"remove \"{CsprojPath}\" package {PackageId}");
 
     // Inspect/Write Values
 

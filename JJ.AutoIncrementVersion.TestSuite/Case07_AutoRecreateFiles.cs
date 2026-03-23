@@ -19,13 +19,13 @@ public class Case07_AutoRecreateFiles
         using var testHelper = new TestHelper();
 
         testHelper.SetInstalledState();
-        testHelper.Build();
+        testHelper.Rebuild();
 
         testHelper.DeleteDirectoryBuildProps();
         IsFalse(testHelper.DirectoryBuildPropsExists());
 
         // TODO: Assertion code could be made reusable.
-        CommandLineResult failBuild = testHelper.Build();
+        CommandLineResult failBuild = testHelper.Rebuild();
 
         if (failBuild.ExitCode != 0)
         {
@@ -49,7 +49,7 @@ public class Case07_AutoRecreateFiles
         int? previousBuildNum = null;
         for (int i = 0; i < 3; i++) // TODO: I like the retry loop and that it checks for increments.
         {
-            CommandLineResult result = testHelper.Build();
+            CommandLineResult result = testHelper.Rebuild();
             // TODO: ExitCode can indicate error, withotu Error text being filled in (error shows up in r.Output instead).
             AreEqual(0, result.ExitCode, $"Build {i + 1} failed.\n{result.Error}");
 
@@ -81,12 +81,12 @@ public class Case07_AutoRecreateFiles
         using var testHelper = new TestHelper();
 
         testHelper.SetInstalledState();
-        testHelper.Build(); // TODO: Working state was not checked, because error is swallowed.
+        testHelper.Rebuild(); // TODO: Working state was not checked, because error is swallowed.
 
         testHelper.DeleteBuildNumXml();
         IsFalse(testHelper.BuildNumXmlExists());
 
-        CommandLineResult buildResult = testHelper.Build();
+        CommandLineResult buildResult = testHelper.Rebuild();
 
         IsTrue(testHelper.BuildNumXmlExists());
         int newBuildNum = testHelper.GetBuildNumFromXml();
@@ -104,7 +104,7 @@ public class Case07_AutoRecreateFiles
         using var testHelper = new TestHelper();
 
         testHelper.SetInstalledState();
-        testHelper.Build(); // TODO: Working state was not checked, because error is swallowed.
+        testHelper.Rebuild(); // TODO: Working state was not checked, because error is swallowed.
 
         testHelper.DeleteBuildNumXml();
         testHelper.DeleteDirectoryBuildProps();
@@ -112,11 +112,11 @@ public class Case07_AutoRecreateFiles
         // TODO: Build success should be asserted.
 
         testHelper.LogStep("Build – may fail first time");
-        var first = testHelper.Build();
+        var first = testHelper.Rebuild();
         testHelper.LogResult($"1st build exit code: {first.ExitCode}");
 
         testHelper.LogStep("2nd build – should succeed");
-        var second = testHelper.Build();
+        var second = testHelper.Rebuild();
         testHelper.LogResult($"2nd build exit code: {second.ExitCode}");
 
         IsTrue(testHelper.BuildNumXmlExists());

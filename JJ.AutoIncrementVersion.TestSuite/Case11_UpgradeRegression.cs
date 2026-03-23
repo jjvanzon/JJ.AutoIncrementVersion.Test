@@ -18,7 +18,7 @@ public class Case11_UpgradeRegression
 
         testHelper.LogStep("Restore committed state and build once");
         testHelper.SetInstalledState();
-        testHelper.Build();
+        testHelper.Rebuild();
 
         // ── Remove BuildNumWasFromXmljj ──
         testHelper.LogStep("Remove BuildNumWasFromXmljj from BuildNum.xml");
@@ -36,7 +36,7 @@ public class Case11_UpgradeRegression
 
         // ── Build ──
         testHelper.LogStep("Build – should restore BuildNumWasFromXmljj");
-        var build1 = testHelper.Build();
+        var build1 = testHelper.Rebuild();
         // TODO: Error is not in build1.Error It's embedded in build1.Output.
         AreEqual(0, build1.ExitCode, $"Build failed.\n{build1.Error}");
 
@@ -48,7 +48,7 @@ public class Case11_UpgradeRegression
         int? previousBuildNum = testHelper.ExtractBuildNumFromNupkgName(build1.Output);
         for (int i = 0; i < 2; i++)
         {
-            CommandLineResult nextBuildResult = testHelper.Build();
+            CommandLineResult nextBuildResult = testHelper.Rebuild();
             AreEqual(0, nextBuildResult.ExitCode, $"Build {i + 2} failed.\n{nextBuildResult.Error}");
 
             int? currentBuildNum = testHelper.ExtractBuildNumFromNupkgName(nextBuildResult.Output);

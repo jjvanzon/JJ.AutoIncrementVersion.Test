@@ -24,13 +24,13 @@ public class Case08_ManualEdit
 
         // ── Build – should increment from the restored value ──
         testHelper.LogStep("Build – should use restored BuildNum");
-        CommandLineResult buildResult1 = testHelper.Build();
+        CommandLineResult buildResult1 = testHelper.Rebuild();
         buildResult1.Assert();
         
         int? nupkgNum1 = testHelper.ExtractBuildNumFromNupkgName(buildResult1.Output);
         testHelper.LogResult($"Build 1 nupkg num: {nupkgNum1}");
 
-        var build2 = testHelper.Build();
+        var build2 = testHelper.Rebuild();
         AreEqual(0, build2.ExitCode);
 
         int? nupkgNum2 = testHelper.ExtractBuildNumFromNupkgName(build2.Output);
@@ -50,7 +50,7 @@ public class Case08_ManualEdit
 
         // ── Build – version should start from the manual value ──
         testHelper.LogStep("Build after manual edit – version should use new BuildNum");
-        var build3 = testHelper.Build();
+        var build3 = testHelper.Rebuild();
         AreEqual(0, build3.ExitCode);
 
         int? nupkgNum3 = testHelper.ExtractBuildNumFromNupkgName(build3.Output);
@@ -61,7 +61,7 @@ public class Case08_ManualEdit
         int? previousBuildNum = nupkgNum3;
         for (int i = 0; i < 2; i++)
         {
-            CommandLineResult nextBuildResult = testHelper.Build();
+            CommandLineResult nextBuildResult = testHelper.Rebuild();
             AreEqual(0, nextBuildResult.ExitCode);
 
             int? currentBuildNum = testHelper.ExtractBuildNumFromNupkgName(nextBuildResult.Output);

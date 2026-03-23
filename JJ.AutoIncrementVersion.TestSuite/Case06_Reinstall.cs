@@ -19,7 +19,7 @@ public class Case06_Reinstall
         // ── Establish working state, uninstall, then reinstall ──
         testHelper.LogStep("Start from committed state and build once");
         testHelper.SetInstalledState();
-        testHelper.Build(); // TODO: Swallowed error.
+        testHelper.Rebuild(); // TODO: Swallowed error.
 
         testHelper.LogStep("Uninstall package");
         testHelper.UninstallPackage(); // TODO: Failure is ignored.
@@ -29,13 +29,13 @@ public class Case06_Reinstall
 
         // ── Build and verify increment ──
         testHelper.LogStep("Build after reinstall – should succeed and increment");
-        var build1 = testHelper.Build();
+        var build1 = testHelper.Rebuild();
         AreEqual(0, build1.ExitCode);
 
         int? firstNum = testHelper.ExtractBuildNumFromNupkgName(build1.Output);
         testHelper.LogResult($"First build after reinstall: BuildNum={firstNum}");
 
-        var build2 = testHelper.Build();
+        var build2 = testHelper.Rebuild();
         AreEqual(0, build2.ExitCode);
 
         int? secondNum = testHelper.ExtractBuildNumFromNupkgName(build2.Output);

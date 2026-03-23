@@ -43,7 +43,7 @@ public class Case04_FirstUse
             IsTrue(hasExpectedError, $"First build failed but not with the expected '{expectedMessage}' error.");
         }
         // 2nd build should succeed
-        CommandLineResult buildResult2 = testHelper.Build();
+        CommandLineResult buildResult2 = testHelper.Rebuild();
         AreEqual(0, buildResult2.ExitCode, $"2nd build failed.\n{buildResult2.Error}");
 
         IsTrue(testHelper.BuildNumXmlExists());
@@ -60,7 +60,7 @@ public class Case04_FirstUse
 
         for (int i = 0; i < 3; i++)
         {
-            var nextBuildNum = testHelper.Build();
+            var nextBuildNum = testHelper.Rebuild();
             AreEqual(0, nextBuildNum.ExitCode, $"Build {i + 3} failed.\n{nextBuildNum.Error}");
 
             int? currentBuildNum = testHelper.ExtractBuildNumFromNupkgName(nextBuildNum.Output);
