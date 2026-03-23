@@ -1,7 +1,7 @@
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]
-public class ManualEditTests
+public class Case08_ManualEdit
 {
     /// <summary>
     /// Manual Test Plan → "Manual Edit"

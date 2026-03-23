@@ -3,7 +3,7 @@ using static System.StringComparison;
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]
-public class ConditionalsTests
+public class Case09_Conditionals
 {
     /// <summary>
     /// Manual Test Plan → "Conditionals"

@@ -1,7 +1,7 @@
 ﻿namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]
-public class SetInitialStateTests
+public class Case01_SetInitialState
 {
     [TestMethod]
     public void SetInitialState_ShouldNotCrash()

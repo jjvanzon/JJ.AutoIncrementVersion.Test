@@ -2,7 +2,7 @@
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]
-public class AutoRecreateFilesTests
+public class Case07_AutoRecreateFiles
 {
     /// <summary>
     /// Manual Test Plan → "Auto-Recreate Files" (Directory.Build.props deleted)
