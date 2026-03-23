@@ -14,7 +14,7 @@ public class Case03_Install
     ///   5. Auto-creates Directory.Build.props with expected content.
     /// </summary>
     [TestMethod]
-    public void Install_AutoCreatesFilesAndBuildsWithZero()
+    public void Case03_Install_AutoCreatesFilesAndBuildsWithZero()
     {
         using var testHelper = new TestHelper();
 

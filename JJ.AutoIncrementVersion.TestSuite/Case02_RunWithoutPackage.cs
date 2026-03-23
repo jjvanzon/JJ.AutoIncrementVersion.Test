@@ -14,7 +14,7 @@ public class Case02_RunWithoutPackage
     ///   5. Output shows .0.nupkg
     /// </summary>
     [TestMethod]
-    public void RunWithoutPackage_ProducesVersionEndingWithZero()
+    public void Case02_RunWithoutPackage_ProducesVersionEndingWithZero()
     {
         using var testHelper = new TestHelper();
 

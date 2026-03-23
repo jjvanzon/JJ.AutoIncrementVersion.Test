@@ -14,7 +14,7 @@ public class Case07_AutoRecreateFiles
     ///   4. Subsequent builds succeed, incrementing version.
     /// </summary>
     [TestMethod]
-    public void DeleteDirectoryBuildProps_FailsThenRecreatesAndIncrements()
+    public void Case07_DeleteDirectoryBuildProps_FailsThenRecreatesAndIncrements()
     {
         using var testHelper = new TestHelper();
 
@@ -76,7 +76,7 @@ public class Case07_AutoRecreateFiles
     ///   4. Versions start at BuildNum 0 or 1 again.
     /// </summary>
     [TestMethod]
-    public void DeleteBuildNumXml_RecreatesToZeroOrOne()
+    public void Case07_DeleteBuildNumXml_RecreatesToZeroOrOne()
     {
         using var testHelper = new TestHelper();
 
@@ -99,7 +99,7 @@ public class Case07_AutoRecreateFiles
     /// Manual Test Plan → "Auto-Recreate Files" (both deleted)
     /// </summary>
     [TestMethod]
-    public void DeleteBoth_ShowsSimilarEffect()
+    public void Case07_DeleteBoth_ShowsSimilarEffect()
     {
         using var testHelper = new TestHelper();
 

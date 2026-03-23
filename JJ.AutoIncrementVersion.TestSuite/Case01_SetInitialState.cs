@@ -4,7 +4,7 @@
 public class Case01_SetInitialState
 {
     [TestMethod]
-    public void SetInitialState_ShouldNotCrash()
+    public void Case01_SetInitialState_ShouldNotCrash()
     {
         using var testHelper = new TestHelper();
         testHelper.SetUninstalledState();

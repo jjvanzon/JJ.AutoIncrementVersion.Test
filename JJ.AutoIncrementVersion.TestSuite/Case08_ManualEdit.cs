@@ -14,7 +14,7 @@ public class Case08_ManualEdit
     ///   5. And they increment each build.
     /// </summary>
     [TestMethod]
-    public void ManualEdit_ContinuesFromRestoredValueThenFromManualValue()
+    public void Case08_ManualEdit_ContinuesFromRestoredValueThenFromManualValue()
     {
         using var testHelper = new TestHelper();
 

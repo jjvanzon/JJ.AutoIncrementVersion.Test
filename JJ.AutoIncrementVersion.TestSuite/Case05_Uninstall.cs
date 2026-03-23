@@ -14,7 +14,7 @@ public class Case05_Uninstall
     ///   5. Version should stay frozen (no increment).
     /// </summary>
     [TestMethod]
-    public void Uninstall_FilesRemainAndVersionFreezes()
+    public void Case05_Uninstall_FilesRemainAndVersionFreezes()
     {
         using var testHelper = new TestHelper();
 

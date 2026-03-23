@@ -11,7 +11,7 @@ public class Case10_CommandLineBuild
     ///   2. It saved 9999 + 1 = 10000 back to BuildNum.xml.
     /// </summary>
     [TestMethod]
-    public void CommandLineBuild_OverridesBuildNumAndSavesNext()
+    public void Case10_CommandLineBuild_OverridesBuildNumAndSavesNext()
     {
         using var testHelper = new TestHelper();
 

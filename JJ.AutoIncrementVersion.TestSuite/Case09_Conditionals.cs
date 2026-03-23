@@ -20,7 +20,7 @@ public class Case09_Conditionals
     ///   4. Swap a few times to see if Release continues with original range.
     /// </summary>
     [TestMethod]
-    public void Conditionals_ReleaseIncrementsDebugUsesZero()
+    public void Case09_Conditionals_ReleaseIncrementsDebugUsesZero()
     {
         using var testHelper = new TestHelper();
 

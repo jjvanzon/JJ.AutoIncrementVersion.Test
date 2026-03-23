@@ -12,7 +12,7 @@ public class Case11_UpgradeRegression
     ///   3. Continues to increment build numbers.
     /// </summary>
     [TestMethod]
-    public void UpgradeRegression_RestoresBuildNumWasFromXmljjAndIncrements()
+    public void Case11_UpgradeRegression_RestoresBuildNumWasFromXmljjAndIncrements()
     {
         using var testHelper = new TestHelper();
 

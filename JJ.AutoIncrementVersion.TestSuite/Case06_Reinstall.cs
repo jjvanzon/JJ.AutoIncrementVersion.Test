@@ -12,7 +12,7 @@ public class Case06_Reinstall
     ///   2. Build should succeed, incrementing version each time.
     /// </summary>
     [TestMethod]
-    public void Reinstall_BuildSucceedsAndIncrements()
+    public void Case06_Reinstall_BuildSucceedsAndIncrements()
     {
         using var testHelper = new TestHelper();
 

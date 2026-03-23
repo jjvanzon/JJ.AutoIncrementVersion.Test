@@ -17,7 +17,7 @@ public class Case04_FirstUse
     ///   8. Subsequent builds auto-increment (.1, .2, …).
     /// </summary>
     [TestMethod]
-    public void FirstUse_FailsThenSucceedsThenIncrements()
+    public void Case04_FirstUse_FailsThenSucceedsThenIncrements()
     {
         using var testHelper = new TestHelper();
 
