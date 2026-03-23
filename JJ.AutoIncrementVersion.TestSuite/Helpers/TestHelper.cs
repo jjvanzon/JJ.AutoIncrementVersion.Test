@@ -152,7 +152,13 @@ internal sealed class TestHelper
         return result;
     }
 
-    public CommandLineResult Build(string configuration = "Release", string? extraArgs = null)
+    public CommandLineResult Build(string configuration = "Release")
+    {
+        string args = $"build \"{CsprojPath}\" -c {configuration}";
+        return RunDotnet(args);
+    }
+    
+    public CommandLineResult BuildWithArgs(string configuration = "Release", string? extraArgs = null)
     {
         string args = $"build \"{CsprojPath}\" -c {configuration}";
         if (extraArgs is not null) args += $" {extraArgs}";
@@ -160,7 +166,7 @@ internal sealed class TestHelper
     }
 
     public CommandLineResult Rebuild(string configuration = "Release")
-        => Build(configuration, "--no-incremental");
+        => BuildWithArgs(configuration, "--no-incremental");
 
     public CommandLineResult InstallPackage()
         => RunDotnet($"add \"{CsprojPath}\" package {PackageId} --version {PackageVersion}");

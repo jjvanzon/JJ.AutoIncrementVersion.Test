@@ -21,7 +21,7 @@ public class CommandLineAndUpgradeTests
         testHelper.GitRestoreAll();
 
         testHelper.LogStep("Build with /p:BuildNum=9999");
-        var result = testHelper.Build("Release", "/p:BuildNum=9999");
+        var result = testHelper.BuildWithArgs("Release", "/p:BuildNum=9999");
         Assert.AreEqual(0, result.ExitCode, $"Build failed.\n{result.Error}");
 
         // ── Verify output contains 9999 ──

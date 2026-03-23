@@ -36,12 +36,14 @@ public class AutoRecreateFilesTests
 
         if (failBuild.ExitCode != 0)
         {
+            string expectedMessage = "is not a valid version string";
+
             bool hasExpectedError =
                 failBuild.Output.Contains("NETSDK1018", StringComparison.OrdinalIgnoreCase) ||
                 failBuild.Error.Contains("NETSDK1018", StringComparison.OrdinalIgnoreCase) ||
-                failBuild.Output.Contains("Invalid NuGet version string", StringComparison.OrdinalIgnoreCase) ||
-                failBuild.Error.Contains("Invalid NuGet version string", StringComparison.OrdinalIgnoreCase);
-            testHelper.LogResult($"Build failed as expected. Expected error: {hasExpectedError}");
+                failBuild.Output.Contains(expectedMessage, StringComparison.OrdinalIgnoreCase) ||
+                failBuild.Error.Contains(expectedMessage, StringComparison.OrdinalIgnoreCase);
+            testHelper.LogResult($"Build failed as expected. Expected error: {expectedMessage}");
         }
         else
         {
