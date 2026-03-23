@@ -87,8 +87,8 @@ public sealed class TestHelper
         var stderr = new StringBuilder();
 
         // REVIEWED: Cool. Didn't know before how to capture output. Bit verbose from .NET, but nice that it's possible
-        process.OutputDataReceived += (_, e) => { if (e.Data is not null) stdout.AppendLine(e.Data); }; // TODO: e.Data ?? "" would prevent null pattern check.
-        process.ErrorDataReceived += (_, e) => { if (e.Data is not null) stderr.AppendLine(e.Data); }; // TODO: e.Data ?? "" would prevent null pattern check.
+        process.OutputDataReceived += (_, e) => { stdout.AppendLine(e.Data ?? ""); };
+        process.ErrorDataReceived += (_, e) => { stderr.AppendLine(e.Data ?? ""); };
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
 
@@ -128,8 +128,8 @@ public sealed class TestHelper
         var stdout = new StringBuilder();
         var stderr = new StringBuilder();
 
-        process.OutputDataReceived += (_, e) => { if (e.Data is not null) stdout.AppendLine(e.Data); };
-        process.ErrorDataReceived += (_, e) => { if (e.Data is not null) stderr.AppendLine(e.Data); };
+        process.OutputDataReceived += (_, e) => { stdout.AppendLine(e.Data ?? ""); };
+        process.ErrorDataReceived += (_, e) => { stderr.AppendLine(e.Data ?? ""); };
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
 
