@@ -126,3 +126,14 @@
             //    errorText = result.Output;
             //}
 
+
+
+    private void ExtractAllResources()
+    {
+        ExtractResourceBuildNumXml();
+        ExtractResourceDirectoryBuildProps();
+        ExtractResourceCsproj();
+        ExtractResourceDummyTxt();
+        ExtractResourceReadMe();
+        ExtractResourceNuGetConfig();
+    }

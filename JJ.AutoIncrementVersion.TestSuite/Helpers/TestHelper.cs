@@ -41,7 +41,7 @@ internal sealed class TestHelper : IDisposable
     public void DeleteBuildNumXml() => File.Delete(BuildNumXmlPath);
     public void DeleteDirectoryBuildProps() => File.Delete(DirectoryBuildPropsPath);
 
-    // Constructor / Embedded Resource Extraction
+    // Init / Cleanup
 
     public TestHelper()
     {
@@ -54,23 +54,50 @@ internal sealed class TestHelper : IDisposable
         CsprojPath = Path.Combine(ProjectDir, $"{TestProjectName}.csproj");
         BuildNumXmlPath = Path.Combine(SolutionDir, "BuildNum.xml");
         DirectoryBuildPropsPath = Path.Combine(SolutionDir, "Directory.Build.props");
+    }
 
+    /// <summary>
+    /// Re-extracts all embedded test files to the isolated folder,
+    /// restoring them to their original state (replaces git restore).
+    /// </summary>
+    public void SetInstalledState()
+    {
+        Log("Set installed state");
         CreateDirectory(SolutionDir);
         CreateDirectory(ProjectDir);
-
-        ExtractAllResources();
+        ExtractResourceBuildNumXml();
+        ExtractResourceDirectoryBuildProps();
+        ExtractResourceCsproj();
+        ExtractResourceDummyTxt();
+        ExtractResourceReadMe();
+        ExtractResourceNuGetConfig();
+        Restore();
     }
 
-    private void ExtractAllResources()
+    /// <summary>
+    /// Full "Set Initial State" as described in the manual test plan:
+    /// uninstall package, delete BuildNum.xml &amp; Directory.Build.props,
+    /// replace $(BuildNum) with 0 in csproj.
+    /// </summary>
+    public void SetUninstalledState()
     {
-        ExtractResource(BuildNumXmlResourceName, BuildNumXmlPath);
-        ExtractResource(DirectoryBuildPropsResourceName, DirectoryBuildPropsPath);
-        ExtractResource(CsprojResourceName, CsprojPath);
-        ExtractResource(DummyTxtResourceName, Path.Combine(ProjectDir, "Dummy.txt"));
-        ExtractResource(ReadMeResourceName, Path.Combine(SolutionDir, "README.md"));
-        ExtractResource(NuGetConfigResourceName, Path.Combine(SolutionDir, "NuGet.config"));
-        Log("Set up project dir.");
+        Log("Set uninstalled state");
+        CreateDirectory(SolutionDir);
+        CreateDirectory(ProjectDir);
+        ExtractResourceCsproj();
+        ExtractResourceDummyTxt();
+        ExtractResourceReadMe();
+        ExtractResourceNuGetConfig();
+        RemovePackageReferenceFromCsproj();
+        SetCsprojVersion("4.3.0"); // TODO: Should not assume the version will start with 4.3. Should use current value for that major/minor.
     }
+
+    private void ExtractResourceBuildNumXml() => ExtractResource(BuildNumXmlResourceName, BuildNumXmlPath);
+    private void ExtractResourceDirectoryBuildProps() => ExtractResource(DirectoryBuildPropsResourceName, DirectoryBuildPropsPath);
+    private void ExtractResourceCsproj() => ExtractResource(CsprojResourceName, CsprojPath);
+    private void ExtractResourceDummyTxt() => ExtractResource(DummyTxtResourceName, Path.Combine(ProjectDir, "Dummy.txt"));
+    private void ExtractResourceReadMe() => ExtractResource(ReadMeResourceName, Path.Combine(SolutionDir, "README.md"));
+    private void ExtractResourceNuGetConfig() => ExtractResource(NuGetConfigResourceName, Path.Combine(SolutionDir, "NuGet.config"));
 
     private static void ExtractResource(string logicalName, string targetPath)
     {
@@ -87,6 +114,32 @@ internal sealed class TestHelper : IDisposable
         using var reader = new StreamReader(stream);
         WriteAllText(targetPath, reader.ReadToEnd());
     }
+
+    /// <summary>
+    /// Deletes the isolated temp folder and all its contents.
+    /// </summary>
+    public void Cleanup()
+    {
+        try
+        {
+            if (Directory.Exists(SolutionDir))
+            {
+                Delete(SolutionDir, recursive: true);
+            }
+        }
+        catch (Exception ex)
+        {
+            LogWarning($"Could not delete isolated folder: {ex.Message}");
+        }
+    }
+
+    public void Dispose()
+    {
+        Cleanup();
+        GC.SuppressFinalize(this);
+    }
+
+    ~TestHelper() => Cleanup();
 
     // Logging
 
@@ -263,50 +316,4 @@ internal sealed class TestHelper : IDisposable
         string? name = ExtractNupkgName(output);
         return name is not null && name.EndsWith(suffix, OrdinalIgnoreCase);
     }
-
-    // Init / Cleanup
-
-    /// <summary>
-    /// Re-extracts all embedded test files to the isolated folder,
-    /// restoring them to their original state (replaces git restore).
-    /// </summary>
-    public void SetInstalledState()
-    {
-        ExtractAllResources();
-    }
-
-    /// <summary>
-    /// Full "Set Initial State" as described in the manual test plan:
-    /// uninstall package, delete BuildNum.xml &amp; Directory.Build.props,
-    /// replace $(BuildNum) with 0 in csproj.
-    /// </summary>
-    public void SetUninstalledState()
-    {
-        ExtractAllResources(); // Re-extract the files to a known baseline first.
-        RemovePackageReferenceFromCsproj();
-        DeleteBuildNumXml();
-        DeleteDirectoryBuildProps();
-        SetCsprojVersion("4.3.0"); // TODO: Should not assume the version will start with 4.3. Should use current value for that major/minor.
-        Log("Set uninstalled state");
-    }
-
-    /// <summary>
-    /// Deletes the isolated temp folder and all its contents.
-    /// </summary>
-    public void Cleanup()
-    {
-        try
-        {
-            if (Directory.Exists(SolutionDir))
-            {
-                Delete(SolutionDir, recursive: true);
-            }
-        }
-        catch (Exception ex)
-        {
-            LogWarning($"Could not delete isolated folder: {ex.Message}");
-        }
-    }
-
-    public void Dispose() => Cleanup();
 }
