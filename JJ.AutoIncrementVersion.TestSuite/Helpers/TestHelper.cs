@@ -11,7 +11,8 @@ namespace JJ.AutoIncrementVersion.TestSuite.Helpers;
 /// </summary>
 internal sealed class TestHelper
 {
-    // ── paths ──────────────────────────────────────────────────────────
+    // Paths
+    
     public string SolutionDir { get; }
     public string ProjectDir { get; } 
     public string CsprojPath { get; } 
@@ -22,8 +23,30 @@ internal sealed class TestHelper
     // TODO: Fixed version number not good. Latest from Pre-Release-Package-Feed is better. Kinda bad, because if we keep this, we'd assume the tests test the latest, which it never would.
     private const string PackageVersion = "4.2.5746";
     private const string TestProjectName = "JJ.AutoIncrementVersion.Test";
+        
+    // File Helpers
 
-    // ── ctor ───────────────────────────────────────────────────────────
+    public bool BuildNumXmlExists() => File.Exists(BuildNumXmlPath);
+    public bool DirectoryBuildPropsExists() => File.Exists(DirectoryBuildPropsPath);
+    public string ReadBuildNumXml() => File.ReadAllText(BuildNumXmlPath);
+    public string ReadDirectoryBuildProps() => File.ReadAllText(DirectoryBuildPropsPath);
+    public void WriteBuildNumXml(string content) => File.WriteAllText(BuildNumXmlPath, content);
+    public void WriteDirectoryBuildProps(string content) => File.WriteAllText(DirectoryBuildPropsPath, content);
+    
+    public void DeleteBuildNumXml()
+    {
+        if (File.Exists(BuildNumXmlPath)) File.Delete(BuildNumXmlPath);
+        Log($"   Deleted BuildNum.xml (exists={File.Exists(BuildNumXmlPath)})"); // TODO: Logs it's deleted even when it didn't evne exist.
+    }
+
+    public void DeleteDirectoryBuildProps()
+    {
+        if (File.Exists(DirectoryBuildPropsPath)) File.Delete(DirectoryBuildPropsPath);
+        Log($"   Deleted Directory.Build.props (exists={File.Exists(DirectoryBuildPropsPath)})"); // TODO: Logs it's deleted even when it didn't evne exist.
+    }
+
+    // Constructor / Path Lookup
+
     public TestHelper()
     {
 
@@ -48,7 +71,9 @@ internal sealed class TestHelper
         DirectoryBuildPropsPath = Path.Combine(SolutionDir, "Directory.Build.props");
     }
 
-    // ── logging ────────────────────────────────────────────────────────
+
+    // Logging
+
     public void Log(string message)
     {
         #if DEBUG
@@ -62,10 +87,11 @@ internal sealed class TestHelper
     public void LogResult(string result) => Log($"   ✓ {result}");
     public void LogWarning(string warning) => Log($"   ⚠ {warning}");
 
-    // ── process execution ──────────────────────────────────────────────
+    // Run Processes
+
     public record CommandLineResult(int ExitCode, string Output, string Error);
 
-    public CommandLineResult RunDotnet(string arguments, int timeoutSeconds = 120)
+    public CommandLineResult RunDotnet(string arguments)
     {
         Log($"   > dotnet {arguments}");
 
@@ -92,6 +118,7 @@ internal sealed class TestHelper
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
 
+        const int timeoutSeconds = 120;
         if (!process.WaitForExit(timeoutSeconds * 1000)) // TODO: Infra-specific 2 min time-out should be central variable and even from config.
         {
             process.Kill(entireProcessTree: true);
@@ -102,13 +129,29 @@ internal sealed class TestHelper
         process.WaitForExit();
 
         var result = new CommandLineResult(process.ExitCode, stdout.ToString(), stderr.ToString());
-        // TODO: Should check exit code here already? Fail fast?
         if (result.Output.Length > 0) Log(result.Output.TrimEnd());
-        if (result.Error.Length > 0) Log($"   [stderr] {result.Error.TrimEnd()}"); // TODO: Throw instead to stop test?
+        if (result.Error.Length > 0) Log($"   [stderr] {result.Error.TrimEnd()}");
+       
+        /*
+        if (mustThrow)
+        {
+            bool hasError = result.ExitCode != 0 || !string.IsNullOrWhiteSpace(result.Error);
+            if (hasError)
+            {
+                string errorText = result.Error;
+                if (string.IsNullOrWhiteSpace(errorText))
+                {
+                    errorText = result.Output;
+                }
+
+                throw new Exception($"dotnet {arguments} failed: Exit code {result.ExitCode}" + errorText);
+            }
+        }
+        */
+
         return result;
     }
 
-    // ── build shortcuts ────────────────────────────────────────────────
     public CommandLineResult Build(string configuration = "Release", string? extraArgs = null)
     {
         string args = $"build \"{CsprojPath}\" -c {configuration}";
@@ -119,7 +162,6 @@ internal sealed class TestHelper
     public CommandLineResult Rebuild(string configuration = "Release")
         => Build(configuration, "--no-incremental");
 
-    // ── package management ─────────────────────────────────────────────
     public CommandLineResult InstallPackage()
         => RunDotnet($"add \"{CsprojPath}\" package {PackageId} --version {PackageVersion}");
 
@@ -130,27 +172,7 @@ internal sealed class TestHelper
     public CommandLineResult UninstallPackage()
         => RunDotnet($"remove \"{CsprojPath}\" package {PackageId}");
 
-    // ── file helpers ───────────────────────────────────────────────────
-    public void DeleteBuildNumXml()
-    {
-        if (File.Exists(BuildNumXmlPath)) File.Delete(BuildNumXmlPath);
-        Log($"   Deleted BuildNum.xml (exists={File.Exists(BuildNumXmlPath)})"); // TODO: Logs it's deleted even when it didn't evne exist.
-    }
-
-    public void DeleteDirectoryBuildProps()
-    {
-        if (File.Exists(DirectoryBuildPropsPath)) File.Delete(DirectoryBuildPropsPath);
-        Log($"   Deleted Directory.Build.props (exists={File.Exists(DirectoryBuildPropsPath)})"); // TODO: Logs it's deleted even when it didn't evne exist.
-    }
-
-    public bool BuildNumXmlExists() => File.Exists(BuildNumXmlPath);
-    public bool DirectoryBuildPropsExists() => File.Exists(DirectoryBuildPropsPath);
-
-    public string ReadBuildNumXml() => File.ReadAllText(BuildNumXmlPath);
-    public string ReadDirectoryBuildProps() => File.ReadAllText(DirectoryBuildPropsPath);
-
-    public void WriteBuildNumXml(string content) => File.WriteAllText(BuildNumXmlPath, content);
-    public void WriteDirectoryBuildProps(string content) => File.WriteAllText(DirectoryBuildPropsPath, content);
+    // Read/Write Values in Files
 
     public int GetBuildNumFromXml()
     {
