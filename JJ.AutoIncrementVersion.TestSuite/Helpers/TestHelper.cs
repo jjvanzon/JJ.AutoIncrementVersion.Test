@@ -82,6 +82,10 @@ internal sealed class TestHelper : IDisposable
         ExtractResource(ResBuildNumXml, BuildNumXmlPath);
         ExtractResource(ResDirectoryBuildProps, DirectoryBuildPropsPath);
         ExtractResource(ResCsproj, CsprojPath);
+
+        // Create placeholder files referenced by the csproj.
+        File.WriteAllText(Path.Combine(ProjectDir, "Dummy.txt"), "");
+        File.WriteAllText(Path.Combine(SolutionDir, "README.md"), "# JJ.AutoIncrementVersion.Test");
     }
 
     private static void ExtractResource(string logicalName, string targetPath)
