@@ -1,6 +1,6 @@
 using JJ.AutoIncrementVersion.TestSuite.Helpers;
 
-namespace JJ.AutoIncrementVersion.TestSuite.Tests;
+namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]
 public class ManualEditTests

@@ -79,3 +79,7 @@
 
 // = "..\\JJ.AutoIncrementVersion.Test";
 //= ProjectDir + "\\JJ.AutoIncrementVersion.Test.csproj";
+
+        // TODO: Lots of ceremony could be reused for multiple ProcessStart helpers.
+
+// TODO: Infra-specific 2 min time-out should be central variable and even from config.

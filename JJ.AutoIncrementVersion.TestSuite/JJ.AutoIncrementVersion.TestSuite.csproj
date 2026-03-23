@@ -15,21 +15,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="..\JJ.AutoIncrementVersion.Test\JJ.AutoIncrementVersion.Test.csproj"
-                      Link="EmbeddedTestFiles\JJ.AutoIncrementVersion.Test.csproj"
-                      LogicalName="TestFiles.JJ.AutoIncrementVersion.Test.csproj" />
-    <EmbeddedResource Include="..\Directory.Build.props"
-                      Link="EmbeddedTestFiles\Directory.Build.props"
-                      LogicalName="TestFiles.Directory.Build.props" />
-    <EmbeddedResource Include="..\BuildNum.xml"
-                      Link="EmbeddedTestFiles\BuildNum.xml"
-                      LogicalName="TestFiles.BuildNum.xml" />
-    <EmbeddedResource Include="..\README.md"
-                      Link="EmbeddedTestFiles\README.md"
-                      LogicalName="TestFiles.README.md" />
-    <EmbeddedResource Include="..\JJ.AutoIncrementVersion.Test\Dummy.txt"
-                      Link="EmbeddedTestFiles\Dummy.txt"
-                      LogicalName="TestFiles.Dummy.txt" />
+    <EmbeddedResource Include="..\JJ.AutoIncrementVersion.Test\JJ.AutoIncrementVersion.Test.csproj" Link="EmbeddedTestFiles\JJ.AutoIncrementVersion.Test.csproj" LogicalName="TestFiles.JJ.AutoIncrementVersion.Test.csproj" />
+    <EmbeddedResource Include="..\Directory.Build.props" Link="EmbeddedTestFiles\Directory.Build.props" LogicalName="TestFiles.Directory.Build.props" />
+    <EmbeddedResource Include="..\BuildNum.xml" Link="EmbeddedTestFiles\BuildNum.xml" LogicalName="TestFiles.BuildNum.xml" />
+    <EmbeddedResource Include="..\README.md" Link="EmbeddedTestFiles\README.md" LogicalName="TestFiles.README.md" />
+    <EmbeddedResource Include="..\JJ.AutoIncrementVersion.Test\Dummy.txt" Link="EmbeddedTestFiles\Dummy.txt" LogicalName="TestFiles.Dummy.txt" />
   </ItemGroup>
 
 </Project>

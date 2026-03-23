@@ -3,6 +3,8 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using static System.Console;
+using static System.IO.File;
 
 namespace JJ.AutoIncrementVersion.TestSuite.Helpers;
 
@@ -38,23 +40,23 @@ internal sealed class TestHelper : IDisposable
 
     // File Helpers
 
-    public bool BuildNumXmlExists() => File.Exists(BuildNumXmlPath);
-    public bool DirectoryBuildPropsExists() => File.Exists(DirectoryBuildPropsPath);
-    public string ReadBuildNumXml() => File.ReadAllText(BuildNumXmlPath);
-    public string ReadDirectoryBuildProps() => File.ReadAllText(DirectoryBuildPropsPath);
-    public void WriteBuildNumXml(string content) => File.WriteAllText(BuildNumXmlPath, content);
-    public void WriteDirectoryBuildProps(string content) => File.WriteAllText(DirectoryBuildPropsPath, content);
+    public bool BuildNumXmlExists() => Exists(BuildNumXmlPath);
+    public bool DirectoryBuildPropsExists() => Exists(DirectoryBuildPropsPath);
+    public string ReadBuildNumXml() => ReadAllText(BuildNumXmlPath);
+    public string ReadDirectoryBuildProps() => ReadAllText(DirectoryBuildPropsPath);
+    public void WriteBuildNumXml(string content) => WriteAllText(BuildNumXmlPath, content);
+    public void WriteDirectoryBuildProps(string content) => WriteAllText(DirectoryBuildPropsPath, content);
 
     public void DeleteBuildNumXml()
     {
-        if (File.Exists(BuildNumXmlPath)) File.Delete(BuildNumXmlPath);
-        Log($"   Deleted BuildNum.xml (exists={File.Exists(BuildNumXmlPath)})"); // TODO: Logs it's deleted even when it didn't evne exist.
+        if (Exists(BuildNumXmlPath)) Delete(BuildNumXmlPath);
+        Log($"   Deleted BuildNum.xml (exists={Exists(BuildNumXmlPath)})"); // TODO: Logs it's deleted even when it didn't evne exist.
     }
 
     public void DeleteDirectoryBuildProps()
     {
-        if (File.Exists(DirectoryBuildPropsPath)) File.Delete(DirectoryBuildPropsPath);
-        Log($"   Deleted Directory.Build.props (exists={File.Exists(DirectoryBuildPropsPath)})"); // TODO: Logs it's deleted even when it didn't evne exist.
+        if (Exists(DirectoryBuildPropsPath)) Delete(DirectoryBuildPropsPath);
+        Log($"   Deleted Directory.Build.props (exists={Exists(DirectoryBuildPropsPath)})"); // TODO: Logs it's deleted even when it didn't evne exist.
     }
 
     // Constructor / Embedded Resource Extraction
@@ -84,8 +86,6 @@ internal sealed class TestHelper : IDisposable
         ExtractResource(ResBuildNumXml, BuildNumXmlPath);
         ExtractResource(ResDirectoryBuildProps, DirectoryBuildPropsPath);
         ExtractResource(ResCsproj, CsprojPath);
-
-        // Extract supporting files referenced by the csproj.
         ExtractResource(ResDummyTxt, Path.Combine(ProjectDir, "Dummy.txt"));
         ExtractResource(ResReadme, Path.Combine(SolutionDir, "README.md"));
     }
@@ -93,14 +93,18 @@ internal sealed class TestHelper : IDisposable
     private static void ExtractResource(string logicalName, string targetPath)
     {
         var assembly = Assembly.GetExecutingAssembly();
-        using var stream = assembly.GetManifestResourceStream(logicalName)
-            ?? throw new InvalidOperationException(
+        using var stream = assembly.GetManifestResourceStream(logicalName);
+
+        if (stream == null)
+        {
+            throw new InvalidOperationException(
                 $"Embedded resource '{logicalName}' not found. Available: " +
                 string.Join(", ", assembly.GetManifestResourceNames()));
-        using var reader = new StreamReader(stream);
-        File.WriteAllText(targetPath, reader.ReadToEnd());
-    }
+        }
 
+        using var reader = new StreamReader(stream);
+        WriteAllText(targetPath, reader.ReadToEnd());
+    }
 
     // Logging
 
@@ -109,7 +113,7 @@ internal sealed class TestHelper : IDisposable
         #if DEBUG
         Debug.WriteLine(message);
         #else
-        Console.WriteLine(message);
+        WriteLine(message);
         #endif
     }
 
@@ -119,13 +123,9 @@ internal sealed class TestHelper : IDisposable
 
     // Run Processes
 
-    public record CommandLineResult(int ExitCode, string Output, string Error);
-
     public CommandLineResult RunDotnet(string arguments)
     {
-        Log($"   > dotnet {arguments}");
-
-        // TODO: Lots of ceremony could be reused for multiple ProcessStart helpers.
+        Log($"> dotnet {arguments}");
 
         var psi = new ProcessStartInfo
         {
@@ -149,7 +149,7 @@ internal sealed class TestHelper : IDisposable
         process.BeginErrorReadLine();
 
         const int timeoutSeconds = 120;
-        if (!process.WaitForExit(timeoutSeconds * 1000)) // TODO: Infra-specific 2 min time-out should be central variable and even from config.
+        if (!process.WaitForExit(timeoutSeconds * 1000))
         {
             process.Kill(entireProcessTree: true);
             throw new TimeoutException($"dotnet {arguments} timed out after {timeoutSeconds}s");
@@ -160,7 +160,7 @@ internal sealed class TestHelper : IDisposable
 
         var result = new CommandLineResult(process.ExitCode, stdout.ToString(), stderr.ToString());
         if (result.Output.Length > 0) Log(result.Output.TrimEnd());
-        if (result.Error.Length > 0) Log($"   [stderr] {result.Error.TrimEnd()}");
+        if (result.Error.Length > 0) Log($"[stderr] {result.Error.TrimEnd()}");
 
         /*
         if (mustThrow)
@@ -204,7 +204,7 @@ internal sealed class TestHelper : IDisposable
     public CommandLineResult UninstallPackage()
         => RunDotnet($"remove \"{CsprojPath}\" package {PackageId}");
 
-    // Read/Write Values in Files
+    // Inspect/Write Values
 
     public int GetBuildNumFromXml()
     {
@@ -219,11 +219,9 @@ internal sealed class TestHelper : IDisposable
         var el = doc.Descendants("BuildNum").First();
         el.Value = num.ToString();
         // Write back as single-line XML (matching original format)
-        File.WriteAllText(BuildNumXmlPath, doc.Declaration?.ToString() ?? "");
-        using var writer = new System.Xml.XmlTextWriter(BuildNumXmlPath, Encoding.UTF8)
-        {
-            Formatting = System.Xml.Formatting.None
-        };
+        WriteAllText(BuildNumXmlPath, doc.Declaration?.ToString() ?? "");
+        using var writer = new System.Xml.XmlTextWriter(BuildNumXmlPath, Encoding.UTF8);
+        writer.Formatting = System.Xml.Formatting.None;
         doc.WriteTo(writer);
     }
 
@@ -232,9 +230,9 @@ internal sealed class TestHelper : IDisposable
     /// </summary>
     public void SetCsprojVersion(string version)
     {
-        string text = File.ReadAllText(CsprojPath);
+        string text = ReadAllText(CsprojPath);
         text = Regex.Replace(text, @"<Version>[^<]*</Version>", $"<Version>{version}</Version>");
-        File.WriteAllText(CsprojPath, text);
+        WriteAllText(CsprojPath, text);
         Log($"   Set <Version> to {version}");
     }
 
@@ -243,7 +241,7 @@ internal sealed class TestHelper : IDisposable
     /// </summary>
     public bool CsprojHasPackageReference()
     {
-        string text = File.ReadAllText(CsprojPath);
+        string text = ReadAllText(CsprojPath);
         return text.Contains($"Include=\"{PackageId}\"", StringComparison.OrdinalIgnoreCase);
     }
 
@@ -253,15 +251,13 @@ internal sealed class TestHelper : IDisposable
     /// </summary>
     public void RemovePackageReferenceFromCsproj()
     {
-        string text = File.ReadAllText(CsprojPath);
+        string text = ReadAllText(CsprojPath);
         // Remove the <PackageReference Include="JJ.AutoIncrementVersion" ... /> line
         string pattern = @"\s*<PackageReference\s+Include=""JJ\.AutoIncrementVersion""[^/]*/>\s*";
         text = Regex.Replace(text, pattern, "\n");
-        File.WriteAllText(CsprojPath, text);
+        WriteAllText(CsprojPath, text);
         Log($"   Removed {PackageId} PackageReference from csproj");
     }
-
-    // ── output inspection ──────────────────────────────────────────────
 
     /// <summary>
     /// Extracts the nupkg file name (e.g. "JJ.AutoIncrementVersion.Test.4.3.5.nupkg")
@@ -310,9 +306,7 @@ internal sealed class TestHelper : IDisposable
     public void SetInitialState()
     {
         LogStep("Set Initial State");
-        // Re-extract the files to a known baseline first.
-        ExtractAllResources();
-
+        ExtractAllResources(); // Re-extract the files to a known baseline first.
         RemovePackageReferenceFromCsproj();
         DeleteBuildNumXml();
         DeleteDirectoryBuildProps();
