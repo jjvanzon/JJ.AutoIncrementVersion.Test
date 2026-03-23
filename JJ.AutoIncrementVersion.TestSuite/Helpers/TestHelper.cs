@@ -90,6 +90,7 @@ internal sealed class TestHelper : IDisposable
         ExtractResourceNuGetConfig();
         RemovePackageReferenceFromCsproj();
         SetCsprojVersion("4.3.0"); // TODO: Should not assume the version will start with 4.3. Should use current value for that major/minor.
+        Restore();
     }
 
     private void ExtractResourceBuildNumXml() => ExtractResource(BuildNumXmlResourceName, BuildNumXmlPath);
