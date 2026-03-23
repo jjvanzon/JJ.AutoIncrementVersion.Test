@@ -108,3 +108,8 @@
         if (Exists(DirectoryBuildPropsPath)) Delete(DirectoryBuildPropsPath);
         Log($"   Deleted Directory.Build.props (exists={Exists(DirectoryBuildPropsPath)})"); // TODO: Logs it's deleted even when it didn't evne exist.
     }
+
+    /// <summary>Root of the isolated temp folder (contains BuildNum.xml, Directory.Build.props).</summary>
+    /// <summary>Sub-folder containing the csproj (one level deeper).</summary>
+
+            // TODO: The error does not contain "Invalid NuGet version string" The actual error is: C:\Program Files\dotnet\sdk\10.0.201\NuGet.targets(196,5): error : '4.3.' is not a valid version string. (Parameter 'value') [D:\Repositories\JJ.AutoIncrementVersion.Test\JJ.AutoIncrementVersion.Test\JJ.AutoIncrementVersion.Test.csproj]

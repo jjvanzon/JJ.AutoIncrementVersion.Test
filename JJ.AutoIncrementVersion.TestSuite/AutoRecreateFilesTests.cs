@@ -1,3 +1,4 @@
+
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]
@@ -17,24 +18,18 @@ public class AutoRecreateFilesTests
     {
         using var testHelper = new TestHelper();
 
-        // ── Start from working state ──
-        testHelper.LogStep("Establish working state");
-        testHelper.RestoreAll();
+        testHelper.SetInstalledState();
         testHelper.Build();
 
-        // ── Delete Directory.Build.props ──
-        testHelper.LogStep("Delete Directory.Build.props");
         testHelper.DeleteDirectoryBuildProps();
-        Assert.IsFalse(testHelper.DirectoryBuildPropsExists());
+        IsFalse(testHelper.DirectoryBuildPropsExists());
 
-        // ── Build should fail ── // TODO: Assertion code could be made reusable.
-        testHelper.LogStep("Build – expect failure (NETSDK1018 / Invalid NuGet version)");
-        var failBuild = testHelper.Build();
-        testHelper.LogResult($"Exit code: {failBuild.ExitCode}");
+        // TODO: Assertion code could be made reusable.
+        CommandLineResult failBuild = testHelper.Build();
 
         if (failBuild.ExitCode != 0)
         {
-            string expectedMessage = "is not a valid version string";
+            const string expectedMessage = "is not a valid version string";
 
             bool hasExpectedError =
                 failBuild.Output.Contains("NETSDK1018", StringComparison.OrdinalIgnoreCase) ||
@@ -48,29 +43,24 @@ public class AutoRecreateFilesTests
             testHelper.LogWarning("Build did not fail – may be OK if props was recreated before version resolution.");
         }
 
-        // ── Directory.Build.props should be recreated ──
-        testHelper.LogStep("Verify Directory.Build.props was recreated");
-        Assert.IsTrue(testHelper.DirectoryBuildPropsExists(),
-            "Directory.Build.props should have been recreated by the build.");
-        testHelper.LogResult($"Content: {testHelper.ReadDirectoryBuildProps().Trim()}");
+        IsTrue(testHelper.DirectoryBuildPropsExists());
 
-        // ── Subsequent builds succeed and increment ──
-        testHelper.LogStep("Subsequent builds – succeed and increment");
-        int? prev = null;
+        // Subsequent builds succeed and increment
+        int? previousBuildNum = null;
         for (int i = 0; i < 3; i++) // TODO: I like the retry loop and that it checks for increments.
         {
-            var r = testHelper.Build();
+            CommandLineResult result = testHelper.Build();
             // TODO: ExitCode can indicate error, withotu Error text being filled in (error shows up in r.Output instead).
-            Assert.AreEqual(0, r.ExitCode, $"Build {i + 1} failed.\n{r.Error}");
+            AreEqual(0, result.ExitCode, $"Build {i + 1} failed.\n{result.Error}");
 
-            int? cur = testHelper.ExtractBuildNumFromNupkg(r.Output);
-            testHelper.LogResult($"Build {i + 1}: nupkg={testHelper.ExtractNupkgName(r.Output)} BuildNum={cur}");
+            int? currentBuildNum = testHelper.ExtractBuildNumFromNupkgName(result.Output);
+            testHelper.LogResult($"Build {i + 1}: nupkg={testHelper.ExtractNupkgName(result.Output)} BuildNum={currentBuildNum}");
 
             // WOuld be nice if it checked for increments by exactly 1.
 
-            if (prev is not null && cur is not null)
-                Assert.IsTrue(cur > prev, $"Expected increment: prev={prev}, cur={cur}");
-            prev = cur;
+            if (previousBuildNum is not null && currentBuildNum is not null)
+                IsTrue(currentBuildNum > previousBuildNum, $"Expected increment: prev={previousBuildNum}, cur={currentBuildNum}");
+            previousBuildNum = currentBuildNum;
         }
 
         testHelper.LogResult("PASS – Delete Directory.Build.props: fail → recreate → increment");
@@ -90,28 +80,17 @@ public class AutoRecreateFilesTests
     {
         using var testHelper = new TestHelper();
 
-        // ── Start from working state ──
-        testHelper.LogStep("Establish working state");
-        testHelper.RestoreAll();
+        testHelper.SetInstalledState();
         testHelper.Build(); // TODO: Working state was not checked, because error is swallowed.
 
-        // ── Delete BuildNum.xml ──
-        testHelper.LogStep("Delete BuildNum.xml");
         testHelper.DeleteBuildNumXml();
-        Assert.IsFalse(testHelper.BuildNumXmlExists());
+        IsFalse(testHelper.BuildNumXmlExists());
 
-        // ── Build ──
-        testHelper.LogStep("Build after deleting BuildNum.xml");
-        var result = testHelper.Build();
-        testHelper.LogResult($"Exit code: {result.ExitCode}");
+        CommandLineResult buildResult = testHelper.Build();
 
-        // ── Verify recreated ──
-        testHelper.LogStep("Verify BuildNum.xml was recreated");
-        Assert.IsTrue(testHelper.BuildNumXmlExists(), "BuildNum.xml should be recreated.");
+        IsTrue(testHelper.BuildNumXmlExists());
         int newBuildNum = testHelper.GetBuildNumFromXml();
-        testHelper.LogResult($"BuildNum.xml recreated with BuildNum={newBuildNum}");
-        Assert.IsTrue(newBuildNum <= 1,
-            $"After recreation, BuildNum should be 0 or 1 but was {newBuildNum}.");
+        IsTrue(newBuildNum <= 1, $"After recreation, BuildNum should be 0 or 1 but was {newBuildNum}.");
 
         testHelper.LogResult("PASS – Delete BuildNum.xml: recreated with low BuildNum");
     }
@@ -124,11 +103,9 @@ public class AutoRecreateFilesTests
     {
         using var testHelper = new TestHelper();
 
-        testHelper.LogStep("Establish working state");
-        testHelper.RestoreAll();
+        testHelper.SetInstalledState();
         testHelper.Build(); // TODO: Working state was not checked, because error is swallowed.
 
-        testHelper.LogStep("Delete both BuildNum.xml and Directory.Build.props");
         testHelper.DeleteBuildNumXml();
         testHelper.DeleteDirectoryBuildProps();
 
@@ -142,11 +119,8 @@ public class AutoRecreateFilesTests
         var second = testHelper.Build();
         testHelper.LogResult($"2nd build exit code: {second.ExitCode}");
 
-        testHelper.LogStep("Verify both files recreated");
-        Assert.IsTrue(testHelper.BuildNumXmlExists(), "BuildNum.xml should be recreated.");
-        Assert.IsTrue(testHelper.DirectoryBuildPropsExists(), "Directory.Build.props should be recreated.");
-        testHelper.LogResult($"BuildNum.xml: {testHelper.ReadBuildNumXml().Trim()}");
-        testHelper.LogResult($"Directory.Build.props: {testHelper.ReadDirectoryBuildProps().Trim()}");
+        IsTrue(testHelper.BuildNumXmlExists());
+        IsTrue(testHelper.DirectoryBuildPropsExists());
 
         testHelper.LogResult("PASS – Both deleted: files recreated");
     }

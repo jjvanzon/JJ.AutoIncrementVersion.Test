@@ -15,28 +15,26 @@ public class CommandLineAndUpgradeTests
     {
         using var testHelper = new TestHelper();
 
-        testHelper.LogStep("Restore committed state");
-        testHelper.RestoreAll();
+        testHelper.SetInstalledState();
 
         testHelper.LogStep("Build with /p:BuildNum=9999");
-        var result = testHelper.BuildWithArgs("Release", "/p:BuildNum=9999");
-        Assert.AreEqual(0, result.ExitCode, $"Build failed.\n{result.Error}");
+        var buildResult = testHelper.BuildWithArgs("Release", "/p:BuildNum=9999");
+        AreEqual(0, buildResult.ExitCode);
 
         // ── Verify output contains 9999 ──
         testHelper.LogStep("Verify nupkg ends with .9999.nupkg");
-        string? nupkg = testHelper.ExtractNupkgName(result.Output);
+        string? nupkg = testHelper.ExtractNupkgName(buildResult.Output);
         testHelper.LogResult($"Nupkg: {nupkg ?? "(none)"}");
 
-        Assert.IsTrue(
-            testHelper.OutputContainsNupkgEndingWith(result.Output, ".9999.nupkg"),
+        IsTrue(
+            testHelper.OutputContainsNupkgEndingWith(buildResult.Output, ".9999.nupkg"),
             $"Expected nupkg ending with .9999.nupkg but got: {nupkg}");
 
         // ── Verify BuildNum.xml saved 10000 ──
         testHelper.LogStep("Verify BuildNum.xml was updated to 10000");
         int savedNum = testHelper.GetBuildNumFromXml();
         testHelper.LogResult($"BuildNum in XML: {savedNum}");
-        Assert.AreEqual(10000, savedNum,
-            $"Expected BuildNum.xml to contain 10000 (9999+1) but got {savedNum}");
+        AreEqual(10000, savedNum,  $"Expected BuildNum.xml to contain 10000 (9999+1) but got {savedNum}");
 
         testHelper.LogResult("PASS – Command Line Build: /p:BuildNum=9999 → .9999.nupkg, saved 10000");
     }
@@ -55,7 +53,7 @@ public class CommandLineAndUpgradeTests
         using var testHelper = new TestHelper();
 
         testHelper.LogStep("Restore committed state and build once");
-        testHelper.RestoreAll();
+        testHelper.SetInstalledState();
         testHelper.Build();
 
         // ── Remove BuildNumWasFromXmljj ──
@@ -70,38 +68,33 @@ public class CommandLineAndUpgradeTests
         testHelper.WriteBuildNumXml(modified);
         testHelper.LogResult($"After removal: {testHelper.ReadBuildNumXml().Trim()}");
 
-        Assert.IsFalse(testHelper.ReadBuildNumXml().Contains("BuildNumWasFromXmljj"),
-            "BuildNumWasFromXmljj should have been removed.");
+        IsFalse(testHelper.ReadBuildNumXml().Contains("BuildNumWasFromXmljj"));
 
         // ── Build ──
         testHelper.LogStep("Build – should restore BuildNumWasFromXmljj");
         var build1 = testHelper.Build();
         // TODO: Error is not in build1.Error It's embedded in build1.Output.
-        Assert.AreEqual(0, build1.ExitCode, $"Build failed.\n{build1.Error}");
+        AreEqual(0, build1.ExitCode, $"Build failed.\n{build1.Error}");
 
-        testHelper.LogStep("Verify BuildNumWasFromXmljj was restored");
-        string afterBuild = testHelper.ReadBuildNumXml();
-        testHelper.LogResult($"BuildNum.xml after build: {afterBuild.Trim()}");
-        Assert.IsTrue(afterBuild.Contains("BuildNumWasFromXmljj"),
-            "BuildNumWasFromXmljj should be restored after build.");
+        string buildNumAfterBuild = testHelper.ReadBuildNumXml();
+        IsTrue(buildNumAfterBuild.Contains("BuildNumWasFromXmljj"));
 
         // ── Verify continued increment ──
         testHelper.LogStep("Verify continued increment");
-        int? prev = testHelper.ExtractBuildNumFromNupkg(build1.Output);
+        int? previousBuildNum = testHelper.ExtractBuildNumFromNupkgName(build1.Output);
         for (int i = 0; i < 2; i++)
         {
-            var next = testHelper.Build();
-            Assert.AreEqual(0, next.ExitCode, $"Build {i + 2} failed.\n{next.Error}");
+            CommandLineResult nextBuildResult = testHelper.Build();
+            AreEqual(0, nextBuildResult.ExitCode, $"Build {i + 2} failed.\n{nextBuildResult.Error}");
 
-            int? cur = testHelper.ExtractBuildNumFromNupkg(next.Output);
-            testHelper.LogResult($"Build {i + 2}: nupkg num={cur}");
+            int? currentBuildNum = testHelper.ExtractBuildNumFromNupkgName(nextBuildResult.Output);
+            testHelper.LogResult($"Build {i + 2}: nupkg num={currentBuildNum}");
 
-            if (prev is not null && cur is not null)
+            if (previousBuildNum is not null && currentBuildNum is not null)
             {
-                Assert.IsTrue(cur > prev,
-                    $"Expected increment: prev={prev}, cur={cur}");
+                IsTrue(currentBuildNum > previousBuildNum);
             }
-            prev = cur;
+            previousBuildNum = currentBuildNum;
         }
 
         testHelper.LogResult("PASS – Upgrade Regression: BuildNumWasFromXmljj restored, increments continue");

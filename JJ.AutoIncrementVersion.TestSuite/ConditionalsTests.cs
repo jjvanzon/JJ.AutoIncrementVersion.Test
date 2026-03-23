@@ -1,3 +1,5 @@
+using static System.StringComparison;
+
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]
@@ -22,52 +24,44 @@ public class ConditionalsTests
     {
         using var testHelper = new TestHelper();
 
-        // ── Restore committed state (which already has the conditional) ──
-        testHelper.LogStep("Restore committed state");
-        testHelper.RestoreAll();
+        testHelper.SetInstalledState();
+
+        string dirPropsContent = testHelper.ReadDirectoryBuildProps();
 
         // ── Verify Directory.Build.props has the conditional ──
-        testHelper.LogStep("Verify Directory.Build.props has Release condition");
-        string propsContent = testHelper.ReadDirectoryBuildProps();
-        testHelper.LogResult($"Directory.Build.props: {propsContent.Trim()}");
-        // Assert can fail because the Release condition is not guaranteed as an initial state.
-        Assert.IsTrue(
-            propsContent.Contains("$(Configuration)=='Release'", StringComparison.OrdinalIgnoreCase),
-            "Directory.Build.props should have the Release condition.");
+        // TODO: Assert can fail because the Release condition is not guaranteed as an initial state.
+        IsTrue(dirPropsContent.Contains("$(Configuration)=='Release'", OrdinalIgnoreCase));
 
         // ── Release build – should increment ──
-        testHelper.LogStep("Release build 1");
-        var rel1 = testHelper.Build("Release");
-        Assert.AreEqual(0, rel1.ExitCode, $"Release build 1 failed.\n{rel1.Error}");
-        int? relNum1 = testHelper.ExtractBuildNumFromNupkg(rel1.Output);
-        testHelper.LogResult($"Release build 1: nupkg num={relNum1}");
+        var releaseBuildResult1 = testHelper.Build("Release");
+        AreEqual(0, releaseBuildResult1.ExitCode, $"Release build 1 failed.\n{releaseBuildResult1.Error}");
+        int? releaseBuildNum1 = testHelper.ExtractBuildNumFromNupkgName(releaseBuildResult1.Output);
+        testHelper.LogResult($"Release build 1: nupkg num={releaseBuildNum1}");
 
         testHelper.LogStep("Release build 2");
-        var rel2 = testHelper.Build("Release");
-        Assert.AreEqual(0, rel2.ExitCode, $"Release build 2 failed.\n{rel2.Error}");
-        int? relNum2 = testHelper.ExtractBuildNumFromNupkg(rel2.Output);
-        testHelper.LogResult($"Release build 2: nupkg num={relNum2}");
+        CommandLineResult releaseBuild2Result = testHelper.Build("Release");
+        AreEqual(0, releaseBuild2Result.ExitCode, $"Release build 2 failed.\n{releaseBuild2Result.Error}");
+        int? releaseBuildNum2 = testHelper.ExtractBuildNumFromNupkgName(releaseBuild2Result.Output);
+        testHelper.LogResult($"Release build 2: nupkg num={releaseBuildNum2}");
 
-        if (relNum1 is not null && relNum2 is not null)
+        if (releaseBuildNum1 is not null && releaseBuildNum2 is not null)
         {
-            Assert.IsTrue(relNum2 > relNum1,
-                $"Release should increment: rel1={relNum1}, rel2={relNum2}");
+            IsTrue(releaseBuildNum2 > releaseBuildNum1);
         }
 
         // ── Debug build – should use BuildNum 0 ──
         testHelper.LogStep("Debug build – should use BuildNum 0");
         var dbg = testHelper.Build("Debug");
-        Assert.AreEqual(0, dbg.ExitCode, $"Debug build failed.\n{dbg.Error}");
+        AreEqual(0, dbg.ExitCode, $"Debug build failed.\n{dbg.Error}");
 
-        int? dbgNum = testHelper.ExtractBuildNumFromNupkg(dbg.Output);
+        int? dbgNum = testHelper.ExtractBuildNumFromNupkgName(dbg.Output);
         testHelper.LogResult($"Debug build: nupkg num={dbgNum}");
 
         // Debug build may or may not produce a nupkg depending on GeneratePackageOnBuild,
         // but if it does, the BuildNum portion should be 0.
         if (dbgNum is not null)
         {
-            Assert.AreEqual(0, dbgNum.Value,
-                $"Debug build should use BuildNum 0 but got {dbgNum}");
+            AreEqual(0, dbgNum.Value, $"Debug build should use BuildNum 0 but got {dbgNum}");
         }
         else
         {
@@ -77,39 +71,38 @@ public class ConditionalsTests
         // ── Swap back to Release – should continue incrementing ──
         testHelper.LogStep("Back to Release – should continue from where it left off");
         var rel3 = testHelper.Build("Release");
-        Assert.AreEqual(0, rel3.ExitCode, $"Release build 3 failed.\n{rel3.Error}");
-        int? relNum3 = testHelper.ExtractBuildNumFromNupkg(rel3.Output);
+        AreEqual(0, rel3.ExitCode, $"Release build 3 failed.\n{rel3.Error}");
+        int? relNum3 = testHelper.ExtractBuildNumFromNupkgName(rel3.Output);
         testHelper.LogResult($"Release build 3: nupkg num={relNum3}");
 
-        if (relNum2 is not null && relNum3 is not null)
+        if (releaseBuildNum2 is not null && relNum3 is not null)
         {
-            Assert.IsTrue(relNum3 > relNum2,
-                $"Release should continue incrementing: rel2={relNum2}, rel3={relNum3}");
+            IsTrue(relNum3 > releaseBuildNum2,
+                $"Release should continue incrementing: rel2={releaseBuildNum2}, rel3={relNum3}");
         }
 
         // ── One more Debug to confirm ──
         testHelper.LogStep("Debug again – still BuildNum 0");
         var dbg2 = testHelper.Build("Debug");
-        Assert.AreEqual(0, dbg2.ExitCode, $"Debug build 2 failed.\n{dbg2.Error}");
-        int? dbgNum2 = testHelper.ExtractBuildNumFromNupkg(dbg2.Output);
+        AreEqual(0, dbg2.ExitCode, $"Debug build 2 failed.\n{dbg2.Error}");
+        int? dbgNum2 = testHelper.ExtractBuildNumFromNupkgName(dbg2.Output);
         testHelper.LogResult($"Debug build 2: nupkg num={dbgNum2}");
 
         if (dbgNum2 is not null)
         {
-            Assert.AreEqual(0, dbgNum2.Value,
-                $"Debug build should still use BuildNum 0 but got {dbgNum2}");
+            AreEqual(0, dbgNum2.Value, $"Debug build should still use BuildNum 0 but got {dbgNum2}");
         }
 
         // ── One more Release ──
         testHelper.LogStep("Release again – still incrementing");
         var rel4 = testHelper.Build("Release");
-        Assert.AreEqual(0, rel4.ExitCode);
-        int? relNum4 = testHelper.ExtractBuildNumFromNupkg(rel4.Output);
+        AreEqual(0, rel4.ExitCode);
+        int? relNum4 = testHelper.ExtractBuildNumFromNupkgName(rel4.Output);
         testHelper.LogResult($"Release build 4: nupkg num={relNum4}");
 
         if (relNum3 is not null && relNum4 is not null)
         {
-            Assert.IsTrue(relNum4 > relNum3,
+            IsTrue(relNum4 > relNum3,
                 $"Release should keep incrementing: rel3={relNum3}, rel4={relNum4}");
         }
 

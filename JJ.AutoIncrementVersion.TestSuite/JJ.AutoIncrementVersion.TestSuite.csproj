@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="JJ.Framework.Testing.Core" Version="4.1.5752" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.*" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.*" />
     <PackageReference Include="MSTest.TestFramework" Version="3.*" />

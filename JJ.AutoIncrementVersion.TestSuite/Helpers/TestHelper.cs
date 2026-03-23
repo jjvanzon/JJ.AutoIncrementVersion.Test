@@ -1,3 +1,4 @@
+
 namespace JJ.AutoIncrementVersion.TestSuite.Helpers;
 
 /// <summary>
@@ -30,14 +31,14 @@ internal sealed class TestHelper : IDisposable
 
     // File Helpers
 
-    public bool BuildNumXmlExists() => Exists(BuildNumXmlPath);
-    public bool DirectoryBuildPropsExists() => Exists(DirectoryBuildPropsPath);
+    public bool BuildNumXmlExists() => File.Exists(BuildNumXmlPath);
+    public bool DirectoryBuildPropsExists() => File.Exists(DirectoryBuildPropsPath);
     public string ReadBuildNumXml() => ReadAllText(BuildNumXmlPath);
     public string ReadDirectoryBuildProps() => ReadAllText(DirectoryBuildPropsPath);
     public void WriteBuildNumXml(string content) => WriteAllText(BuildNumXmlPath, content);
     public void WriteDirectoryBuildProps(string content) => WriteAllText(DirectoryBuildPropsPath, content);
-    public void DeleteBuildNumXml() => Delete(BuildNumXmlPath);
-    public void DeleteDirectoryBuildProps() => Delete(DirectoryBuildPropsPath);
+    public void DeleteBuildNumXml() => File.Delete(BuildNumXmlPath);
+    public void DeleteDirectoryBuildProps() => File.Delete(DirectoryBuildPropsPath);
 
     // Constructor / Embedded Resource Extraction
 
@@ -52,13 +53,10 @@ internal sealed class TestHelper : IDisposable
         BuildNumXmlPath = Path.Combine(SolutionDir, "BuildNum.xml");
         DirectoryBuildPropsPath = Path.Combine(SolutionDir, "Directory.Build.props");
 
-        Directory.CreateDirectory(SolutionDir);
-        Directory.CreateDirectory(ProjectDir);
+        CreateDirectory(SolutionDir);
+        CreateDirectory(ProjectDir);
 
-        // Extract all embedded test files to the isolated folder.
         ExtractAllResources();
-
-        Log($"── TestHelper: isolated folder created at {SolutionDir}");
     }
 
     private void ExtractAllResources()
@@ -253,7 +251,7 @@ internal sealed class TestHelper : IDisposable
     /// Extracts the last segment of the version from the nupkg name.
     /// E.g. "JJ.AutoIncrementVersion.Test.4.3.7.nupkg" → 7
     /// </summary>
-    public int? ExtractBuildNumFromNupkg(string output)
+    public int? ExtractBuildNumFromNupkgName(string output)
     {
         var match = Regex.Match(output, @"JJ\.AutoIncrementVersion\.Test\.[\d]+\.[\d]+\.([\d]+)\.nupkg");
         return match.Success ? int.Parse(match.Groups[1].Value) : null;
@@ -271,11 +269,9 @@ internal sealed class TestHelper : IDisposable
     /// Re-extracts all embedded test files to the isolated folder,
     /// restoring them to their original state (replaces git restore).
     /// </summary>
-    public void RestoreAll()
+    public void SetInstalledState()
     {
-        Log("   Restoring isolated files from embedded resources...");
         ExtractAllResources();
-        LogResult("Isolated files restored to original state");
     }
 
     /// <summary>
@@ -283,9 +279,8 @@ internal sealed class TestHelper : IDisposable
     /// uninstall package, delete BuildNum.xml &amp; Directory.Build.props,
     /// replace $(BuildNum) with 0 in csproj.
     /// </summary>
-    public void SetInitialState()
+    public void SetUninstalledState()
     {
-        LogStep("Set Initial State");
         ExtractAllResources(); // Re-extract the files to a known baseline first.
         RemovePackageReferenceFromCsproj();
         DeleteBuildNumXml();
@@ -299,13 +294,11 @@ internal sealed class TestHelper : IDisposable
     /// </summary>
     public void Cleanup()
     {
-        Log("── CLEANUP ──");
         try
         {
             if (Directory.Exists(SolutionDir))
             {
-                Directory.Delete(SolutionDir, recursive: true);
-                LogResult($"Deleted isolated folder: {SolutionDir}");
+                Delete(SolutionDir, recursive: true);
             }
         }
         catch (Exception ex)

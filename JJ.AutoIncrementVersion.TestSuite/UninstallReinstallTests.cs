@@ -33,26 +33,23 @@ public class UninstallReinstallTests
         testHelper.LogResult($"Package uninstalled. Has reference: {testHelper.CsprojHasPackageReference()}");
 
         // ── Verify files remain ──
-        testHelper.LogStep("Verify BuildNum.xml and Directory.Build.props still exist");
-        Assert.IsTrue(testHelper.BuildNumXmlExists(), "BuildNum.xml should remain after uninstall.");
-        Assert.IsTrue(testHelper.DirectoryBuildPropsExists(), "Directory.Build.props should remain after uninstall.");
-        testHelper.LogResult("Both files still present.");
+        IsTrue(testHelper.BuildNumXmlExists());
+        IsTrue(testHelper.DirectoryBuildPropsExists());
 
         // ── Build should succeed ──
         testHelper.LogStep("Build after uninstall – should succeed");
         var buildResult = testHelper.Build();
-        Assert.AreEqual(0, buildResult.ExitCode, $"Build failed after uninstall.\n{buildResult.Error}");
+        AreEqual(0, buildResult.ExitCode, $"Build failed after uninstall.\n{buildResult.Error}");
         testHelper.LogResult("Build succeeded.");
 
         // ── Version should be frozen ──
         testHelper.LogStep("Build again – version should stay frozen (no increment)");
         int buildNumAfterBuild = testHelper.GetBuildNumFromXml();
-        var secondBuild = testHelper.Build();
+        var secondBuildResult = testHelper.Build();
         int buildNumAfterSecond = testHelper.GetBuildNumFromXml();
         testHelper.LogResult($"BuildNum after 1st build: {buildNumAfterBuild}, after 2nd build: {buildNumAfterSecond}");
 
-        Assert.AreEqual(buildNumAfterBuild, buildNumAfterSecond,
-            "BuildNum should not change when package is uninstalled.");
+        AreEqual(buildNumAfterBuild, buildNumAfterSecond, "BuildNum should not change when package is uninstalled.");
 
         testHelper.LogResult("PASS – Uninstall: files remain, build succeeds, version frozen");
     }
@@ -72,7 +69,7 @@ public class UninstallReinstallTests
 
         // ── Establish working state, uninstall, then reinstall ──
         testHelper.LogStep("Start from committed state and build once");
-        testHelper.RestoreAll();
+        testHelper.SetInstalledState();
         testHelper.Build(); // TODO: Swallowed error.
 
         testHelper.LogStep("Uninstall package");
@@ -83,22 +80,21 @@ public class UninstallReinstallTests
 
         // ── Build and verify increment ──
         testHelper.LogStep("Build after reinstall – should succeed and increment");
-        var first = testHelper.Build();
-        Assert.AreEqual(0, first.ExitCode, $"Build failed.\n{first.Error}");
+        var build1 = testHelper.Build();
+        AreEqual(0, build1.ExitCode);
 
-        int? firstNum = testHelper.ExtractBuildNumFromNupkg(first.Output);
+        int? firstNum = testHelper.ExtractBuildNumFromNupkgName(build1.Output);
         testHelper.LogResult($"First build after reinstall: BuildNum={firstNum}");
 
-        var second = testHelper.Build();
-        Assert.AreEqual(0, second.ExitCode, $"Second build failed.\n{second.Error}");
+        var build2 = testHelper.Build();
+        AreEqual(0, build2.ExitCode);
 
-        int? secondNum = testHelper.ExtractBuildNumFromNupkg(second.Output);
+        int? secondNum = testHelper.ExtractBuildNumFromNupkgName(build2.Output);
         testHelper.LogResult($"Second build after reinstall: BuildNum={secondNum}");
 
         if (firstNum is not null && secondNum is not null)
         {
-            Assert.IsTrue(secondNum > firstNum,
-                $"Expected increment: first={firstNum}, second={secondNum}");
+            IsTrue(secondNum > firstNum);
         }
 
         testHelper.LogResult("PASS – Reinstall: build succeeds and version increments");
