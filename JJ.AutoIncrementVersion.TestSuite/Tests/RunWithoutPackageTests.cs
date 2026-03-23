@@ -9,15 +9,6 @@ namespace JJ.AutoIncrementVersion.TestSuite.Tests;
 [TestClass]
 public class RunWithoutPackageTests
 {
-    // TODO: Rename _h to _helper or even _testHelper. No need to be obscure.
-    private TestHelper _h = null!;
-
-    [TestInitialize]
-    public void Init() => _h = new TestHelper(); // TODO: Init and CleanUp may as well be put in the test code iteself.
-
-    [TestCleanup]
-    public void Cleanup() => _h.Cleanup();
-
     /// <summary>
     /// Manual Test Plan → "Set Initial State" + "Run Without Package"
     /// 
@@ -31,25 +22,27 @@ public class RunWithoutPackageTests
     [TestMethod]
     public void RunWithoutPackage_ProducesVersionEndingWithZero()
     {
+        var testHelper = new TestHelper();
+
         // ── Set Initial State ──
-        _h.SetInitialState();
+        testHelper.SetInitialState();
 
         // TODO: Error for uninstall package is swallowed in the logic of SetInitialState, so we actually don't even know that we're running with or without the package.
 
         // ── Run Without Package ──
-        _h.LogStep("Run Without Package – Rebuild");
-        var result = _h.Rebuild();
+        testHelper.LogStep("Run Without Package – Rebuild");
+        var result = testHelper.Rebuild();
 
-        _h.LogStep("Verify output contains .0.nupkg");
-        string? nupkg = _h.ExtractNupkgName(result.Output);
-        _h.LogResult($"Extracted nupkg name: {nupkg ?? "(none)"}");
+        testHelper.LogStep("Verify output contains .0.nupkg");
+        string? nupkg = testHelper.ExtractNupkgName(result.Output);
+        testHelper.LogResult($"Extracted nupkg name: {nupkg ?? "(none)"}");
 
         Assert.AreEqual(0, result.ExitCode, $"Build failed.\n{result.Error}");
         Assert.IsNotNull(nupkg, "No nupkg file name found in build output.");
         Assert.IsTrue(
-            _h.OutputContainsNupkgEndingWith(result.Output, ".0.nupkg"),
+            testHelper.OutputContainsNupkgEndingWith(result.Output, ".0.nupkg"),
             $"Expected nupkg ending with .0.nupkg but got: {nupkg}");
 
-        _h.LogResult("PASS – Package version ends with .0.nupkg");
+        testHelper.LogResult("PASS – Package version ends with .0.nupkg");
     }
 }

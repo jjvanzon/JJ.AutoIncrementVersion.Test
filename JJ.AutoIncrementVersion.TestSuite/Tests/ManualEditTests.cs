@@ -5,14 +5,6 @@ namespace JJ.AutoIncrementVersion.TestSuite.Tests;
 [TestClass]
 public class ManualEditTests
 {
-    private TestHelper _h = null!;
-
-    [TestInitialize]
-    public void Init() => _h = new TestHelper(); // TODO: Init and CleanUp may as well be put in the test code iteself.
-
-    [TestCleanup]
-    public void Cleanup() => _h.Cleanup();
-
     /// <summary>
     /// Manual Test Plan → "Manual Edit"
     ///
@@ -26,27 +18,29 @@ public class ManualEditTests
     [TestMethod]
     public void ManualEdit_ContinuesFromRestoredValueThenFromManualValue()
     {
-        // ── Restore original state ──
-        _h.LogStep("Restore original BuildNum.xml via git");
-        _h.GitRestoreAll(); // Doing a git restore of our work mid-test automatically is a big no no.
+        var testHelper = new TestHelper();
 
-        int originalBuildNum = _h.GetBuildNumFromXml();
-        _h.LogResult($"Original BuildNum from XML: {originalBuildNum}");
+        // ── Restore original state ──
+        testHelper.LogStep("Restore original BuildNum.xml via git");
+        testHelper.GitRestoreAll(); // Doing a git restore of our work mid-test automatically is a big no no.
+
+        int originalBuildNum = testHelper.GetBuildNumFromXml();
+        testHelper.LogResult($"Original BuildNum from XML: {originalBuildNum}");
 
         // ── Build – should increment from the restored value ──
-        _h.LogStep("Build – should use restored BuildNum");
-        var build1 = _h.Build();
+        testHelper.LogStep("Build – should use restored BuildNum");
+        var build1 = testHelper.Build();
         // TODO: Assertion not clear (build1.Error doesn't contain error. It's embedded in build1.Output).
         Assert.AreEqual(0, build1.ExitCode, $"Build failed.\n{build1.Error}");
         
-        int? nupkgNum1 = _h.ExtractBuildNumFromNupkg(build1.Output);
-        _h.LogResult($"Build 1 nupkg num: {nupkgNum1}");
+        int? nupkgNum1 = testHelper.ExtractBuildNumFromNupkg(build1.Output);
+        testHelper.LogResult($"Build 1 nupkg num: {nupkgNum1}");
 
-        var build2 = _h.Build();
+        var build2 = testHelper.Build();
         Assert.AreEqual(0, build2.ExitCode, $"Build 2 failed.\n{build2.Error}");
 
-        int? nupkgNum2 = _h.ExtractBuildNumFromNupkg(build2.Output);
-        _h.LogResult($"Build 2 nupkg num: {nupkgNum2}");
+        int? nupkgNum2 = testHelper.ExtractBuildNumFromNupkg(build2.Output);
+        testHelper.LogResult($"Build 2 nupkg num: {nupkgNum2}");
 
         if (nupkgNum1 is not null && nupkgNum2 is not null)
         {
@@ -56,28 +50,28 @@ public class ManualEditTests
 
         // ── Manually set BuildNum to a specific value ──
         int manualValue = 100;
-        _h.LogStep($"Manually set BuildNum to {manualValue}");
-        _h.SetBuildNumInXml(manualValue);
-        _h.LogResult($"BuildNum.xml now: {_h.ReadBuildNumXml().Trim()}");
+        testHelper.LogStep($"Manually set BuildNum to {manualValue}");
+        testHelper.SetBuildNumInXml(manualValue);
+        testHelper.LogResult($"BuildNum.xml now: {testHelper.ReadBuildNumXml().Trim()}");
 
         // ── Build – version should start from the manual value ──
-        _h.LogStep("Build after manual edit – version should use new BuildNum");
-        var build3 = _h.Build();
+        testHelper.LogStep("Build after manual edit – version should use new BuildNum");
+        var build3 = testHelper.Build();
         Assert.AreEqual(0, build3.ExitCode, $"Build 3 failed.\n{build3.Error}");
 
-        int? nupkgNum3 = _h.ExtractBuildNumFromNupkg(build3.Output);
-        _h.LogResult($"Build 3 nupkg num: {nupkgNum3} (set manually to {manualValue})");
+        int? nupkgNum3 = testHelper.ExtractBuildNumFromNupkg(build3.Output);
+        testHelper.LogResult($"Build 3 nupkg num: {nupkgNum3} (set manually to {manualValue})");
 
         // ── Subsequent builds should increment from that new value ──
-        _h.LogStep("Subsequent builds – should increment from manual value");
+        testHelper.LogStep("Subsequent builds – should increment from manual value");
         int? prev = nupkgNum3;
         for (int i = 0; i < 2; i++)
         {
-            var next = _h.Build();
+            var next = testHelper.Build();
             Assert.AreEqual(0, next.ExitCode, $"Build {i + 4} failed.\n{next.Error}");
 
-            int? cur = _h.ExtractBuildNumFromNupkg(next.Output);
-            _h.LogResult($"Build {i + 4}: nupkg num={cur}");
+            int? cur = testHelper.ExtractBuildNumFromNupkg(next.Output);
+            testHelper.LogResult($"Build {i + 4}: nupkg num={cur}");
 
             if (prev is not null && cur is not null)
             {
@@ -87,6 +81,6 @@ public class ManualEditTests
             prev = cur;
         }
 
-        _h.LogResult("PASS – Manual Edit: restored → increments; manual set → increments from new value");
+        testHelper.LogResult("PASS – Manual Edit: restored → increments; manual set → increments from new value");
     }
 }

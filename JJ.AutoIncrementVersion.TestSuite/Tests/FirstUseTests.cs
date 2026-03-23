@@ -5,14 +5,6 @@ namespace JJ.AutoIncrementVersion.TestSuite.Tests;
 [TestClass]
 public class FirstUseTests
 {
-    private TestHelper _h = null!;
-
-    [TestInitialize]
-    public void Init() => _h = new TestHelper(); // TODO: Init and CleanUp may as well be put in the test code iteself.
-
-    [TestCleanup]
-    public void Cleanup() => _h.Cleanup();
-
     /// <summary>
     /// Manual Test Plan → "First Use"
     ///
@@ -29,21 +21,23 @@ public class FirstUseTests
     [TestMethod]
     public void FirstUse_FailsThenSucceedsThenIncrements()
     {
+        var testHelper = new TestHelper();
+
         // ── Set Initial State ──
-        _h.SetInitialState();
+        testHelper.SetInitialState();
 
         // ── Install package ──
-        _h.LogStep("Install package");
-        _h.InstallPackage();
+        testHelper.LogStep("Install package");
+        testHelper.InstallPackage();
 
         // ── Set $(BuildNum) in version ──
-        _h.LogStep("Set <Version>4.3.$(BuildNum)</Version>");
-        _h.SetCsprojVersion("4.3.$(BuildNum)");
+        testHelper.LogStep("Set <Version>4.3.$(BuildNum)</Version>");
+        testHelper.SetCsprojVersion("4.3.$(BuildNum)");
 
         // ── 1st rebuild: expect failure ──
-        _h.LogStep("1st rebuild – expect failure (no BuildNum.xml yet)");
-        var first = _h.Rebuild();
-        _h.LogResult($"Exit code: {first.ExitCode}");
+        testHelper.LogStep("1st rebuild – expect failure (no BuildNum.xml yet)");
+        var first = testHelper.Rebuild();
+        testHelper.LogResult($"Exit code: {first.ExitCode}");
 
         // The first build may fail because $(BuildNum) resolves to empty.
         // This is expected per the manual plan.
@@ -54,7 +48,7 @@ public class FirstUseTests
                 first.Error.Contains("Invalid NuGet version string", StringComparison.OrdinalIgnoreCase) ||
                 first.Output.Contains("NETSDK1018", StringComparison.OrdinalIgnoreCase) ||
                 first.Error.Contains("NETSDK1018", StringComparison.OrdinalIgnoreCase);
-            _h.LogResult($"First build failed as expected. Expected error present: {hasExpectedError}");
+            testHelper.LogResult($"First build failed as expected. Expected error present: {hasExpectedError}");
 
             // TODO: The error does not contain "Invalid NuGet version string" The actual error is: C:\Program Files\dotnet\sdk\10.0.201\NuGet.targets(196,5): error : '4.3.' is not a valid version string. (Parameter 'value') [D:\Repositories\JJ.AutoIncrementVersion.Test\JJ.AutoIncrementVersion.Test\JJ.AutoIncrementVersion.Test.csproj]
             Assert.IsTrue(hasExpectedError,
@@ -63,44 +57,44 @@ public class FirstUseTests
         else
         {
 
-            _h.LogWarning("First build did NOT fail — this is acceptable if BuildNum.xml was auto-created in time.");
+            testHelper.LogWarning("First build did NOT fail — this is acceptable if BuildNum.xml was auto-created in time.");
         }
 
         // ── 2nd build: expect success ──
-        _h.LogStep("2nd build – should succeed");
-        var second = _h.Build();
+        testHelper.LogStep("2nd build – should succeed");
+        var second = testHelper.Build();
         Assert.AreEqual(0, second.ExitCode, $"2nd build failed.\n{second.Error}");
 
         // ── Verify auto-created files ──
-        _h.LogStep("Verify BuildNum.xml auto-created");
-        Assert.IsTrue(_h.BuildNumXmlExists(), "BuildNum.xml was not created.");
-        string buildNumContent = _h.ReadBuildNumXml();
-        _h.LogResult($"BuildNum.xml: {buildNumContent.Trim()}");
+        testHelper.LogStep("Verify BuildNum.xml auto-created");
+        Assert.IsTrue(testHelper.BuildNumXmlExists(), "BuildNum.xml was not created.");
+        string buildNumContent = testHelper.ReadBuildNumXml();
+        testHelper.LogResult($"BuildNum.xml: {buildNumContent.Trim()}");
         Assert.IsTrue(buildNumContent.Contains("<BuildNum>"), "Missing <BuildNum>.");
         Assert.IsTrue(buildNumContent.Contains("<BuildNumWasFromXmljj>True</BuildNumWasFromXmljj>"),
             "Missing BuildNumWasFromXmljj.");
 
-        _h.LogStep("Verify Directory.Build.props auto-created");
-        Assert.IsTrue(_h.DirectoryBuildPropsExists(), "Directory.Build.props was not created.");
-        string propsContent = _h.ReadDirectoryBuildProps();
-        _h.LogResult($"Directory.Build.props: {propsContent.Trim()}");
+        testHelper.LogStep("Verify Directory.Build.props auto-created");
+        Assert.IsTrue(testHelper.DirectoryBuildPropsExists(), "Directory.Build.props was not created.");
+        string propsContent = testHelper.ReadDirectoryBuildProps();
+        testHelper.LogResult($"Directory.Build.props: {propsContent.Trim()}");
 
         // ── Verify nupkg output ──
-        string? nupkg = _h.ExtractNupkgName(second.Output);
-        _h.LogResult($"Nupkg from 2nd build: {nupkg ?? "(none)"}");
+        string? nupkg = testHelper.ExtractNupkgName(second.Output);
+        testHelper.LogResult($"Nupkg from 2nd build: {nupkg ?? "(none)"}");
 
         // ── Subsequent builds should auto-increment ──
-        _h.LogStep("Subsequent builds – verify auto-increment");
-        int? prevNum = _h.ExtractBuildNumFromNupkg(second.Output);
+        testHelper.LogStep("Subsequent builds – verify auto-increment");
+        int? prevNum = testHelper.ExtractBuildNumFromNupkg(second.Output);
 
         for (int i = 0; i < 3; i++)
         {
-            var next = _h.Build();
+            var next = testHelper.Build();
             Assert.AreEqual(0, next.ExitCode, $"Build {i + 3} failed.\n{next.Error}");
 
-            int? curNum = _h.ExtractBuildNumFromNupkg(next.Output);
-            string? curNupkg = _h.ExtractNupkgName(next.Output);
-            _h.LogResult($"Build {i + 3}: {curNupkg} (BuildNum={curNum})");
+            int? curNum = testHelper.ExtractBuildNumFromNupkg(next.Output);
+            string? curNupkg = testHelper.ExtractNupkgName(next.Output);
+            testHelper.LogResult($"Build {i + 3}: {curNupkg} (BuildNum={curNum})");
 
             if (prevNum is not null && curNum is not null)
             {
@@ -110,6 +104,6 @@ public class FirstUseTests
             prevNum = curNum;
         }
 
-        _h.LogResult("PASS – First Use: fail → succeed → auto-increment");
+        testHelper.LogResult("PASS – First Use: fail → succeed → auto-increment");
     }
 }
