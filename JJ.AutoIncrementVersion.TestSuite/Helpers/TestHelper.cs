@@ -181,14 +181,18 @@ internal sealed class TestHelper : IDisposable
     {
         Log("Install package");
         RunDotNet($"add \"{CsprojPath}\" package {PackageId} --version {PackageVersion}");
-    }
+        // dotnet add package includes its own restore (matching VS NuGet UI behavior).
+        // Or maybe not
+        // Restore(); // JJ added
+      }
 
     public void UninstallPackage()
     {
         Log("Uninstall package");
         RunDotNet($"remove \"{CsprojPath}\" package {PackageId}");
+        // Restore(); // AI added
     }
-
+    
     private void Restore()
     {
         Log("Restore");
