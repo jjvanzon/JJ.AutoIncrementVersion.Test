@@ -1,6 +1,4 @@
-﻿using JJ.AutoIncrementVersion.TestSuite.Helpers;
-
-namespace JJ.AutoIncrementVersion.TestSuite;
+﻿namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]
 public class SetInitialStateTests

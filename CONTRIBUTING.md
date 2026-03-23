@@ -110,27 +110,11 @@ Grouped by Theme
 Assertion messages reference `build1.Error` but actual build errors are embedded in `build1.Output`.
 *(ManualEditTests.cs line 41; CommandLineAndUpgradeTests.cs line 87)*
 
-#### 6. Test isolation / no parallel execution
-
-Tests share the same project files on disk and cannot run in parallel. Needs enforcement (e.g. `[DoNotParallelize]`).
-*(RunWithoutPackageTests.cs line 7; UninstallReinstallTests.cs line 71)*
-
 #### 7. Move files up / global usings
 
-Drop `Tests\` subfolder. Add `Usings.cs` with global usings.
+- [x] Drop `Tests\` subfolder. 
+- [ ] Add `Usings.cs` with global usings.
 *(RunWithoutPackageTests.cs lines 1, 6)*
-
-#### 10. DRY: deduplicate process execution
-
-`RunDotnet` and `RunDotnetAtSolutionDir` share nearly identical `ProcessStartInfo` ceremony.
-*(TestHelper.cs line 75)*
-
-#### 11. Config / resilience / NCrunch
-
-- [x] ~~Timeout from config.~~ > Unnecessary
-- [ ] Static path init.
-- [ ] Embedded resources for NCrunch compatibility.
-      *(TestHelper.cs lines 34–37, 98)*
 
 #### 12. Delete logging accuracy
 
@@ -140,7 +124,6 @@ Log whether file actually existed before deletion.
 #### 13. Hardcoded versions
 
 `"4.3.0"` and `PackageVersion = "4.2.5746"` — should read dynamically.
-
 *(TestHelper.cs lines 25, 309)*
 
 #### 15. Minor
@@ -159,6 +142,12 @@ Log whether file actually existed before deletion.
       *(TestHelper.cs line 154)*
       > DONE
 
+#### 6. ~~Test isolation / no parallel execution~~
+
+- [x] Tests share the same project files on disk and cannot run in parallel. Needs enforcement (e.g. `[DoNotParallelize]`).  
+      *(RunWithoutPackageTests.cs line 7; UninstallReinstallTests.cs line 71)*
+      > Done
+
 #### 8. ~~Remove `[TestInitialize]`/`[TestCleanup]` boilerplate~~
 
 - [x] Inline into test methods. Remove dead `Cleanup()`.
@@ -171,8 +160,22 @@ Log whether file actually existed before deletion.
       *(RunWithoutPackageTests.cs line 12; TestHelper.cs line 69)*
       > DONE
 
+#### 10. ~~DRY: deduplicate process execution~~
+
+- [x] `RunDotnet` and `RunDotnetAtSolutionDir` share nearly identical `ProcessStartInfo` ceremony.
+      *(TestHelper.cs line 75)*
+      > DONE
+
+#### 11. ~~Config / resilience / NCrunch~~
+
+- [x] ~~Timeout from config.~~ > Unnecessary
+- [x] ~~Static path init.~~ > Irrelevant
+- [x] Embedded resources for NCrunch compatibility.
+      *(TestHelper.cs lines 34–37, 98)*
+      > DONE
+
 #### 14. ~~Logging sinks~~
 
-- [x] ~~Drop `TestContext` dependency, simplify to `Console`+`Debug`.~~
+- [x] Drop `TestContext` dependency, simplify to `Console`+`Debug`.
       *(TestHelper.cs lines 21, 58)*
       > DONE

@@ -1,5 +1,3 @@
-using JJ.AutoIncrementVersion.TestSuite.Helpers;
-
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]

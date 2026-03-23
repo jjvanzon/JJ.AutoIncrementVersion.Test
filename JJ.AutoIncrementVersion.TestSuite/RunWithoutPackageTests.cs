@@ -1,12 +1,4 @@
-// TODO: Use global usings (in new `Using.cs`)
-
-// TODO: Use global usings (in new `Using.cs`)
-using JJ.AutoIncrementVersion.TestSuite.Helpers;
-
 namespace JJ.AutoIncrementVersion.TestSuite;
-
-// TODO: Sub folder `Tests` not necessary. Move test classes up a directory.
-// TODO: None of the tests can run in parallel or must run in isolation.
 
 [TestClass]
 public class RunWithoutPackageTests

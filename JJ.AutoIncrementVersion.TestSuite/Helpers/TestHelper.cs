@@ -1,11 +1,3 @@
-using System.Diagnostics;
-using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml.Linq;
-using static System.Console;
-using static System.IO.File;
-
 namespace JJ.AutoIncrementVersion.TestSuite.Helpers;
 
 /// <summary>
