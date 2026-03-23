@@ -1,7 +1,10 @@
 ﻿<SolutionConfiguration>
   <Settings>
-    <AllowParallelTestExecution>True</AllowParallelTestExecution>
+    <AllowParallelTestExecution>False</AllowParallelTestExecution>
+    <AllowTestsToRunInParallelWithThemselves>False</AllowTestsToRunInParallelWithThemselves>
     <EnableRDI>False</EnableRDI>
+    <FastLaneThreads>0</FastLaneThreads>
+    <MaxNumberOfProcessingThreads>1</MaxNumberOfProcessingThreads>
     <RdiConfigured>True</RdiConfigured>
     <SolutionConfigured>True</SolutionConfigured>
   </Settings>
