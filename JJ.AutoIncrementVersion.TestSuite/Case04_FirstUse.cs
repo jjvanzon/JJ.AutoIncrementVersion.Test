@@ -1,3 +1,4 @@
+
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]
@@ -25,26 +26,25 @@ public class Case04_FirstUse
         testHelper.InstallPackage();
         testHelper.SetCsprojVersion("4.3.$(BuildNum)");
 
-        CommandLineResult buildResult1 = testHelper.Rebuild();
-
-        // The first build may fail because $(BuildNum) resolves to empty.
-        // This is expected per the manual plan.
-        if (buildResult1.ExitCode != 0)
+        try
         {
+            testHelper.Rebuild();
+        }
+        catch (Exception ex)
+        {
+            // The first build may fail because $(BuildNum) resolves to empty.
+            // This is expected per the manual plan.
             const string expectedMessage = "is not a valid version string";
 
             bool hasExpectedError =
-                buildResult1.Output.Contains(expectedMessage, StringComparison.OrdinalIgnoreCase) ||
-                buildResult1.Error.Contains(expectedMessage, StringComparison.OrdinalIgnoreCase) ||
-                buildResult1.Output.Contains("NETSDK1018", StringComparison.OrdinalIgnoreCase) ||
-                buildResult1.Error.Contains("NETSDK1018", StringComparison.OrdinalIgnoreCase);
-            testHelper.LogResult($"First build failed as expected. Expected error present: {expectedMessage}");
+                ex.Message.Contains(expectedMessage, OrdinalIgnoreCase) ||
+                ex.Message.Contains("NETSDK1018", OrdinalIgnoreCase);
 
             IsTrue(hasExpectedError, $"First build failed but not with the expected '{expectedMessage}' error.");
         }
+
         // 2nd build should succeed
         CommandLineResult buildResult2 = testHelper.Rebuild();
-        AreEqual(0, buildResult2.ExitCode, $"2nd build failed.\n{buildResult2.Error}");
 
         IsTrue(testHelper.BuildNumXmlExists());
         string buildNumContent = testHelper.ReadBuildNumXml();

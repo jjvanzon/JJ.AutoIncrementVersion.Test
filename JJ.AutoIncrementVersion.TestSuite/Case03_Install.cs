@@ -19,22 +19,10 @@ public class Case03_Install
         using var testHelper = new TestHelper();
 
         testHelper.SetUninstalledState();
-
-        var installResult = testHelper.InstallPackage();
-        testHelper.LogResult($"Install exit code: {installResult.ExitCode}");
-
-        testHelper.LogStep("Rebuild after install");
+        testHelper.InstallPackage();
         CommandLineResult rebuildResult = testHelper.Rebuild();
 
-        string? nupkg = testHelper.ExtractNupkgName(rebuildResult.Output);
-        testHelper.LogResult($"Nupkg: {nupkg ?? "(none)"}");
-
-        // TODO: Use AssertCore (global using static) from JJ.Framework.Testing.Core (from JJs-Dev-Package-Feed)
-
-        AreEqual(0, rebuildResult.ExitCode, $"Build failed.\n{rebuildResult.Error}");
-        IsTrue(
-            testHelper.OutputContainsNupkgEndingWith(rebuildResult.Output, ".0.nupkg"),
-            $"Expected nupkg ending with .0.nupkg but got: {nupkg}");
+        IsTrue(testHelper.OutputContainsNupkgEndingWith(rebuildResult.Output, ".0.nupkg"));
 
         IsTrue(testHelper.BuildNumXmlExists());
         string buildNumContent = testHelper.ReadBuildNumXml();
@@ -46,7 +34,5 @@ public class Case03_Install
         string dirPropsContent = testHelper.ReadDirectoryBuildProps();
         IsTrue(dirPropsContent.Contains("<BuildNum>0</BuildNum>"));
         IsTrue(dirPropsContent.Contains("Import Project=\"BuildNum.xml\""));
-
-        testHelper.LogResult("PASS – Install auto-creates expected files and builds .0.nupkg");
     }
 }

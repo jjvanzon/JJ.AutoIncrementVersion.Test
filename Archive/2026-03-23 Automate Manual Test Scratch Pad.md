@@ -113,3 +113,9 @@
     /// <summary>Sub-folder containing the csproj (one level deeper).</summary>
 
             // TODO: The error does not contain "Invalid NuGet version string" The actual error is: C:\Program Files\dotnet\sdk\10.0.201\NuGet.targets(196,5): error : '4.3.' is not a valid version string. (Parameter 'value') [D:\Repositories\JJ.AutoIncrementVersion.Test\JJ.AutoIncrementVersion.Test\JJ.AutoIncrementVersion.Test.csproj]
+
+
+        // TODO: Use AssertCore (global using static) from JJ.Framework.Testing.Core (from JJs-Dev-Package-Feed)
+
+            // TODO: ExitCode can indicate error, withotu Error text being filled in (error shows up in r.Output instead).
+            AreEqual(0, result.ExitCode, $"Build {i + 1} failed.\n{result.Error}");

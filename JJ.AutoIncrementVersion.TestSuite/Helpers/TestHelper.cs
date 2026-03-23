@@ -102,21 +102,21 @@ internal sealed class TestHelper : IDisposable
     // Run Processes
 
     public CommandLineResult Rebuild() 
-        => RunDotnet($"build \"{CsprojPath}\" -c Release --no-incremental");
+        => RunDotNet($"build \"{CsprojPath}\" -c Release --no-incremental");
 
     public CommandLineResult RebuildWithArgs(string? extraArgs = null) 
-        => RunDotnet($"build \"{CsprojPath}\" -c Release --no-incremental {extraArgs}");
+        => RunDotNet($"build \"{CsprojPath}\" -c Release --no-incremental {extraArgs}");
 
     public CommandLineResult RebuildDebug() 
-        => RunDotnet($"build \"{CsprojPath}\" -c Debug --no-incremental");
+        => RunDotNet($"build \"{CsprojPath}\" -c Debug --no-incremental");
 
-    public CommandLineResult InstallPackage()
-        => RunDotnet($"add \"{CsprojPath}\" package {PackageId} --version {PackageVersion}");
+    public void InstallPackage()
+        => RunDotNet($"add \"{CsprojPath}\" package {PackageId} --version {PackageVersion}");
 
-    public CommandLineResult UninstallPackage()
-        => RunDotnet($"remove \"{CsprojPath}\" package {PackageId}");
+    public void UninstallPackage()
+        => RunDotNet($"remove \"{CsprojPath}\" package {PackageId}");
     
-    private CommandLineResult RunDotnet(string arguments)
+    private CommandLineResult RunDotNet(string arguments)
     {
         Log($"> dotnet {arguments}");
 
@@ -155,22 +155,18 @@ internal sealed class TestHelper : IDisposable
         if (result.Output.Length > 0) Log(result.Output.TrimEnd());
         if (result.Error.Length > 0) Log($"[stderr] {result.Error.TrimEnd()}");
 
-        /*
-        if (mustThrow)
+        // TODO: This is still not enough. It could be exit code 0 and no error text? But error in the output?
+        bool hasError = result.ExitCode != 0 || !string.IsNullOrWhiteSpace(result.Error);
+        if (hasError)
         {
-            bool hasError = result.ExitCode != 0 || !string.IsNullOrWhiteSpace(result.Error);
-            if (hasError)
+            string errorText = result.Error;
+            if (string.IsNullOrWhiteSpace(errorText))
             {
-                string errorText = result.Error;
-                if (string.IsNullOrWhiteSpace(errorText))
-                {
-                    errorText = result.Output;
-                }
-
-                throw new Exception($"dotnet {arguments} failed: Exit code {result.ExitCode}" + errorText);
+                errorText = result.Output;
             }
+
+            throw new Exception($"dotnet {arguments} failed: Exit code {result.ExitCode}" + errorText);
         }
-        */
 
         return result;
     }

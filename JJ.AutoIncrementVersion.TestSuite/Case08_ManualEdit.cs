@@ -25,7 +25,6 @@ public class Case08_ManualEdit
         // ── Build – should increment from the restored value ──
         testHelper.LogStep("Build – should use restored BuildNum");
         CommandLineResult buildResult1 = testHelper.Rebuild();
-        buildResult1.Assert();
         
         int? nupkgNum1 = testHelper.ExtractBuildNumFromNupkgName(buildResult1.Output);
         testHelper.LogResult($"Build 1 nupkg num: {nupkgNum1}");

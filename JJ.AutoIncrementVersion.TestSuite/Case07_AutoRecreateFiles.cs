@@ -25,22 +25,21 @@ public class Case07_AutoRecreateFiles
         IsFalse(testHelper.DirectoryBuildPropsExists());
 
         // TODO: Assertion code could be made reusable.
-        CommandLineResult failBuild = testHelper.Rebuild();
-
-        if (failBuild.ExitCode != 0)
+        try
         {
+            testHelper.Rebuild();
+        }
+        catch (Exception ex)
+        {
+            // The first build may fail because $(BuildNum) resolves to empty.
+            // This is expected per the manual plan.
             const string expectedMessage = "is not a valid version string";
 
             bool hasExpectedError =
-                failBuild.Output.Contains("NETSDK1018", StringComparison.OrdinalIgnoreCase) ||
-                failBuild.Error.Contains("NETSDK1018", StringComparison.OrdinalIgnoreCase) ||
-                failBuild.Output.Contains(expectedMessage, StringComparison.OrdinalIgnoreCase) ||
-                failBuild.Error.Contains(expectedMessage, StringComparison.OrdinalIgnoreCase);
-            testHelper.LogResult($"Build failed as expected. Expected error: {expectedMessage}");
-        }
-        else
-        {
-            testHelper.LogWarning("Build did not fail – may be OK if props was recreated before version resolution.");
+                ex.Message.Contains("NETSDK1018", OrdinalIgnoreCase) ||
+                ex.Message.Contains(expectedMessage, OrdinalIgnoreCase);
+
+            IsTrue(hasExpectedError, $"First build failed but not with the expected '{expectedMessage}' error.");
         }
 
         IsTrue(testHelper.DirectoryBuildPropsExists());
@@ -49,18 +48,19 @@ public class Case07_AutoRecreateFiles
         int? previousBuildNum = null;
         for (int i = 0; i < 3; i++) // TODO: I like the retry loop and that it checks for increments.
         {
-            CommandLineResult result = testHelper.Rebuild();
-            // TODO: ExitCode can indicate error, withotu Error text being filled in (error shows up in r.Output instead).
-            AreEqual(0, result.ExitCode, $"Build {i + 1} failed.\n{result.Error}");
+            CommandLineResult nextBuildResult = testHelper.Rebuild();
 
-            int? currentBuildNum = testHelper.ExtractBuildNumFromNupkgName(result.Output);
-            testHelper.LogResult($"Build {i + 1}: nupkg={testHelper.ExtractNupkgName(result.Output)} BuildNum={currentBuildNum}");
+            int? nextBuildNum = testHelper.ExtractBuildNumFromNupkgName(nextBuildResult.Output);
+            testHelper.LogResult($"Build {i + 1}: nupkg={testHelper.ExtractNupkgName(nextBuildResult.Output)} BuildNum={nextBuildNum}");
 
             // WOuld be nice if it checked for increments by exactly 1.
 
-            if (previousBuildNum is not null && currentBuildNum is not null)
-                IsTrue(currentBuildNum > previousBuildNum, $"Expected increment: prev={previousBuildNum}, cur={currentBuildNum}");
-            previousBuildNum = currentBuildNum;
+            if (previousBuildNum is not null && nextBuildNum is not null)
+            {
+                IsTrue(nextBuildNum > previousBuildNum);
+            }
+
+            previousBuildNum = nextBuildNum;
         }
 
         testHelper.LogResult("PASS – Delete Directory.Build.props: fail → recreate → increment");
@@ -81,18 +81,14 @@ public class Case07_AutoRecreateFiles
         using var testHelper = new TestHelper();
 
         testHelper.SetInstalledState();
-        testHelper.Rebuild(); // TODO: Working state was not checked, because error is swallowed.
-
+        testHelper.Rebuild();
         testHelper.DeleteBuildNumXml();
         IsFalse(testHelper.BuildNumXmlExists());
-
-        CommandLineResult buildResult = testHelper.Rebuild();
-
+        testHelper.Rebuild();
         IsTrue(testHelper.BuildNumXmlExists());
+
         int newBuildNum = testHelper.GetBuildNumFromXml();
         IsTrue(newBuildNum <= 1, $"After recreation, BuildNum should be 0 or 1 but was {newBuildNum}.");
-
-        testHelper.LogResult("PASS – Delete BuildNum.xml: recreated with low BuildNum");
     }
 
     /// <summary>
@@ -104,24 +100,21 @@ public class Case07_AutoRecreateFiles
         using var testHelper = new TestHelper();
 
         testHelper.SetInstalledState();
-        testHelper.Rebuild(); // TODO: Working state was not checked, because error is swallowed.
-
+        testHelper.Rebuild();
         testHelper.DeleteBuildNumXml();
         testHelper.DeleteDirectoryBuildProps();
 
-        // TODO: Build success should be asserted.
+        try
+        {
+            testHelper.Rebuild();
+        }
+        catch
+        {
+            // 1st build may fail
+        }
 
-        testHelper.LogStep("Build – may fail first time");
-        var first = testHelper.Rebuild();
-        testHelper.LogResult($"1st build exit code: {first.ExitCode}");
-
-        testHelper.LogStep("2nd build – should succeed");
-        var second = testHelper.Rebuild();
-        testHelper.LogResult($"2nd build exit code: {second.ExitCode}");
-
+        testHelper.Rebuild();
         IsTrue(testHelper.BuildNumXmlExists());
         IsTrue(testHelper.DirectoryBuildPropsExists());
-
-        testHelper.LogResult("PASS – Both deleted: files recreated");
     }
 }
