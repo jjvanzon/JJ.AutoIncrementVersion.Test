@@ -14,4 +14,16 @@
     <PackageReference Include="MSTest.TestFramework" Version="3.*" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="..\JJ.AutoIncrementVersion.Test\JJ.AutoIncrementVersion.Test.csproj"
+                      Link="EmbeddedTestFiles\JJ.AutoIncrementVersion.Test.csproj"
+                      LogicalName="TestFiles.JJ.AutoIncrementVersion.Test.csproj" />
+    <EmbeddedResource Include="..\Directory.Build.props"
+                      Link="EmbeddedTestFiles\Directory.Build.props"
+                      LogicalName="TestFiles.Directory.Build.props" />
+    <EmbeddedResource Include="..\BuildNum.xml"
+                      Link="EmbeddedTestFiles\BuildNum.xml"
+                      LogicalName="TestFiles.BuildNum.xml" />
+  </ItemGroup>
+
 </Project>

@@ -21,7 +21,7 @@ public class FirstUseTests
     [TestMethod]
     public void FirstUse_FailsThenSucceedsThenIncrements()
     {
-        var testHelper = new TestHelper();
+        using var testHelper = new TestHelper();
 
         // ── Set Initial State ──
         testHelper.SetInitialState();

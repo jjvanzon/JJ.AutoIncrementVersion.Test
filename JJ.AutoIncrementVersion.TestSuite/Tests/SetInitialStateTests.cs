@@ -8,7 +8,7 @@ public class SetInitialStateTests
     [TestMethod]
     public void SetInitialState_ShouldNotCrash()
     {
-        var testHelper = new TestHelper();
+        using var testHelper = new TestHelper();
         testHelper.SetInitialState();
     }
 }

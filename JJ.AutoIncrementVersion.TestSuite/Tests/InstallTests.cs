@@ -18,7 +18,7 @@ public class InstallTests
     [TestMethod]
     public void Install_AutoCreatesFilesAndBuildsWithZero()
     {
-        var testHelper = new TestHelper();
+        using var testHelper = new TestHelper();
 
         // ── Set Initial State ──
         testHelper.SetInitialState();

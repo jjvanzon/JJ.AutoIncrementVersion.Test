@@ -22,11 +22,11 @@ public class ConditionalsTests
     [TestMethod]
     public void Conditionals_ReleaseIncrementsDebugUsesZero()
     {
-        var testHelper = new TestHelper();
+        using var testHelper = new TestHelper();
 
         // ── Restore committed state (which already has the conditional) ──
         testHelper.LogStep("Restore committed state");
-        testHelper.GitRestoreAll(); // Git reset mid-test is a no. Either set up initial state explicitly, or follow a sequential plan to get to that state in the formerly manual test. By the way: tests can't run in parallel which they are assumed to be able to, so they have to be forced to be sequential.
+        testHelper.RestoreAll();
 
         // ── Verify Directory.Build.props has the conditional ──
         testHelper.LogStep("Verify Directory.Build.props has Release condition");

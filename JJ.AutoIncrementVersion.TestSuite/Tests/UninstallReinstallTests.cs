@@ -18,12 +18,11 @@ public class UninstallReinstallTests
     [TestMethod]
     public void Uninstall_FilesRemainAndVersionFreezes()
     {
-        var testHelper = new TestHelper();
+        using var testHelper = new TestHelper();
 
         // ── Establish working state ──
         testHelper.LogStep("Establish working state with package installed");
-        //_h.GitRestoreAll(); // Do not do this. It's undoes our edits. Ensure state explicitly.
-        // The committed state already has the package and $(BuildNum) in version.
+        // The isolated folder already has the package reference and $(BuildNum) in version.
         // Do a build to ensure BuildNum.xml/props exist.
         testHelper.Build();
 
@@ -71,11 +70,11 @@ public class UninstallReinstallTests
     [TestMethod]
     public void Reinstall_BuildSucceedsAndIncrements()
     {
-        var testHelper = new TestHelper();
+        using var testHelper = new TestHelper();
 
         // ── Establish working state, uninstall, then reinstall ──
         testHelper.LogStep("Start from committed state and build once");
-        testHelper.GitRestoreAll();
+        testHelper.RestoreAll();
         testHelper.Build(); // TODO: Swallowed error.
 
         testHelper.LogStep("Uninstall package");

@@ -17,11 +17,11 @@ public class AutoRecreateFilesTests
     [TestMethod]
     public void DeleteDirectoryBuildProps_FailsThenRecreatesAndIncrements()
     {
-        var testHelper = new TestHelper();
+        using var testHelper = new TestHelper();
 
         // ── Start from working state ──
         testHelper.LogStep("Establish working state");
-        testHelper.GitRestoreAll();
+        testHelper.RestoreAll();
         testHelper.Build();
 
         // ── Delete Directory.Build.props ──
@@ -90,11 +90,11 @@ public class AutoRecreateFilesTests
     [TestMethod]
     public void DeleteBuildNumXml_RecreatesToZeroOrOne()
     {
-        var testHelper = new TestHelper();
+        using var testHelper = new TestHelper();
 
         // ── Start from working state ──
         testHelper.LogStep("Establish working state");
-        testHelper.GitRestoreAll();
+        testHelper.RestoreAll();
         testHelper.Build(); // TODO: Working state was not checked, because error is swallowed.
 
         // ── Delete BuildNum.xml ──
@@ -124,10 +124,10 @@ public class AutoRecreateFilesTests
     [TestMethod]
     public void DeleteBoth_ShowsSimilarEffect()
     {
-        var testHelper = new TestHelper();
+        using var testHelper = new TestHelper();
 
         testHelper.LogStep("Establish working state");
-        testHelper.GitRestoreAll();
+        testHelper.RestoreAll();
         testHelper.Build(); // TODO: Working state was not checked, because error is swallowed.
 
         testHelper.LogStep("Delete both BuildNum.xml and Directory.Build.props");

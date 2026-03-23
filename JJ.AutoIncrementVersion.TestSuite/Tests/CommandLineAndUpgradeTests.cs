@@ -15,10 +15,10 @@ public class CommandLineAndUpgradeTests
     [TestMethod]
     public void CommandLineBuild_OverridesBuildNumAndSavesNext()
     {
-        var testHelper = new TestHelper();
+        using var testHelper = new TestHelper();
 
         testHelper.LogStep("Restore committed state");
-        testHelper.GitRestoreAll();
+        testHelper.RestoreAll();
 
         testHelper.LogStep("Build with /p:BuildNum=9999");
         var result = testHelper.BuildWithArgs("Release", "/p:BuildNum=9999");
@@ -54,10 +54,10 @@ public class CommandLineAndUpgradeTests
     [TestMethod]
     public void UpgradeRegression_RestoresBuildNumWasFromXmljjAndIncrements()
     {
-        var testHelper = new TestHelper();
+        using var testHelper = new TestHelper();
 
         testHelper.LogStep("Restore committed state and build once");
-        testHelper.GitRestoreAll(); // Ensure initial state otherwise.
+        testHelper.RestoreAll();
         testHelper.Build();
 
         // ── Remove BuildNumWasFromXmljj ──

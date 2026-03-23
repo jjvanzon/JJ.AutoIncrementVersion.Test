@@ -18,11 +18,11 @@ public class ManualEditTests
     [TestMethod]
     public void ManualEdit_ContinuesFromRestoredValueThenFromManualValue()
     {
-        var testHelper = new TestHelper();
+        using var testHelper = new TestHelper();
 
         // ── Restore original state ──
-        testHelper.LogStep("Restore original BuildNum.xml via git");
-        testHelper.GitRestoreAll(); // Doing a git restore of our work mid-test automatically is a big no no.
+        testHelper.LogStep("Restore original BuildNum.xml from embedded resources");
+        testHelper.RestoreAll();
 
         int originalBuildNum = testHelper.GetBuildNumFromXml();
         testHelper.LogResult($"Original BuildNum from XML: {originalBuildNum}");

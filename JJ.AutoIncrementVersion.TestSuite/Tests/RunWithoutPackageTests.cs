@@ -22,7 +22,7 @@ public class RunWithoutPackageTests
     [TestMethod]
     public void RunWithoutPackage_ProducesVersionEndingWithZero()
     {
-        var testHelper = new TestHelper();
+        using var testHelper = new TestHelper();
 
         // ── Set Initial State ──
         testHelper.SetInitialState();

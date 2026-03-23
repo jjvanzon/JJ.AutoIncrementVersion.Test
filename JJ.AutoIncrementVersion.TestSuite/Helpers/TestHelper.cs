@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -8,14 +9,18 @@ namespace JJ.AutoIncrementVersion.TestSuite.Helpers;
 /// <summary>
 /// Helpers for running dotnet CLI commands, manipulating project files,
 /// and inspecting build output — used by the automated test-plan tests.
+/// Each instance creates an isolated copy of the test files under a random
+/// temp folder so that tests do not interfere with each other or the repo.
 /// </summary>
-internal sealed class TestHelper
+internal sealed class TestHelper : IDisposable
 {
     // Paths
-    
+
+    /// <summary>Root of the isolated temp folder (contains BuildNum.xml, Directory.Build.props).</summary>
     public string SolutionDir { get; }
-    public string ProjectDir { get; } 
-    public string CsprojPath { get; } 
+    /// <summary>Sub-folder containing the csproj (one level deeper).</summary>
+    public string ProjectDir { get; }
+    public string CsprojPath { get; }
     public string BuildNumXmlPath { get; }
     public string DirectoryBuildPropsPath { get; }
 
@@ -23,7 +28,12 @@ internal sealed class TestHelper
     // TODO: Fixed version number not good. Latest from Pre-Release-Package-Feed is better. Kinda bad, because if we keep this, we'd assume the tests test the latest, which it never would.
     private const string PackageVersion = "4.2.5746";
     private const string TestProjectName = "JJ.AutoIncrementVersion.Test";
-        
+
+    // Embedded resource logical names
+    private const string ResCsproj = "TestFiles.JJ.AutoIncrementVersion.Test.csproj";
+    private const string ResDirectoryBuildProps = "TestFiles.Directory.Build.props";
+    private const string ResBuildNumXml = "TestFiles.BuildNum.xml";
+
     // File Helpers
 
     public bool BuildNumXmlExists() => File.Exists(BuildNumXmlPath);
@@ -32,7 +42,7 @@ internal sealed class TestHelper
     public string ReadDirectoryBuildProps() => File.ReadAllText(DirectoryBuildPropsPath);
     public void WriteBuildNumXml(string content) => File.WriteAllText(BuildNumXmlPath, content);
     public void WriteDirectoryBuildProps(string content) => File.WriteAllText(DirectoryBuildPropsPath, content);
-    
+
     public void DeleteBuildNumXml()
     {
         if (File.Exists(BuildNumXmlPath)) File.Delete(BuildNumXmlPath);
@@ -45,30 +55,44 @@ internal sealed class TestHelper
         Log($"   Deleted Directory.Build.props (exists={File.Exists(DirectoryBuildPropsPath)})"); // TODO: Logs it's deleted even when it didn't evne exist.
     }
 
-    // Constructor / Path Lookup
+    // Constructor / Embedded Resource Extraction
 
     public TestHelper()
     {
-
-        // TODO: Do once (static)
-        // TODO: sln file isn't even there in an NCrunch context.
-        // TODO: Can we make assumptions about (relative) locations?
-        // TODO: Maybe we should copy the necessary test project files to somewhere reachable by a test. Maybe as embedded resources in the .TestSuite project, that link to the files, so that they are compiled into the .TestSuite project and then saved to disk relative to the .TestSuite.dll so all files everything resolve. That might even help us with test isolation/parallel tests.
-
-        // Walk up from the test assembly's location to find the repo root.
-        // The repo root contains Directory.Build.props / BuildNum.xml.
-        string assemblyDir = Path.GetDirectoryName(typeof(TestHelper).Assembly.Location)!;
-        string? dir = assemblyDir;
-        while (dir is not null && !File.Exists(Path.Combine(dir, "JJ.AutoIncrementVersion.Test.sln")))
-            dir = Directory.GetParent(dir)?.FullName;
-
-        SolutionDir = dir ?? throw new InvalidOperationException(
-            $"Could not find solution root walking up from {assemblyDir}");
-
+        // Create a random isolated folder in the system temp directory
+        // (outside the repo tree, so MSBuild won't pick up the repo's Directory.Build.props).
+        string basePath = Path.Combine(Path.GetTempPath(), "JJ.AutoIncrementVersion.TestRuns", Guid.NewGuid().ToString("N"));
+        SolutionDir = basePath;
         ProjectDir = Path.Combine(SolutionDir, TestProjectName);
         CsprojPath = Path.Combine(ProjectDir, $"{TestProjectName}.csproj");
         BuildNumXmlPath = Path.Combine(SolutionDir, "BuildNum.xml");
         DirectoryBuildPropsPath = Path.Combine(SolutionDir, "Directory.Build.props");
+
+        Directory.CreateDirectory(SolutionDir);
+        Directory.CreateDirectory(ProjectDir);
+
+        // Extract all embedded test files to the isolated folder.
+        ExtractAllResources();
+
+        Log($"── TestHelper: isolated folder created at {SolutionDir}");
+    }
+
+    private void ExtractAllResources()
+    {
+        ExtractResource(ResBuildNumXml, BuildNumXmlPath);
+        ExtractResource(ResDirectoryBuildProps, DirectoryBuildPropsPath);
+        ExtractResource(ResCsproj, CsprojPath);
+    }
+
+    private static void ExtractResource(string logicalName, string targetPath)
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+        using var stream = assembly.GetManifestResourceStream(logicalName)
+            ?? throw new InvalidOperationException(
+                $"Embedded resource '{logicalName}' not found. Available: " +
+                string.Join(", ", assembly.GetManifestResourceNames()));
+        using var reader = new StreamReader(stream);
+        File.WriteAllText(targetPath, reader.ReadToEnd());
     }
 
 
@@ -102,7 +126,7 @@ internal sealed class TestHelper
             FileName = "dotnet",
             Arguments = arguments,
             WorkingDirectory = ProjectDir,
-            RedirectStandardOutput = true, 
+            RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
             CreateNoWindow = true
@@ -131,7 +155,7 @@ internal sealed class TestHelper
         var result = new CommandLineResult(process.ExitCode, stdout.ToString(), stderr.ToString());
         if (result.Output.Length > 0) Log(result.Output.TrimEnd());
         if (result.Error.Length > 0) Log($"   [stderr] {result.Error.TrimEnd()}");
-       
+
         /*
         if (mustThrow)
         {
@@ -157,7 +181,7 @@ internal sealed class TestHelper
         string args = $"build \"{CsprojPath}\" -c {configuration}";
         return RunDotnet(args);
     }
-    
+
     public CommandLineResult BuildWithArgs(string configuration = "Release", string? extraArgs = null)
     {
         string args = $"build \"{CsprojPath}\" -c {configuration}";
@@ -170,10 +194,6 @@ internal sealed class TestHelper
 
     public CommandLineResult InstallPackage()
         => RunDotnet($"add \"{CsprojPath}\" package {PackageId} --version {PackageVersion}");
-
-    // TODO: Command errors out hard. Note sure if it's correct:
-    // > dotnet remove "D:\Repositories\JJ.AutoIncrementVersion.Test\JJ.AutoIncrementVersion.Test\JJ.AutoIncrementVersion.Test.csproj" package JJ.AutoIncrementVersion
-   // [stderr] Found more than one project in `D:\Repositories\JJ.AutoIncrementVersion.Test\JJ.AutoIncrementVersion.Test`. Specify which one to use.
 
     public CommandLineResult UninstallPackage()
         => RunDotnet($"remove \"{CsprojPath}\" package {PackageId}");
@@ -221,6 +241,20 @@ internal sealed class TestHelper
         return text.Contains($"Include=\"{PackageId}\"", StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// Removes the JJ.AutoIncrementVersion PackageReference from the csproj
+    /// by editing the file directly (no dotnet CLI needed).
+    /// </summary>
+    public void RemovePackageReferenceFromCsproj()
+    {
+        string text = File.ReadAllText(CsprojPath);
+        // Remove the <PackageReference Include="JJ.AutoIncrementVersion" ... /> line
+        string pattern = @"\s*<PackageReference\s+Include=""JJ\.AutoIncrementVersion""[^/]*/>\s*";
+        text = Regex.Replace(text, pattern, "\n");
+        File.WriteAllText(CsprojPath, text);
+        Log($"   Removed {PackageId} PackageReference from csproj");
+    }
+
     // ── output inspection ──────────────────────────────────────────────
 
     /// <summary>
@@ -249,30 +283,17 @@ internal sealed class TestHelper
         return name is not null && name.EndsWith(suffix, StringComparison.OrdinalIgnoreCase);
     }
 
-    // ── git restore ────────────────────────────────────────────────────
-    /// <summary>
-    /// Restores all modified/tracked files in the repo via git checkout, 
-    /// so the next test starts clean.
-    /// </summary>
-    public void GitRestoreAll()
-    {
-        Log("   SKIPPED GIT RESET. THE TEST SHOULD NOT ERASE OUR EDITS!!!");
-        return; // REVIEWED: Added `return`: Not a good plan to do this. It may wipe out changes to our test code.
-        Log("   Restoring repo to clean state via git...");
-        var psi = new ProcessStartInfo
-        {
-            FileName = "git",
-            Arguments = "checkout -- .",
-            WorkingDirectory = SolutionDir,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
-        using var p = Process.Start(psi)!;
-        p.WaitForExit(30_000);
-        LogResult("Repo restored to committed state"); // CHANGED: Moved from CleanUp method.
+    // ── restore from embedded resources ────────────────────────────────
 
+    /// <summary>
+    /// Re-extracts all embedded test files to the isolated folder,
+    /// restoring them to their original state (replaces git restore).
+    /// </summary>
+    public void RestoreAll()
+    {
+        Log("   Restoring isolated files from embedded resources...");
+        ExtractAllResources();
+        LogResult("Isolated files restored to original state");
     }
 
     /// <summary>
@@ -283,27 +304,35 @@ internal sealed class TestHelper
     public void SetInitialState()
     {
         LogStep("Set Initial State");
-        // Restore tracked files first so csproj is in its committed state.
-        //GitRestoreAll(); // REVIEWED: Commented out. Not a good plan to do this. It may wipe out changes to our test code.
+        // Re-extract the files to a known baseline first.
+        ExtractAllResources();
 
-        UninstallPackage(); // TODO: Output result is ignored. If fails it. It would just blindly continue the next steps.
+        RemovePackageReferenceFromCsproj();
         DeleteBuildNumXml();
         DeleteDirectoryBuildProps();
         SetCsprojVersion("4.3.0"); // TODO: Should not assume the version will start with 4.3. Should use current value for that major/minor.
-        LogResult("Initial state set (package removed, xml/props deleted, version=4.3.0)"); // REVIEWED: Nice. Clear information in log. // TODO: False though, because errors are ignored. So package was actually not removed.
+        LogResult("Initial state set (package removed, xml/props deleted, version=4.3.0)");
     }
 
-    // TODO: Cleanup does nothing as GitRestoreAll is omitted. Remove clean-up logic completely? 
-
     /// <summary>
-    /// Restore repo back to its committed state after each test.
+    /// Deletes the isolated temp folder and all its contents.
     /// </summary>
     public void Cleanup()
     {
         Log("── CLEANUP ──");
-        //GitRestoreAll();  // REVIEWED: Commented out. Not a good plan to do this. It may wipe out changes to our test code.
-        // Also restore potentially deleted untracked files? BuildNum.xml is tracked,
-        // Directory.Build.props is tracked, so git checkout restores them.
-        //LogResult("Repo restored to committed state"); // CHANGED: Moved to GitRestoreAll method.
+        try
+        {
+            if (Directory.Exists(SolutionDir))
+            {
+                Directory.Delete(SolutionDir, recursive: true);
+                LogResult($"Deleted isolated folder: {SolutionDir}");
+            }
+        }
+        catch (Exception ex)
+        {
+            LogWarning($"Could not delete isolated folder: {ex.Message}");
+        }
     }
+
+    public void Dispose() => Cleanup();
 }
