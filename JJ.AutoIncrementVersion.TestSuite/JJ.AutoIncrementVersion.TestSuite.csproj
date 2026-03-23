@@ -24,6 +24,12 @@
     <EmbeddedResource Include="..\BuildNum.xml"
                       Link="EmbeddedTestFiles\BuildNum.xml"
                       LogicalName="TestFiles.BuildNum.xml" />
+    <EmbeddedResource Include="..\README.md"
+                      Link="EmbeddedTestFiles\README.md"
+                      LogicalName="TestFiles.README.md" />
+    <EmbeddedResource Include="..\JJ.AutoIncrementVersion.Test\Dummy.txt"
+                      Link="EmbeddedTestFiles\Dummy.txt"
+                      LogicalName="TestFiles.Dummy.txt" />
   </ItemGroup>
 
 </Project>

@@ -33,6 +33,8 @@ internal sealed class TestHelper : IDisposable
     private const string ResCsproj = "TestFiles.JJ.AutoIncrementVersion.Test.csproj";
     private const string ResDirectoryBuildProps = "TestFiles.Directory.Build.props";
     private const string ResBuildNumXml = "TestFiles.BuildNum.xml";
+    private const string ResReadme = "TestFiles.README.md";
+    private const string ResDummyTxt = "TestFiles.Dummy.txt";
 
     // File Helpers
 
@@ -83,9 +85,9 @@ internal sealed class TestHelper : IDisposable
         ExtractResource(ResDirectoryBuildProps, DirectoryBuildPropsPath);
         ExtractResource(ResCsproj, CsprojPath);
 
-        // Create placeholder files referenced by the csproj.
-        File.WriteAllText(Path.Combine(ProjectDir, "Dummy.txt"), "");
-        File.WriteAllText(Path.Combine(SolutionDir, "README.md"), "# JJ.AutoIncrementVersion.Test");
+        // Extract supporting files referenced by the csproj.
+        ExtractResource(ResDummyTxt, Path.Combine(ProjectDir, "Dummy.txt"));
+        ExtractResource(ResReadme, Path.Combine(SolutionDir, "README.md"));
     }
 
     private static void ExtractResource(string logicalName, string targetPath)
