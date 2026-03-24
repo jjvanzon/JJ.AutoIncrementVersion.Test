@@ -162,48 +162,48 @@ internal sealed class TestHelper : IDisposable
     public string Rebuild()
     {
         Log("Rebuild");
-        return RunDotNet($"msbuild \"{CsprojPath}\" /t:Rebuild /p:Configuration=Release /v:Normal");
+        return RunProcess("dotnet", $"msbuild \"{CsprojPath}\" /t:Rebuild /p:Configuration=Release /v:Normal");
     }
 
     public string RebuildWithArgs(string? extraArgs = null)
     {
         Log($"Rebuild with {extraArgs}");
-        return RunDotNet($"msbuild \"{CsprojPath}\" /t:Rebuild /p:Configuration=Release /v:Normal {extraArgs}");
+        return RunProcess("dotnet", $"msbuild \"{CsprojPath}\" /t:Rebuild /p:Configuration=Release /v:Normal {extraArgs}");
     }
 
     public string RebuildDebug()
     {
         Log("Rebuild Debug");
-        return RunDotNet($"msbuild \"{CsprojPath}\" /t:Rebuild /p:Configuration=Debug /v:Normal");
+        return RunProcess("dotnet", $"msbuild \"{CsprojPath}\" /t:Rebuild /p:Configuration=Debug /v:Normal");
     }
 
     public void InstallPackage()
     {
         Log("Install package");
-        RunDotNet($"add \"{CsprojPath}\" package {PackageId} --version {PackageVersion}");
-        Restore();    
-    }
+        RunProcess("dotnet", $"add \"{CsprojPath}\" package {PackageId} --version {PackageVersion}");
+        Restore();
+      }
 
     public void UninstallPackage()
     {
         Log("Uninstall package");
-        RunDotNet($"remove \"{CsprojPath}\" package {PackageId}");
+        RunProcess("dotnet", $"remove \"{CsprojPath}\" package {PackageId}");
         Restore(); // Or uninstall isn't finalized somehow.
     }
     
     private void Restore()
     {
         Log("Restore");
-        RunDotNet($"restore \"{CsprojPath}\"");
+        RunProcess("dotnet", $"restore \"{CsprojPath}\"");
     }
 
-    private string RunDotNet(string arguments)
+    private string RunProcess(string fileName, string arguments)
     {
-        //Log($"> dotnet {arguments}");
+        //Log($"> {fileName} {arguments}");
 
         using Process process = Process.Start(new ProcessStartInfo
         {
-            FileName = "dotnet",
+            FileName = fileName,
             Arguments = arguments,
             WorkingDirectory = ProjectDir,
             RedirectStandardOutput = true,
@@ -224,7 +224,7 @@ internal sealed class TestHelper : IDisposable
         if (!process.WaitForExit(timeoutSeconds * 1000))
         {
             process.Kill(entireProcessTree: true);
-            throw new TimeoutException($"dotnet {arguments} timed out after {timeoutSeconds}s");
+            throw new TimeoutException($"{fileName} {arguments} timed out after {timeoutSeconds}s");
         }
 
         // .NET may flush async after WaitForExit(int); call the parameterless overload.
@@ -238,7 +238,7 @@ internal sealed class TestHelper : IDisposable
         bool hasError = result.ExitCode != 0 || !string.IsNullOrWhiteSpace(result.Error);
         if (hasError)
         {
-            throw new Exception($"dotnet {arguments} failed: Exit code {result.ExitCode} {result.Error} {result.Output}");
+            throw new Exception($"{fileName} {arguments} failed: Exit code {result.ExitCode} {result.Error} {result.Output}");
         }
 
         return result.Output;
