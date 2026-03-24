@@ -1,3 +1,6 @@
+using static System.Reflection.Assembly;
+using static JJ.Framework.Common.Legacy.EmbeddedResourceHelper;
+
 namespace JJ.AutoIncrementVersion.TestSuite.Helpers;
 
 /// <summary>
@@ -91,27 +94,23 @@ internal sealed class TestHelper : IDisposable
         Restore();
     }
 
-    private void ExtractResourceBuildNumXml() => ExtractResource(BuildNumXmlResourceName, BuildNumXmlPath);
-    private void ExtractResourceDirectoryBuildProps() => ExtractResource(DirectoryBuildPropsResourceName, DirectoryBuildPropsPath);
-    private void ExtractResourceCsproj() => ExtractResource(CsprojResourceName, CsprojPath);
-    private void ExtractResourceDummyTxt() => ExtractResource(DummyTxtResourceName, Path.Combine(ProjectDir, "Dummy.txt"));
-    private void ExtractResourceReadMe() => ExtractResource(ReadMeResourceName, Path.Combine(SolutionDir, "README.md"));
-    private void ExtractResourceNuGetConfig() => ExtractResource(NuGetConfigResourceName, Path.Combine(SolutionDir, "NuGet.config"));
+    private void ExtractResourceBuildNumXml() => ExtractResource("BuildNum.xml", BuildNumXmlPath);
+    private void ExtractResourceDirectoryBuildProps() => ExtractResource("Directory.Build.props", DirectoryBuildPropsPath);
+    private void ExtractResourceCsproj() => ExtractResource("JJ.AutoIncrementVersion.Test.csproj", CsprojPath);
+    private void ExtractResourceDummyTxt() => ExtractResource("Dummy.txt", Path.Combine(ProjectDir, "Dummy.txt"));
+    private void ExtractResourceReadMe() => ExtractResource("README.md", Path.Combine(SolutionDir, "README.md"));
+    private void ExtractResourceNuGetConfig() => ExtractResource("NuGet.config", Path.Combine(SolutionDir, "NuGet.config"));
 
-    private static void ExtractResource(string logicalName, string targetPath)
+    private static void ExtractResource(string resourceName, string targetPath)
     {
-        var assembly = Assembly.GetExecutingAssembly();
-        using var stream = assembly.GetManifestResourceStream(logicalName);
+        var text = GetTestResource(resourceName);
+        WriteAllText(targetPath, text);
+    }
 
-        if (stream == null)
-        {
-            throw new InvalidOperationException(
-                $"Embedded resource '{logicalName}' not found. Available: " +
-                string.Join(", ", assembly.GetManifestResourceNames()));
-        }
-
-        using var reader = new StreamReader(stream);
-        WriteAllText(targetPath, reader.ReadToEnd());
+    private static string GetTestResource(string resourceName)
+    {
+        string text = GetEmbeddedResourceText(GetExecutingAssembly(), "TestResources", resourceName);
+        return text;
     }
 
     /// <summary>
@@ -375,17 +374,7 @@ internal sealed class TestHelper : IDisposable
 
     private string GetEmbeddedPackageVersion()
     {
-        var assembly = Assembly.GetExecutingAssembly();
-        using var stream = assembly.GetManifestResourceStream(CsprojResourceName);
-
-        if (stream == null)
-        {
-            throw new InvalidOperationException(
-                $"Embedded resource '{CsprojResourceName}' not found.");
-        }
-
-        using var reader = new StreamReader(stream);
-        string content = reader.ReadToEnd();
+        string content = GetTestResource("JJ.AutoIncrementVersion.Test.csproj");
 
         Match match = Regex.Match(content, @"<PackageReference\s+Include=""JJ\.AutoIncrementVersion""\s+Version=""([^""]+)""", IgnoreCase);
         if (!match.Success)

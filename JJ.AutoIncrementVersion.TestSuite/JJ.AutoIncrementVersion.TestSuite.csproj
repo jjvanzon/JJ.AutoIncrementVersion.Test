@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="JJ.Framework.Common.Legacy" Version="0.251.5752" />
     <PackageReference Include="JJ.Framework.Testing.Core" Version="4.1.5752" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.*" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.*" />
@@ -16,30 +17,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource 
-      Include="..\JJ.AutoIncrementVersion.Test\JJ.AutoIncrementVersion.Test.csproj" 
-      Link="EmbeddedTestFiles\JJ.AutoIncrementVersion.Test.csproj" 
-      LogicalName="TestFiles.JJ.AutoIncrementVersion.Test.csproj" />
-    <EmbeddedResource 
-      Include="..\Directory.Build.props" 
-      Link="EmbeddedTestFiles\Directory.Build.props" 
-      LogicalName="TestFiles.Directory.Build.props" />
-    <EmbeddedResource 
-      Include="..\BuildNum.xml" 
-      Link="EmbeddedTestFiles\BuildNum.xml" 
-      LogicalName="TestFiles.BuildNum.xml" />
-    <EmbeddedResource 
-      Include="..\NuGet.config" 
-      Link="EmbeddedTestFiles\NuGet.config" 
-      LogicalName="TestFiles.NuGet.config" />
-    <EmbeddedResource 
-      Include="..\README.md" 
-      Link="EmbeddedTestFiles\README.md" 
-      LogicalName="TestFiles.README.md" />
-    <EmbeddedResource 
-      Include="..\JJ.AutoIncrementVersion.Test\Dummy.txt" 
-      Link="EmbeddedTestFiles\Dummy.txt" 
-      LogicalName="TestFiles.Dummy.txt" />
+    <EmbeddedResource Include="..\JJ.AutoIncrementVersion.Test\JJ.AutoIncrementVersion.Test.csproj" Link="TestResources\JJ.AutoIncrementVersion.Test.csproj" />
+    <EmbeddedResource Include="..\Directory.Build.props" Link="TestResources\Directory.Build.props" />
+    <EmbeddedResource Include="..\BuildNum.xml" Link="TestResources\BuildNum.xml" />
+    <EmbeddedResource Include="..\NuGet.config" Link="TestResources\NuGet.config" />
+    <EmbeddedResource Include="..\README.md" Link="TestResources\README.md" />
+    <EmbeddedResource Include="..\JJ.AutoIncrementVersion.Test\Dummy.txt" Link="TestResources\Dummy.txt" />
   </ItemGroup>
 
 </Project>
