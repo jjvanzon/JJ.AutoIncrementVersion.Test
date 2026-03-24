@@ -1,4 +1,3 @@
-
 namespace JJ.AutoIncrementVersion.TestSuite.Helpers;
 
 /// <summary>
@@ -89,7 +88,7 @@ internal sealed class TestHelper : IDisposable
         ExtractResourceReadMe();
         ExtractResourceNuGetConfig();
         RemovePackageReferenceFromCsproj();
-        SetCsprojVersion("4.3.0"); // TODO: Should not assume the version will start with 4.3. Should use current value for that major/minor.
+        SetCsprojVersionToCurrentMajorMinorZero();
         Restore();
     }
 
@@ -271,6 +270,31 @@ internal sealed class TestHelper : IDisposable
         string text = ReadAllText(CsprojPath);
         text = Regex.Replace(text, @"<Version>[^<]*</Version>", $"<Version>{version}</Version>");
         WriteAllText(CsprojPath, text);
+    }
+
+    /// <summary>
+    /// Sets csproj Version to <c>&lt;major&gt;.&lt;minor&gt;.0</c>,
+    /// using the major/minor currently present in the csproj Version value.
+    /// </summary>
+    public void SetCsprojVersionToCurrentMajorMinorZero()
+    {
+        string text = ReadAllText(CsprojPath);
+
+        Match versionElementMatch = Regex.Match(text, @"<Version>\s*([^<]+)\s*</Version>", IgnoreCase);
+        if (!versionElementMatch.Success)
+        {
+            throw new InvalidOperationException("Could not find <Version> element in csproj.");
+        }
+
+        string currentVersion = versionElementMatch.Groups[1].Value.Trim();
+        Match majorMinorMatch = Regex.Match(currentVersion, @"^(\d+)\.(\d+)", IgnoreCase);
+        if (!majorMinorMatch.Success)
+        {
+            throw new InvalidOperationException($"Could not extract major.minor from csproj Version '{currentVersion}'. ");
+        }
+
+        string normalizedVersion = $"{majorMinorMatch.Groups[1].Value}.{majorMinorMatch.Groups[2].Value}.0";
+        SetCsprojVersion(normalizedVersion);
     }
 
     /// <summary>
