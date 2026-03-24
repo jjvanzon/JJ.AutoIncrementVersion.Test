@@ -199,8 +199,6 @@ internal sealed class TestHelper : IDisposable
 
     private string RunProcess(string fileName, string arguments)
     {
-        //Log($"> {fileName} {arguments}");
-
         using Process process = Process.Start(new ProcessStartInfo
         {
             FileName = fileName,
@@ -231,10 +229,9 @@ internal sealed class TestHelper : IDisposable
         process.WaitForExit();
 
         var result = new CommandLineResult(process.ExitCode, stdout.ToString(), stderr.ToString());
-        //if (result.Output.Length > 0) Log(result.Output.TrimEnd());
-        //if (result.Error.Length > 0) Log($"[stderr] {result.Error.TrimEnd()}");
 
-        // TODO: This is still not enough? It could be exit code 0 and no error text? But error in the output?
+        // TODO: This is still not enough? Build might have exit code 0 and no error text? But error in the output?
+        // TODO: Suspicious code line. Restore/install/uninstall/build results may block/continue behavior on varying conditions.
         bool hasError = result.ExitCode != 0 || !string.IsNullOrWhiteSpace(result.Error);
         if (hasError)
         {

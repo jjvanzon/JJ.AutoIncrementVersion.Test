@@ -137,3 +137,8 @@
         ExtractResourceReadMe();
         ExtractResourceNuGetConfig();
     }
+
+        //Log($"> {fileName} {arguments}");
+
+        //if (result.Output.Length > 0) Log(result.Output.TrimEnd());
+        //if (result.Error.Length > 0) Log($"[stderr] {result.Error.TrimEnd()}");
