@@ -161,23 +161,23 @@ internal sealed class TestHelper : IDisposable
 
     public string Rebuild()
     {
-        Restore(); // JJ added
+        //Restore(); // JJ added
         Log("Rebuild");
-        return RunDotNet($"build \"{CsprojPath}\" -c Release -v:Normal --no-incremental");
+        return RunDotNet($"msbuild \"{CsprojPath}\" /t:Rebuild /p:Configuration=Release /v:Normal");
     }
 
     public string RebuildWithArgs(string? extraArgs = null)
     {
-        Restore(); // JJ added
+        //Restore(); // JJ added
         Log($"Rebuild with {extraArgs}");
-        return RunDotNet($"build \"{CsprojPath}\" -c Release -v:Normal --no-incremental {extraArgs}");
+        return RunDotNet($"msbuild \"{CsprojPath}\" /t:Rebuild /p:Configuration=Release /v:Normal {extraArgs}");
     }
 
     public string RebuildDebug()
     {
-        Restore(); // JJ added
+        //Restore(); // JJ added
         Log("Rebuild Debug");
-        return RunDotNet($"build \"{CsprojPath}\" -c Debug -v:Normal --no-incremental");
+        return RunDotNet($"msbuild \"{CsprojPath}\" /t:Rebuild /p:Configuration=Debug /v:Normal");
     }
 
     public void InstallPackage()
