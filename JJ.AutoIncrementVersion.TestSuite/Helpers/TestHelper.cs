@@ -1,3 +1,4 @@
+
 namespace JJ.AutoIncrementVersion.TestSuite.Helpers;
 
 /// <summary>
@@ -328,7 +329,7 @@ internal sealed class TestHelper : IDisposable
     {
         string content = ReadDirectoryBuildProps();
 
-        if (content.Contains("$(Configuration)=='Release'", StringComparison.OrdinalIgnoreCase))
+        if (content.Contains("$(Configuration)=='Release'", OrdinalIgnoreCase))
         {
             return;
         }
@@ -336,7 +337,7 @@ internal sealed class TestHelper : IDisposable
         const string pattern = "Condition\\s*=\\s*\"Exists\\('BuildNum\\.xml'\\)\"";
         const string replacement = "Condition=\"Exists('BuildNum.xml') And $(Configuration)=='Release'\"";
 
-        string updated = Regex.Replace(content, pattern, replacement, RegexOptions.IgnoreCase);
+        string updated = Regex.Replace(content, pattern, replacement, IgnoreCase);
 
         if (updated == content)
         {

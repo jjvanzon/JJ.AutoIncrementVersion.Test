@@ -1,5 +1,3 @@
-using static System.StringComparison;
-
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]

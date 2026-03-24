@@ -6,6 +6,7 @@ global using System.Xml.Linq;
 global using JJ.AutoIncrementVersion.TestSuite.Helpers;
 global using static System.Console;
 global using static System.StringComparison;
+global using static System.Text.RegularExpressions.RegexOptions;
 global using static System.IO.File;
 global using static System.IO.Directory;
 global using static JJ.Framework.Testing.Core.AssertCore;
