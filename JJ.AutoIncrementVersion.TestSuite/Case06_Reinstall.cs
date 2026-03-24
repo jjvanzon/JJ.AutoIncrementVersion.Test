@@ -35,24 +35,6 @@ public class Case06_Reinstall : TestHelper
         InstallPackage();
         Log();
 
-        int buildNum1 = GetBuildNumFromXml();
-        string output1 = Rebuild();
-        string packageName1 = ExtractPackageFileName(output1);
-        IsTrue(packageName1.EndsWith($".{buildNum1}.nupkg"));
-        Log();
-
-        int buildNum2 = GetBuildNumFromXml();
-        string output2 = Rebuild();
-        string packageName2 = ExtractPackageFileName(output2);
-        IsTrue(packageName2.EndsWith($".{buildNum2}.nupkg"));
-        AreEqual(buildNum1 + 1, buildNum2);
-        Log();
-
-        int buildNum3 = GetBuildNumFromXml();
-        string output3 = Rebuild();
-        string packageName3 = ExtractPackageFileName(output3);
-        IsTrue(packageName3.EndsWith($".{buildNum3}.nupkg"));
-        AreEqual(buildNum2 + 1, buildNum3);
-        Log();
+        RebuildsIncrement();
     }
 }

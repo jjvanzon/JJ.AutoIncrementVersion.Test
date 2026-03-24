@@ -196,6 +196,23 @@ public class TestHelper : IDisposable
 
     // Run Processes
 
+    public void RebuildsIncrement(int repeats = 3)
+    {
+        int prevBuildNum = default;
+        for (int i = 0; i < repeats; i++)
+        {
+            int buildNum = GetBuildNumFromXml();
+            string output = Rebuild();
+            string packageName = ExtractPackageFileName(output);
+            IsTrue(packageName.EndsWith($".{buildNum}.nupkg"));
+            Log();
+
+            if (i != 0) IsTrue(buildNum == prevBuildNum + 1);
+            prevBuildNum = buildNum;
+
+        }
+    }
+
     public void RebuildExpectFail()
     {
         try

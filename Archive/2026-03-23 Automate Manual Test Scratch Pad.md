@@ -167,3 +167,67 @@
             IsTrue(nextBuildNum > buildNumFromOutput);
             buildNumFromOutput = nextBuildNum;
         }
+
+Literal repeat Rebuilds:
+
+```cs
+
+    // From Case07_AutoRecreateFiles:
+
+        int buildNum1;
+        {
+            int buildNum = GetBuildNumFromXml();
+            string output = Rebuild();
+            string packageName = ExtractPackageFileName(output);
+            IsTrue(packageName.EndsWith($".{buildNum}.nupkg"));
+            Log();
+            buildNum1 = buildNum;
+        }
+        int buildNum2;
+        {
+            int buildNum = GetBuildNumFromXml();
+            string output = Rebuild();
+            string packageName = ExtractPackageFileName(output);
+            IsTrue(packageName.EndsWith($".{buildNum}.nupkg"));
+            Log();
+            buildNum2 = buildNum;
+        }
+        IsTrue(buildNum2 == buildNum1 + 1);
+
+        int buildNum3;
+        {
+            int buildNum = GetBuildNumFromXml();
+            string output = Rebuild();
+            string packageName = ExtractPackageFileName(output);
+            IsTrue(packageName.EndsWith($".{buildNum}.nupkg"));
+            Log();
+
+            buildNum3 = buildNum;
+        }
+        IsTrue(buildNum3 == buildNum2 + 1);
+
+
+    // From Case06_Reinstall:
+
+
+        Log("OLD");
+        int buildNum1 = GetBuildNumFromXml();
+        string output1 = Rebuild();
+        string packageName1 = ExtractPackageFileName(output1);
+        IsTrue(packageName1.EndsWith($".{buildNum1}.nupkg"));
+        Log();
+
+        int buildNum2 = GetBuildNumFromXml();
+        string output2 = Rebuild();
+        string packageName2 = ExtractPackageFileName(output2);
+        IsTrue(packageName2.EndsWith($".{buildNum2}.nupkg"));
+        AreEqual(buildNum1 + 1, buildNum2);
+        Log();
+
+        int buildNum3 = GetBuildNumFromXml();
+        string output3 = Rebuild();
+        string packageName3 = ExtractPackageFileName(output3);
+        IsTrue(packageName3.EndsWith($".{buildNum3}.nupkg"));
+        AreEqual(buildNum2 + 1, buildNum3);
+        Log();
+```

@@ -34,63 +34,10 @@ public class Case07_AutoRecreateFiles : TestHelper
             IsTrue(DirPropsExists());
             Log();
         }
-        int buildNum1;
-        {
-            int buildNum = GetBuildNumFromXml();
-            string output = Rebuild();
-            string packageName = ExtractPackageFileName(output);
-            IsTrue(packageName.EndsWith($".{buildNum}.nupkg"));
-            Log();
-            buildNum1 = buildNum;
-        }
-        int buildNum2;
-        {
-            int buildNum = GetBuildNumFromXml();
-            string output = Rebuild();
-            string packageName = ExtractPackageFileName(output);
-            IsTrue(packageName.EndsWith($".{buildNum}.nupkg"));
-            Log();
-            buildNum2 = buildNum;
-        }
-        IsTrue(buildNum2 == buildNum1 + 1);
-
-        int buildNum3;
-        {
-            int buildNum = GetBuildNumFromXml();
-            string output = Rebuild();
-            string packageName = ExtractPackageFileName(output);
-            IsTrue(packageName.EndsWith($".{buildNum}.nupkg"));
-            Log();
-
-            buildNum3 = buildNum;
-        }
-        IsTrue(buildNum3 == buildNum2 + 1);
-
-        //return;
-
-        int prev = default;
         
-        // Subsequent builds succeed and increment
-
-        // TODO: Put in helper and reuse.
-        int repeats = 3;
-        for (int i = 0; i < repeats; i++)
-        {
-            int buildNum = GetBuildNumFromXml();
-            string output = Rebuild();
-            string packageName = ExtractPackageFileName(output);
-            IsTrue(packageName.EndsWith($".{buildNum}.nupkg"));
-
-            if (i != 0)
-            {
-                IsTrue(buildNum == prev + 1);
-            }
-
-            prev = buildNum;
-
-            Log();
-        }
+        RebuildsIncrement();
     }
+
 
     /// <summary>
     /// Manual Test Plan → "Auto-Recreate Files" (BuildNum.xml deleted)
