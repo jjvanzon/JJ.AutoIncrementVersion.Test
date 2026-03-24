@@ -27,11 +27,11 @@ public class Case09_Conditionals
 
         // ── Release build – should increment ──
         string releaseBuildOutput1 = testHelper.Rebuild();
-        int? releaseBuildNum1 = testHelper.ExtractBuildNumFromNupkgName(releaseBuildOutput1);
+        int? releaseBuildNum1 = testHelper.ExtractPackageBuildNum(releaseBuildOutput1);
         testHelper.LogResult($"Release build 1: nupkg num={releaseBuildNum1}");
 
         string releaseBuildOutput2 = testHelper.Rebuild();
-        int? releaseBuildNum2 = testHelper.ExtractBuildNumFromNupkgName(releaseBuildOutput2);
+        int? releaseBuildNum2 = testHelper.ExtractPackageBuildNum(releaseBuildOutput2);
         testHelper.LogResult($"Release build 2: nupkg num={releaseBuildNum2}");
 
         // TODO: Assert exact increment by 1
@@ -43,7 +43,7 @@ public class Case09_Conditionals
         // ── Debug build – should use BuildNum 0 ──
         testHelper.LogStep("Debug build – should use BuildNum 0");
         string debugBuildOutput = testHelper.RebuildDebug();
-        int? debugBuildNum = testHelper.ExtractBuildNumFromNupkgName(debugBuildOutput);
+        int? debugBuildNum = testHelper.ExtractPackageBuildNum(debugBuildOutput);
         testHelper.LogResult($"Debug build: nupkg num={debugBuildNum}");
 
         // Debug build may or may not produce a nupkg depending on GeneratePackageOnBuild,
@@ -60,7 +60,7 @@ public class Case09_Conditionals
         // ── Swap back to Release – should continue incrementing ──
         testHelper.LogStep("Back to Release – should continue from where it left off");
         var rel3 = testHelper.Rebuild();
-        int? relNum3 = testHelper.ExtractBuildNumFromNupkgName(rel3);
+        int? relNum3 = testHelper.ExtractPackageBuildNum(rel3);
         testHelper.LogResult($"Release build 3: nupkg num={relNum3}");
 
         if (releaseBuildNum2 is not null && relNum3 is not null)
@@ -72,7 +72,7 @@ public class Case09_Conditionals
         // ── One more Debug to confirm ──
         testHelper.LogStep("Debug again – still BuildNum 0");
         var dbg2 = testHelper.RebuildDebug();
-        int? dbgNum2 = testHelper.ExtractBuildNumFromNupkgName(dbg2);
+        int? dbgNum2 = testHelper.ExtractPackageBuildNum(dbg2);
         testHelper.LogResult($"Debug build 2: nupkg num={dbgNum2}");
 
         if (dbgNum2 is not null)
@@ -83,7 +83,7 @@ public class Case09_Conditionals
         // ── One more Release ──
         testHelper.LogStep("Release again – still incrementing");
         var rel4 = testHelper.Rebuild();
-        int? relNum4 = testHelper.ExtractBuildNumFromNupkgName(rel4);
+        int? relNum4 = testHelper.ExtractPackageBuildNum(rel4);
         testHelper.LogResult($"Release build 4: nupkg num={relNum4}");
 
         if (relNum3 is not null && relNum4 is not null)

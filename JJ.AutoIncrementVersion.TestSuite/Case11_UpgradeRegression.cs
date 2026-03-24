@@ -43,11 +43,11 @@ public class Case11_UpgradeRegression
 
         // ── Verify continued increment ──
         testHelper.LogStep("Verify continued increment");
-        int? previousBuildNum = testHelper.ExtractBuildNumFromNupkgName(buildOutput1);
+        int? previousBuildNum = testHelper.ExtractPackageBuildNum(buildOutput1);
         for (int i = 0; i < 2; i++)
         {
             string nextBuildOutput = testHelper.Rebuild();
-            int? nextBuildNum = testHelper.ExtractBuildNumFromNupkgName(nextBuildOutput);
+            int? nextBuildNum = testHelper.ExtractPackageBuildNum(nextBuildOutput);
 
             // TODO: Assert exact increments by 1.
             if (previousBuildNum is not null && nextBuildNum is not null)

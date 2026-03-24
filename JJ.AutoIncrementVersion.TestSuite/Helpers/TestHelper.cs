@@ -355,8 +355,8 @@ internal sealed class TestHelper : IDisposable
     /// </summary>
     public void RemovePackageReferenceFromCsproj()
     {
+        Log($"Remove package reference");
         string text = ReadAllText(CsprojFilePath);
-        // Remove the <PackageReference Include="JJ.AutoIncrementVersion" ... /> line
         const string pattern = @"\s*<PackageReference\s+Include=""JJ\.AutoIncrementVersion""[^/]*/>\s*";
         text = Regex.Replace(text, pattern, "\n");
         WriteAllText(CsprojFilePath, text);
@@ -385,10 +385,21 @@ internal sealed class TestHelper : IDisposable
     /// Extracts the last segment of the version from the nupkg name.
     /// E.g. "JJ.AutoIncrementVersion.Test.4.3.7.nupkg" → 7
     /// </summary>
-    public int? ExtractBuildNumFromNupkgName(string output)
+    public int ExtractPackageBuildNum(string output)
     {
         var match = Regex.Match(output, @"JJ\.AutoIncrementVersion\.Test\.[\d]+\.[\d]+\.([\d]+)\.nupkg");
-        return match.Success ? int.Parse(match.Groups[1].Value) : null;
+        if (!match.Success)
+        {
+            throw new InvalidOperationException(
+                $"Could not extract BuildNum from " +
+                $"JJ.AutoIncrementVersion.Test build: {output}");
+        }
+
+        int buildNum = int.Parse(match.Groups[1].Value);
+        
+        Log($"Output BuildNum = {buildNum}");
+
+        return buildNum;
     }
 
     public bool OutputContainsNupkgEndingWith(string output, string suffix)

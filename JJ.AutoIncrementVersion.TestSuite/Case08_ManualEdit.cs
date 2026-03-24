@@ -23,13 +23,13 @@ public class Case08_ManualEdit
         int originalBuildNum = testHelper.GetBuildNumFromXml();
 
         string buildOutput1 = testHelper.Rebuild();
-        int? nupkgNum1 = testHelper.ExtractBuildNumFromNupkgName(buildOutput1);
+        int? nupkgNum1 = testHelper.ExtractPackageBuildNum(buildOutput1);
         // ── Build – should increment from the restored value ──
         // TODO: Don't just log. Assert.
         testHelper.LogResult($"Build 1 nupkg num: {nupkgNum1}");
 
         string buildOutput2 = testHelper.Rebuild();
-        int? nupkgNum2 = testHelper.ExtractBuildNumFromNupkgName(buildOutput2);
+        int? nupkgNum2 = testHelper.ExtractPackageBuildNum(buildOutput2);
         // TODO: Don't just log. Assert.
         testHelper.LogResult($"Build 2 nupkg num: {nupkgNum2}");
 
@@ -48,7 +48,7 @@ public class Case08_ManualEdit
         // ── Build – version should start from the manual value ──
         testHelper.LogStep("Build after manual edit – version should use new BuildNum");
         var buildOutput3 = testHelper.Rebuild();
-        int? nupkgNum3 = testHelper.ExtractBuildNumFromNupkgName(buildOutput3);
+        int? nupkgNum3 = testHelper.ExtractPackageBuildNum(buildOutput3);
         // TODO: Don't just log. Assert.
         testHelper.LogResult($"Build 3 nupkg num: {nupkgNum3} (set manually to {manualValue})");
 
@@ -61,7 +61,7 @@ public class Case08_ManualEdit
 
             // TODO: Assert exact increments. Not just >
 
-            int? currentBuildNum = testHelper.ExtractBuildNumFromNupkgName(nextBuildOutput);
+            int? currentBuildNum = testHelper.ExtractPackageBuildNum(nextBuildOutput);
             testHelper.LogResult($"Build {i + 4}: nupkg num={currentBuildNum}");
 
             if (previousBuildNum is not null && currentBuildNum is not null)

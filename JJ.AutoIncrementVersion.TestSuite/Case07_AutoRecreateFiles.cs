@@ -35,7 +35,7 @@ public class Case07_AutoRecreateFiles
         {
             string nextBuildOutput = testHelper.Rebuild();
 
-            int? nextBuildNum = testHelper.ExtractBuildNumFromNupkgName(nextBuildOutput);
+            int? nextBuildNum = testHelper.ExtractPackageBuildNum(nextBuildOutput);
 
             // WOuld be nice if it checked for increments by exactly 1.
 

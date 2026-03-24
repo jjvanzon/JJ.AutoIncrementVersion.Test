@@ -22,12 +22,12 @@ public class Case06_Reinstall
         testHelper.InstallPackage();
 
         string buildOutput1 = testHelper.Rebuild();
-        int? buildNum1 = testHelper.ExtractBuildNumFromNupkgName(buildOutput1);
+        int? buildNum1 = testHelper.ExtractPackageBuildNum(buildOutput1);
         // TODO: Don't just log. Assert.
         testHelper.LogResult($"First build after reinstall: BuildNum={buildNum1}");
 
         string buildOutput2 = testHelper.Rebuild();
-        int? buikdNum2 = testHelper.ExtractBuildNumFromNupkgName(buildOutput2);
+        int? buikdNum2 = testHelper.ExtractPackageBuildNum(buildOutput2);
         // TODO: Don't just log. Assert.
         testHelper.LogResult($"Second build after reinstall: BuildNum={buikdNum2}");
 

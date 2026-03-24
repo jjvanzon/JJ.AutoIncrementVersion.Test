@@ -39,18 +39,15 @@ public class Case04_FirstUse
         IsTrue(dirPropsContent.Contains("<BuildNum>0</BuildNum>"));
         IsTrue(dirPropsContent.Contains("Import Project=\"BuildNum.xml\""));
 
-        // ── Subsequent builds should auto-increment ──
-        int? previousBuildNum = testHelper.ExtractBuildNumFromNupkgName(buildOutput);
+        int buildNumFromOutput = testHelper.ExtractPackageBuildNum(buildOutput);
+        int buildNumFroXml = testHelper.GetBuildNumFromXml();
 
         for (int i = 0; i < 3; i++)
         {
             var nextBuildOutput = testHelper.Rebuild();
-            int? nextBuildNum = testHelper.ExtractBuildNumFromNupkgName(nextBuildOutput);
-            if (previousBuildNum is not null && nextBuildNum is not null)
-            {
-                IsTrue(nextBuildNum > previousBuildNum);
-            }
-            previousBuildNum = nextBuildNum;
+            int nextBuildNum = testHelper.ExtractPackageBuildNum(nextBuildOutput);
+            IsTrue(nextBuildNum > buildNumFromOutput);
+            buildNumFromOutput = nextBuildNum;
         }
     }
 }
