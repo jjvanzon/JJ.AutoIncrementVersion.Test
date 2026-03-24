@@ -1,4 +1,3 @@
-
 namespace JJ.AutoIncrementVersion.TestSuite.Helpers;
 
 /// <summary>
@@ -21,27 +20,18 @@ internal sealed class TestHelper : IDisposable
     private string NuGetConfigFilePath { get; }
 
     private const string PackageId = "JJ.AutoIncrementVersion";
-    // TODO: Fixed version number not good. Latest from Pre-Release-Package-Feed is better. Kinda bad, because if we keep this, we'd assume the tests test the latest, which it never would.
     private const string TestProjectName = "JJ.AutoIncrementVersion.Test";
-
-    // Embedded resource logical names
-    private const string CsprojFileName = "JJ.AutoIncrementVersion.Test.csproj";
-    //private const string DirBuildPropsFileName = "Directory.Build.props";
-    //private const string BuildNumXmlFileName = "BuildNum.xml";
-    //private const string ReadMeFileName = "README.md";
-    //private const string DummyTxtFileName = "Dummy.txt";
-    //private const string NuGetConfigFileName = "NuGet.config";
 
     // File Helpers
 
-    public bool BuildNumXmlExists() => File.Exists(BuildNumXmlFilePath);
-    public bool DirectoryBuildPropsExists() => File.Exists(DirPropsFilePath);
-    public string ReadBuildNumXml() => ReadAllText(BuildNumXmlFilePath);
-    public string ReadDirectoryBuildProps() => ReadAllText(DirPropsFilePath);
-    public void WriteBuildNumXml(string content) => WriteAllText(BuildNumXmlFilePath, content);
-    public void WriteDirectoryBuildProps(string content) => WriteAllText(DirPropsFilePath, content);
-    public void DeleteBuildNumXml() => File.Delete(BuildNumXmlFilePath);
-    public void DeleteDirectoryBuildProps() => File.Delete(DirPropsFilePath);
+    public bool   BuildNumXmlExists()                      => File.Exists(BuildNumXmlFilePath);
+    public bool   DirectoryBuildPropsExists()              => File.Exists(DirPropsFilePath);
+    public string ReadBuildNumXml()                        => ReadAllText(BuildNumXmlFilePath);
+    public string ReadDirectoryBuildProps()                => ReadAllText(DirPropsFilePath);
+    public void   WriteBuildNumXml(string content)         => WriteAllText(BuildNumXmlFilePath, content);
+    public void   WriteDirectoryBuildProps(string content) => WriteAllText(DirPropsFilePath, content);
+    public void   DeleteBuildNumXml()                      => Delete(BuildNumXmlFilePath);
+    public void   DeleteDirectoryBuildProps()              => Delete(DirPropsFilePath);
 
     // Init / Cleanup
 
@@ -49,15 +39,15 @@ internal sealed class TestHelper : IDisposable
     {
         // Create a random isolated folder in the system temp directory
         // (outside the repo tree, so MSBuild won't pick up the repo's Directory.Build.props).
-        SolutionDir = Path.Combine(Path.GetTempPath(), "JJ.AutoIncrementVersion.TestRuns", Guid.NewGuid().ToString("N"));
-        //SolutionDir= Path.Combine(Environment.CurrentDirectory, Guid.NewGuid().ToString());
-        ProjectDir = Path.Combine(SolutionDir, TestProjectName);
-        CsprojFilePath = Path.Combine(ProjectDir, $"{TestProjectName}.csproj");
-        BuildNumXmlFilePath = Path.Combine(SolutionDir, "BuildNum.xml");
-        DirPropsFilePath = Path.Combine(SolutionDir, "Directory.Build.props");
-        DummyTxtFilePath = Path.Combine(ProjectDir, "Dummy.txt");
-        ReadmeMDFilePath = Path.Combine(SolutionDir, "README.md");
-        NuGetConfigFilePath = Path.Combine(SolutionDir, "NuGet.config");
+        //SolutionDir       = Path.Combine(Environment.CurrentDirectory, Guid.NewGuid().ToString());
+        SolutionDir         = Combine(GetTempPath(), "JJ.AutoIncrementVersion.TestRuns", Guid.NewGuid().ToString("N"));
+        ProjectDir          = Combine(SolutionDir, TestProjectName);
+        CsprojFilePath      = Combine(ProjectDir, $"{TestProjectName}.csproj");
+        BuildNumXmlFilePath = Combine(SolutionDir, "BuildNum.xml");
+        DirPropsFilePath    = Combine(SolutionDir, "Directory.Build.props");
+        DummyTxtFilePath    = Combine(ProjectDir, "Dummy.txt");
+        ReadmeMDFilePath    = Combine(SolutionDir, "README.md");
+        NuGetConfigFilePath = Combine(SolutionDir, "NuGet.config");
     }
 
     /// <summary>
@@ -67,14 +57,14 @@ internal sealed class TestHelper : IDisposable
     public void SetInstalledState()
     {
         Log("Set installed state");
-        CreateDirectory(SolutionDir);
-        CreateDirectory(ProjectDir);
-        ExtractResourceBuildNumXml();
-        ExtractResourceDirectoryBuildProps();
-        ExtractResourceCsproj();
-        ExtractResourceDummyTxt();
-        ExtractResourceReadMe();
-        ExtractResourceNuGetConfig();
+        Directory.CreateDirectory(SolutionDir);
+        Directory.CreateDirectory(ProjectDir);
+        InitBuildNumXml();
+        InitDirectoryBuildProps();
+        InitCsproj();
+        InitDummyTxt();
+        InitReadMe();
+        InitNuGetConfig();
         Restore();
     }
 
@@ -86,30 +76,25 @@ internal sealed class TestHelper : IDisposable
     public void SetUninstalledState()
     {
         Log("Set uninstalled state");
-        CreateDirectory(SolutionDir);
-        CreateDirectory(ProjectDir);
-        ExtractResourceCsproj();
-        ExtractResourceDummyTxt();
-        ExtractResourceReadMe();
-        ExtractResourceNuGetConfig();
+        Directory.CreateDirectory(SolutionDir);
+        Directory.CreateDirectory(ProjectDir);
+        InitCsproj();
+        InitDummyTxt();
+        InitReadMe();
+        InitNuGetConfig();
         RemovePackageReferenceFromCsproj();
         SetCsProjPatchNum("0");
         Restore();
     }
 
-    private void ExtractResourceBuildNumXml() => ExtractResource("BuildNum.xml", BuildNumXmlFilePath);
-    private void ExtractResourceDirectoryBuildProps() => ExtractResource("Directory.Build.props", DirPropsFilePath);
-    private void ExtractResourceCsproj() => ExtractResource(TestProjectName + ".csproj", CsprojFilePath);
-    private void ExtractResourceDummyTxt() => ExtractResource("Dummy.txt", DummyTxtFilePath);
-    private void ExtractResourceReadMe() => ExtractResource("README.md", ReadmeMDFilePath);
-    private void ExtractResourceNuGetConfig() => ExtractResource("NuGet.config", NuGetConfigFilePath);
+    private void InitBuildNumXml        () => WriteAllText(BuildNumXmlFilePath, GetResource("BuildNum.xml"));
+    private void InitDirectoryBuildProps() => WriteAllText(DirPropsFilePath,    GetResource("Directory.Build.props"));
+    private void InitCsproj             () => WriteAllText(CsprojFilePath,      GetResource(TestProjectName + ".csproj"));
+    private void InitDummyTxt           () => WriteAllText(DummyTxtFilePath,    GetResource("Dummy.txt"));
+    private void InitReadMe             () => WriteAllText(ReadmeMDFilePath,    GetResource("README.md"));
+    private void InitNuGetConfig        () => WriteAllText(NuGetConfigFilePath, GetResource("NuGet.config"));
 
-    private static void ExtractResource(string resourceName, string targetPath)
-    {
-        WriteAllText(targetPath, GetTestResource(resourceName));
-    }
-
-    private static string GetTestResource(string resourceName) 
+    private static string GetResource(string resourceName) 
         => GetEmbeddedResourceText(GetExecutingAssembly(), "TestResources", resourceName);
 
     /// <summary>
@@ -121,7 +106,7 @@ internal sealed class TestHelper : IDisposable
         {
             if (Directory.Exists(SolutionDir))
             {
-                Delete(SolutionDir, recursive: true);
+                Directory.Delete(SolutionDir, recursive: true);
             }
         }
         catch (Exception ex)
@@ -373,7 +358,7 @@ internal sealed class TestHelper : IDisposable
 
     private string GetEmbeddedPackageVersion()
     {
-        string content = GetTestResource(TestProjectName + ".csproj");
+        string content = GetResource(TestProjectName + ".csproj");
 
         Match match = Regex.Match(content, @"<PackageReference\s+Include=""JJ\.AutoIncrementVersion""\s+Version=""([^""]+)""", IgnoreCase);
         if (!match.Success)

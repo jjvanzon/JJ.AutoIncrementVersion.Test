@@ -142,3 +142,12 @@
 
         //if (result.Output.Length > 0) Log(result.Output.TrimEnd());
         //if (result.Error.Length > 0) Log($"[stderr] {result.Error.TrimEnd()}");
+
+
+    // Embedded resource logical names
+    //private const string CsprojFileName = "JJ.AutoIncrementVersion.Test.csproj";
+    //private const string DirBuildPropsFileName = "Directory.Build.props";
+    //private const string BuildNumXmlFileName = "BuildNum.xml";
+    //private const string ReadMeFileName = "README.md";
+    //private const string DummyTxtFileName = "Dummy.txt";
+    //private const string NuGetConfigFileName = "NuGet.config";
