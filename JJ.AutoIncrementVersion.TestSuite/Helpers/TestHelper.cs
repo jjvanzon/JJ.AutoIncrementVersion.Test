@@ -88,7 +88,7 @@ internal sealed class TestHelper : IDisposable
         ExtractResourceReadMe();
         ExtractResourceNuGetConfig();
         RemovePackageReferenceFromCsproj();
-        SetCsprojVersionToCurrentMajorMinorZero();
+        SetCsProjPatchNum("0");
         Restore();
     }
 
@@ -273,28 +273,30 @@ internal sealed class TestHelper : IDisposable
     }
 
     /// <summary>
-    /// Sets csproj Version to <c>&lt;major&gt;.&lt;minor&gt;.0</c>,
-    /// using the major/minor currently present in the csproj Version value.
+    /// Extracts major.minor from the csproj Version element.
+    /// E.g. "4.3.0" → "4.3", "4.3.$(BuildNum)" → "4.3"
     /// </summary>
-    public void SetCsprojVersionToCurrentMajorMinorZero()
+    private string GetCsprojMajorMinor()
     {
         string text = ReadAllText(CsprojPath);
-
-        Match versionElementMatch = Regex.Match(text, @"<Version>\s*([^<]+)\s*</Version>", IgnoreCase);
-        if (!versionElementMatch.Success)
+        Match versionMatch = Regex.Match(text, @"<Version>\s*(\d+\.\d+)", IgnoreCase);
+        
+        if (!versionMatch.Success)
         {
-            throw new InvalidOperationException("Could not find <Version> element in csproj.");
+            throw new InvalidOperationException("Could not extract major.minor from csproj Version element.");
         }
 
-        string currentVersion = versionElementMatch.Groups[1].Value.Trim();
-        Match majorMinorMatch = Regex.Match(currentVersion, @"^(\d+)\.(\d+)", IgnoreCase);
-        if (!majorMinorMatch.Success)
-        {
-            throw new InvalidOperationException($"Could not extract major.minor from csproj Version '{currentVersion}'. ");
-        }
+        return versionMatch.Groups[1].Value;
+    }
 
-        string normalizedVersion = $"{majorMinorMatch.Groups[1].Value}.{majorMinorMatch.Groups[2].Value}.0";
-        SetCsprojVersion(normalizedVersion);
+    /// <summary>
+    /// Sets csproj Version to &lt;major&gt;.&lt;minor&gt;.0,
+    /// extracting major.minor from the current csproj Version value.
+    /// </summary>
+    public void SetCsProjPatchNum(string patch)
+    {
+        string majorMinor = GetCsprojMajorMinor();
+        SetCsprojVersion($"{majorMinor}.{patch}");
     }
 
     /// <summary>
