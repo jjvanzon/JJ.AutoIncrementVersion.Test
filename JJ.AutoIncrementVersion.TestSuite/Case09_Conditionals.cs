@@ -10,11 +10,8 @@ public class Case09_Conditionals
     ///
     /// Tests conditional BuildNum.xml inclusion from Directory.Build.props.
     ///
-    /// The committed Directory.Build.props already has the condition:
-    ///   Condition="Exists('BuildNum.xml') And $(Configuration)=='Release'"
-    ///
     /// Steps:
-    ///   1. Verify Directory.Build.props has the Release condition.
+    ///   1. Ensure Directory.Build.props has the Release condition.
     ///   2. Build for Release – BuildNum increments.
     ///   3. Build for Debug – uses BuildNum 0.
     ///   4. Swap a few times to see if Release continues with original range.
@@ -25,11 +22,9 @@ public class Case09_Conditionals
         using var testHelper = new TestHelper();
 
         testHelper.SetInstalledState();
+        testHelper.EnsureDirectoryBuildPropsHasReleaseCondition();
 
         string dirPropsContent = testHelper.ReadDirectoryBuildProps();
-
-        // ── Verify Directory.Build.props has the conditional ──
-        // TODO: Assert can fail because the Release condition is not guaranteed as an initial state.
         IsTrue(dirPropsContent.Contains("$(Configuration)=='Release'", OrdinalIgnoreCase));
 
         // ── Release build – should increment ──

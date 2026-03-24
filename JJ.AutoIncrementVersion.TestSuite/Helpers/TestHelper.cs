@@ -1,4 +1,3 @@
-
 namespace JJ.AutoIncrementVersion.TestSuite.Helpers;
 
 /// <summary>
@@ -319,5 +318,31 @@ internal sealed class TestHelper : IDisposable
     {
         string? name = ExtractNupkgName(output);
         return name is not null && name.EndsWith(suffix, OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Ensures Directory.Build.props imports BuildNum.xml only for Release configuration.
+    /// If the Release condition is missing, it is inserted.
+    /// </summary>
+    public void EnsureDirectoryBuildPropsHasReleaseCondition()
+    {
+        string content = ReadDirectoryBuildProps();
+
+        if (content.Contains("$(Configuration)=='Release'", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        const string pattern = "Condition\\s*=\\s*\"Exists\\('BuildNum\\.xml'\\)\"";
+        const string replacement = "Condition=\"Exists('BuildNum.xml') And $(Configuration)=='Release'\"";
+
+        string updated = Regex.Replace(content, pattern, replacement, RegexOptions.IgnoreCase);
+
+        if (updated == content)
+        {
+            throw new InvalidOperationException("Could not inject Release condition into Directory.Build.props.");
+        }
+
+        WriteDirectoryBuildProps(updated);
     }
 }
