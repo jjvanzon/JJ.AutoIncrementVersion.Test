@@ -17,33 +17,78 @@ public class Case07_AutoRecreateFiles : TestHelper
     [TestMethod]
     public void Case07_DeleteDirectoryBuildProps_FailsThenRecreatesAndIncrements()
     {
-        InitInstalledState();
-        Rebuild();
-
-        DeleteDirectoryBuildProps();
-        IsFalse(DirPropsExists());
-
-        RebuildExpectFail();
-
-
-        IsTrue(DirPropsExists());
-
-        // Subsequent builds succeed and increment
-        int? previousBuildNum = null;
-        for (int i = 0; i < 3; i++) // TODO: I like the retry loop and that it checks for increments.
         {
-            string nextBuildOutput = Rebuild();
+            InitInstalledState();
+            IsTrue(BuildNumXmlExists());
+            IsTrue(DirPropsExists());
+            GetBuildNumFromXml();
+            string outputInit = Rebuild();
+            ExtractPackageFileName(outputInit);
+            GetBuildNumFromXml();
+            Log();
+        }
+        {
+            DeleteDirectoryBuildProps();
+            IsFalse(DirPropsExists());
+            RebuildExpectFail();
+            IsTrue(DirPropsExists());
+            Log();
+        }
+        int buildNum1;
+        {
+            int buildNum = GetBuildNumFromXml();
+            string output = Rebuild();
+            string packageName = ExtractPackageFileName(output);
+            IsTrue(packageName.EndsWith($".{buildNum}.nupkg"));
+            Log();
+            buildNum1 = buildNum;
+        }
+        int buildNum2;
+        {
+            int buildNum = GetBuildNumFromXml();
+            string output = Rebuild();
+            string packageName = ExtractPackageFileName(output);
+            IsTrue(packageName.EndsWith($".{buildNum}.nupkg"));
+            Log();
+            buildNum2 = buildNum;
+        }
+        IsTrue(buildNum2 == buildNum1 + 1);
 
-            int? nextBuildNum = ExtractPackageBuildNum(nextBuildOutput);
+        int buildNum3;
+        {
+            int buildNum = GetBuildNumFromXml();
+            string output = Rebuild();
+            string packageName = ExtractPackageFileName(output);
+            IsTrue(packageName.EndsWith($".{buildNum}.nupkg"));
+            Log();
 
-            // WOuld be nice if it checked for increments by exactly 1.
+            buildNum3 = buildNum;
+        }
+        IsTrue(buildNum3 == buildNum2 + 1);
 
-            if (previousBuildNum is not null && nextBuildNum is not null)
+        //return;
+
+        int prev = default;
+        
+        // Subsequent builds succeed and increment
+
+        // TODO: Put in helper and reuse.
+        int repeats = 3;
+        for (int i = 0; i < repeats; i++)
+        {
+            int buildNum = GetBuildNumFromXml();
+            string output = Rebuild();
+            string packageName = ExtractPackageFileName(output);
+            IsTrue(packageName.EndsWith($".{buildNum}.nupkg"));
+
+            if (i != 0)
             {
-                IsTrue(nextBuildNum > previousBuildNum);
+                IsTrue(buildNum == prev + 1);
             }
 
-            previousBuildNum = nextBuildNum;
+            prev = buildNum;
+
+            Log();
         }
     }
 

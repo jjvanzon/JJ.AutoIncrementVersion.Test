@@ -187,6 +187,13 @@ public class TestHelper : IDisposable
         return true;
     }
 
+    private void Delete(string filePath)
+    {
+        string fileName = Path.GetFileName(filePath);
+        Log("Deleting " + fileName);
+        File.Delete(filePath);
+    }
+
     // Run Processes
 
     public void RebuildExpectFail()
