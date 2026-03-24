@@ -1,5 +1,3 @@
-using static System.Reflection.Assembly;
-using static JJ.Framework.Common.Legacy.EmbeddedResourceHelper;
 
 namespace JJ.AutoIncrementVersion.TestSuite.Helpers;
 
@@ -15,32 +13,32 @@ internal sealed class TestHelper : IDisposable
 
     private string SolutionDir { get; }
     private string ProjectDir { get; }
-    private string CsprojPath { get; }
-    private string BuildNumXmlPath { get; }
-    private string DirectoryBuildPropsPath { get; }
+    private string CsprojFilePath { get; }
+    private string BuildNumXmlFilePath { get; }
+    private string DirPropsFilePath { get; }
 
     private const string PackageId = "JJ.AutoIncrementVersion";
     // TODO: Fixed version number not good. Latest from Pre-Release-Package-Feed is better. Kinda bad, because if we keep this, we'd assume the tests test the latest, which it never would.
     private const string TestProjectName = "JJ.AutoIncrementVersion.Test";
 
     // Embedded resource logical names
-    private const string CsprojResourceName = "TestFiles.JJ.AutoIncrementVersion.Test.csproj";
-    private const string DirectoryBuildPropsResourceName = "TestFiles.Directory.Build.props";
-    private const string BuildNumXmlResourceName = "TestFiles.BuildNum.xml";
-    private const string ReadMeResourceName = "TestFiles.README.md";
-    private const string DummyTxtResourceName = "TestFiles.Dummy.txt";
-    private const string NuGetConfigResourceName = "TestFiles.NuGet.config";
+    private const string CsprojFileName = "JJ.AutoIncrementVersion.Test.csproj";
+    //private const string DirBuildPropsFileName = "Directory.Build.props";
+    //private const string BuildNumXmlFileName = "BuildNum.xml";
+    //private const string ReadMeFileName = "README.md";
+    //private const string DummyTxtFileName = "Dummy.txt";
+    //private const string NuGetConfigFileName = "NuGet.config";
 
     // File Helpers
 
-    public bool BuildNumXmlExists() => File.Exists(BuildNumXmlPath);
-    public bool DirectoryBuildPropsExists() => File.Exists(DirectoryBuildPropsPath);
-    public string ReadBuildNumXml() => ReadAllText(BuildNumXmlPath);
-    public string ReadDirectoryBuildProps() => ReadAllText(DirectoryBuildPropsPath);
-    public void WriteBuildNumXml(string content) => WriteAllText(BuildNumXmlPath, content);
-    public void WriteDirectoryBuildProps(string content) => WriteAllText(DirectoryBuildPropsPath, content);
-    public void DeleteBuildNumXml() => File.Delete(BuildNumXmlPath);
-    public void DeleteDirectoryBuildProps() => File.Delete(DirectoryBuildPropsPath);
+    public bool BuildNumXmlExists() => File.Exists(BuildNumXmlFilePath);
+    public bool DirectoryBuildPropsExists() => File.Exists(DirPropsFilePath);
+    public string ReadBuildNumXml() => ReadAllText(BuildNumXmlFilePath);
+    public string ReadDirectoryBuildProps() => ReadAllText(DirPropsFilePath);
+    public void WriteBuildNumXml(string content) => WriteAllText(BuildNumXmlFilePath, content);
+    public void WriteDirectoryBuildProps(string content) => WriteAllText(DirPropsFilePath, content);
+    public void DeleteBuildNumXml() => File.Delete(BuildNumXmlFilePath);
+    public void DeleteDirectoryBuildProps() => File.Delete(DirPropsFilePath);
 
     // Init / Cleanup
 
@@ -52,9 +50,9 @@ internal sealed class TestHelper : IDisposable
         //string basePath = Path.Combine(Environment.CurrentDirectory, Guid.NewGuid().ToString());
         SolutionDir = basePath;
         ProjectDir = Path.Combine(SolutionDir, TestProjectName);
-        CsprojPath = Path.Combine(ProjectDir, $"{TestProjectName}.csproj");
-        BuildNumXmlPath = Path.Combine(SolutionDir, "BuildNum.xml");
-        DirectoryBuildPropsPath = Path.Combine(SolutionDir, "Directory.Build.props");
+        CsprojFilePath = Path.Combine(ProjectDir, $"{TestProjectName}.csproj");
+        BuildNumXmlFilePath = Path.Combine(SolutionDir, "BuildNum.xml");
+        DirPropsFilePath = Path.Combine(SolutionDir, "Directory.Build.props");
     }
 
     /// <summary>
@@ -94,9 +92,9 @@ internal sealed class TestHelper : IDisposable
         Restore();
     }
 
-    private void ExtractResourceBuildNumXml() => ExtractResource("BuildNum.xml", BuildNumXmlPath);
-    private void ExtractResourceDirectoryBuildProps() => ExtractResource("Directory.Build.props", DirectoryBuildPropsPath);
-    private void ExtractResourceCsproj() => ExtractResource("JJ.AutoIncrementVersion.Test.csproj", CsprojPath);
+    private void ExtractResourceBuildNumXml() => ExtractResource("BuildNum.xml", BuildNumXmlFilePath);
+    private void ExtractResourceDirectoryBuildProps() => ExtractResource("Directory.Build.props", DirPropsFilePath);
+    private void ExtractResourceCsproj() => ExtractResource(CsprojFileName, CsprojFilePath);
     private void ExtractResourceDummyTxt() => ExtractResource("Dummy.txt", Path.Combine(ProjectDir, "Dummy.txt"));
     private void ExtractResourceReadMe() => ExtractResource("README.md", Path.Combine(SolutionDir, "README.md"));
     private void ExtractResourceNuGetConfig() => ExtractResource("NuGet.config", Path.Combine(SolutionDir, "NuGet.config"));
@@ -159,40 +157,40 @@ internal sealed class TestHelper : IDisposable
     public string Rebuild()
     {
         Log("Rebuild");
-        return RunProcess("dotnet", $"msbuild \"{CsprojPath}\" /t:Rebuild /p:Configuration=Release /v:Normal");
+        return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:Normal");
     }
 
     public string RebuildWithArgs(string? extraArgs = null)
     {
         Log($"Rebuild with {extraArgs}");
-        return RunProcess("dotnet", $"msbuild \"{CsprojPath}\" /t:Rebuild /p:Configuration=Release /v:Normal {extraArgs}");
+        return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:Normal {extraArgs}");
     }
 
     public string RebuildDebug()
     {
         Log("Rebuild Debug");
-        return RunProcess("dotnet", $"msbuild \"{CsprojPath}\" /t:Rebuild /p:Configuration=Debug /v:Normal");
+        return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Debug /v:Normal");
     }
 
     public void InstallPackage()
     {
         Log("Install package");
         string version = GetEmbeddedPackageVersion();
-        RunProcess("dotnet", $"add \"{CsprojPath}\" package {PackageId} --version {version}");
+        RunProcess("dotnet", $"add \"{CsprojFilePath}\" package {PackageId} --version {version}");
         Restore();
       }
 
     public void UninstallPackage()
     {
         Log("Uninstall package");
-        RunProcess("dotnet", $"remove \"{CsprojPath}\" package {PackageId}");
+        RunProcess("dotnet", $"remove \"{CsprojFilePath}\" package {PackageId}");
         Restore(); // Or uninstall isn't finalized somehow.
     }
     
     private void Restore()
     {
         Log("Restore");
-        RunProcess("dotnet", $"restore \"{CsprojPath}\"");
+        RunProcess("dotnet", $"restore \"{CsprojFilePath}\"");
     }
 
     private string RunProcess(string fileName, string arguments)
@@ -243,7 +241,7 @@ internal sealed class TestHelper : IDisposable
 
     public int GetBuildNumFromXml()
     {
-        var doc = XDocument.Load(BuildNumXmlPath);
+        var doc = XDocument.Load(BuildNumXmlFilePath);
         string? val = doc.Descendants("BuildNum").FirstOrDefault()?.Value;
         return int.Parse(val ?? "0");
     }
@@ -251,12 +249,12 @@ internal sealed class TestHelper : IDisposable
     public void SetBuildNumInXml(int num)
     {
         Log("Set BuildNum.xml to " + num);
-        var doc = XDocument.Load(BuildNumXmlPath);
+        var doc = XDocument.Load(BuildNumXmlFilePath);
         var el = doc.Descendants("BuildNum").First();
         el.Value = num.ToString();
         // Write back as single-line XML (matching original format)
-        WriteAllText(BuildNumXmlPath, doc.Declaration?.ToString() ?? "");
-        using var writer = new System.Xml.XmlTextWriter(BuildNumXmlPath, Encoding.UTF8);
+        WriteAllText(BuildNumXmlFilePath, doc.Declaration?.ToString() ?? "");
+        using var writer = new System.Xml.XmlTextWriter(BuildNumXmlFilePath, Encoding.UTF8);
         writer.Formatting = System.Xml.Formatting.None;
         doc.WriteTo(writer);
     }
@@ -266,9 +264,9 @@ internal sealed class TestHelper : IDisposable
     /// </summary>
     public void SetCsprojVersion(string version)
     {
-        string text = ReadAllText(CsprojPath);
+        string text = ReadAllText(CsprojFilePath);
         text = Regex.Replace(text, @"<Version>[^<]*</Version>", $"<Version>{version}</Version>");
-        WriteAllText(CsprojPath, text);
+        WriteAllText(CsprojFilePath, text);
     }
 
     /// <summary>
@@ -277,7 +275,7 @@ internal sealed class TestHelper : IDisposable
     /// </summary>
     private string GetCsprojMajorMinor()
     {
-        string text = ReadAllText(CsprojPath);
+        string text = ReadAllText(CsprojFilePath);
         Match versionMatch = Regex.Match(text, @"<Version>\s*(\d+\.\d+)", IgnoreCase);
         
         if (!versionMatch.Success)
@@ -303,7 +301,7 @@ internal sealed class TestHelper : IDisposable
     /// </summary>
     public bool CsprojHasPackageReference()
     {
-        string text = ReadAllText(CsprojPath);
+        string text = ReadAllText(CsprojFilePath);
         return text.Contains($"Include=\"{PackageId}\"", StringComparison.OrdinalIgnoreCase);
     }
 
@@ -313,11 +311,11 @@ internal sealed class TestHelper : IDisposable
     /// </summary>
     public void RemovePackageReferenceFromCsproj()
     {
-        string text = ReadAllText(CsprojPath);
+        string text = ReadAllText(CsprojFilePath);
         // Remove the <PackageReference Include="JJ.AutoIncrementVersion" ... /> line
         const string pattern = @"\s*<PackageReference\s+Include=""JJ\.AutoIncrementVersion""[^/]*/>\s*";
         text = Regex.Replace(text, pattern, "\n");
-        WriteAllText(CsprojPath, text);
+        WriteAllText(CsprojFilePath, text);
     }
 
     /// <summary>

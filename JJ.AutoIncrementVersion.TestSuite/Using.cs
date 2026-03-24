@@ -1,5 +1,4 @@
 ﻿global using System.Diagnostics;
-global using System.Reflection;
 global using System.Text;
 global using System.Text.RegularExpressions;
 global using System.Xml.Linq;
@@ -9,4 +8,6 @@ global using static System.StringComparison;
 global using static System.Text.RegularExpressions.RegexOptions;
 global using static System.IO.File;
 global using static System.IO.Directory;
+global using static System.Reflection.Assembly;
+global using static JJ.Framework.Common.Legacy.EmbeddedResourceHelper;
 global using static JJ.Framework.Testing.Core.AssertCore;
