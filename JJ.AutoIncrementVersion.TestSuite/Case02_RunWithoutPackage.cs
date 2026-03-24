@@ -17,10 +17,10 @@ public class Case02_RunWithoutPackage
     public void Case02_RunWithoutPackage_ProducesVersionEndingWithZero()
     {
         using var testHelper = new TestHelper();
-        testHelper.SetUninstalledState();
+        testHelper.InitUninstalled();
         string buildOutput = testHelper.Rebuild();
-        string? nupkgFileName = testHelper.ExtractNupkgName(buildOutput);
-        IsNotNull(nupkgFileName);
-        IsTrue(testHelper.OutputContainsNupkgEndingWith(buildOutput, ".0.nupkg"));
+        string? packageFileName = testHelper.ExtractPackageFileName(buildOutput);
+        IsNotNull(packageFileName);
+        IsTrue(packageFileName.EndsWith(".0.nupkg"));
     }
 }

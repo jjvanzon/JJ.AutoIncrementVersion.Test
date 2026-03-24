@@ -7,7 +7,6 @@ global using static System.Console;
 global using static System.StringComparison;
 global using static System.Text.RegularExpressions.RegexOptions;
 global using static System.IO.File;
-global using static System.IO.Path;
 global using static System.Reflection.Assembly;
 global using static JJ.Framework.Common.Legacy.EmbeddedResourceHelper;
 global using static JJ.Framework.Testing.Core.AssertCore;

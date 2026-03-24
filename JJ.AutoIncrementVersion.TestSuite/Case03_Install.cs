@@ -17,12 +17,10 @@ public class Case03_Install
     public void Case03_Install_AutoCreatesFilesAndBuildsWithZero()
     {
         using var testHelper = new TestHelper();
-
-        testHelper.SetUninstalledState();
+        testHelper.InitUninstalled();
         testHelper.InstallPackage();
-        string buildOutput = testHelper.Rebuild();
 
-        IsTrue(testHelper.OutputContainsNupkgEndingWith(buildOutput, ".0.nupkg"));
+        string buildOutput = testHelper.Rebuild();
 
         IsTrue(testHelper.BuildNumXmlExists());
         string buildNumContent = testHelper.ReadBuildNumXml();
@@ -34,5 +32,8 @@ public class Case03_Install
         string dirPropsContent = testHelper.ReadDirectoryBuildProps();
         IsTrue(dirPropsContent.Contains("<BuildNum>0</BuildNum>"));
         IsTrue(dirPropsContent.Contains("Import Project=\"BuildNum.xml\""));
+
+        string packageFileName = testHelper.ExtractPackageFileName(buildOutput);
+        IsTrue(packageFileName.EndsWith(".0.nupkg"));
     }
 }

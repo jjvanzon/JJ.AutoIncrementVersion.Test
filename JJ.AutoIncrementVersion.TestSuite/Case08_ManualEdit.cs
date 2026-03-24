@@ -18,7 +18,7 @@ public class Case08_ManualEdit
     {
         using var testHelper = new TestHelper();
 
-        testHelper.SetInstalledState();
+        testHelper.InitInstalledState();
 
         int originalBuildNum = testHelper.GetBuildNumFromXml();
 

@@ -19,7 +19,7 @@ public class Case09_Conditionals
     {
         using var testHelper = new TestHelper();
 
-        testHelper.SetInstalledState();
+        testHelper.InitInstalledState();
         testHelper.EnsureDirectoryBuildPropsHasReleaseCondition();
 
         string dirPropsContent = testHelper.ReadDirectoryBuildProps();

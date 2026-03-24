@@ -17,7 +17,7 @@ public class Case11_UpgradeRegression
         using var testHelper = new TestHelper();
 
         testHelper.LogStep("Restore committed state and build once");
-        testHelper.SetInstalledState();
+        testHelper.InitInstalledState();
         testHelper.Rebuild();
 
         // ── Remove BuildNumWasFromXmljj ──

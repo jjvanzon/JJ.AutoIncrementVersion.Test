@@ -15,13 +15,13 @@ public class Case10_CommandLineBuild
     {
         using var testHelper = new TestHelper();
 
-        testHelper.SetInstalledState();
+        testHelper.InitInstalledState();
 
-        string buildOutput = testHelper.RebuildWithArgs("/p:BuildNum=9999");
+        string buildOutput = testHelper.Rebuild("/p:BuildNum=9999");
 
         // ── Verify output contains 9999 ──
         testHelper.LogStep("Verify nupkg ends with .9999.nupkg");
-        string? nupkg = testHelper.ExtractNupkgName(buildOutput);
+        string? nupkg = testHelper.ExtractPackageFileName(buildOutput);
         // TODO: Dpn't just log. Assert.
         testHelper.LogResult($"Nupkg: {nupkg ?? "(none)"}");
 

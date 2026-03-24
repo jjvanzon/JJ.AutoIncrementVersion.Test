@@ -6,32 +6,12 @@ Overview of TODOs found across the automated test suite.
 TODO by File
 ------------
 
-### [ ] TestHelper.cs
-
-- [ ] Fixed `PackageVersion = "4.2.5746"` is bad. Should use latest from pre-release package feed. Tests would never test the latest otherwise. (Line 25) 
-- [ ] `UninstallPackage()` result is ignored in `SetInitialState`. If it fails, next steps blindly continue. (Line 306) 
-- [ ] Hardcoded `"4.3.0"` — should read current major/minor from csproj. (Line 309) 
-
-### [ ] UninstallReinstallTests.cs
-
-- [ ] `UninstallPackage()` failure is ignored. (Line 43)
-- [ ] `UninstallPackage()` failure is ignored. (Line 88)
-
-### [ ] RunWithoutPackageTests.cs
-
-- [ ] Error for uninstall is swallowed in `SetInitialState`, so we don't even know the package state. (Line 39)
-
 ### [ ] CommandLineAndUpgradeTests.cs
 
 - [ ] Assert `BuildNumWasFromXmljj` was present *before* removal. (Line 74)
 
 TODO Grouped by Theme
 ---------------------
-
-### [ ] 13. Hardcoded versions
-
-- [ ] `"4.3.0"` and `PackageVersion = "4.2.5746"` - should read dynamically.  
-      (TestHelper.cs lines 25, 309)
 
 ### [ ] 15. Minor
 
@@ -61,11 +41,18 @@ Done by File
 - [x] Delete log says "Deleted" even when `Directory.Build.props` didn't exist. (Line 188) 
 - [x] Log says "initial state set" but errors were ignored, so it's potentially false. (Line 310) 
 - [x] `Cleanup()` does nothing now since `GitRestoreAll` is disabled. Remove cleanup logic entirely? > Replaced by embedded resources written and cleaned up from isolated temp dir. (Line 313) 
+- [x] Fixed `PackageVersion = "4.2.5746"` is bad. Should use latest from pre-release package feed. Tests would never test the latest otherwise. (Line 25) 
+- [x] `UninstallPackage()` result is ignored in `SetInitialState`. If it fails, next steps blindly continue. (Line 306) 
+- [x] Hardcoded `"4.3.0"` — should read current major/minor from csproj. (Line 309) 
+
 
 ### [x] UninstallReinstallTests.cs
 
 - [x] One-test-one-step principle violated. Split Reinstall. Also: tests share same dependency, can't run in parallel — enforce that. (Line 71)
 - [x] `Build()` return value (error) is swallowed. (Line 85)
+
+- [x] `UninstallPackage()` failure is ignored. (Line 43)
+- [x] `UninstallPackage()` failure is ignored. (Line 88)
 
 ### [x] RunWithoutPackageTests.cs
 
@@ -73,6 +60,7 @@ Done by File
 - [x] `Tests` subfolder not necessary — move test classes up a directory. (Line 6) 
 - [x] None of the tests can run in parallel; must run in isolation. (Line 7) 
 - [x] Rename `_h` to `_helper` or `_testHelper`. (Line 12)
+- [x] Error for uninstall is swallowed in `SetInitialState`, so we don't even know the package state. (Line 39)
 
 ### [x] FirstUseTests.cs
 
@@ -159,6 +147,11 @@ Done Grouped by Theme
 
 - [x] Log whether file actually existed before deletion.  
       (TestHelper.cs lines 182, 188)
+
+### [x] 13. Hardcoded versions
+
+- [x] `"4.3.0"` and `PackageVersion = "4.2.5746"` - should read dynamically.  
+      (TestHelper.cs lines 25, 309)
 
 ### [x] 14. Logging sinks
 

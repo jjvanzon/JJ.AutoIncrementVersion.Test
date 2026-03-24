@@ -22,17 +22,6 @@ internal sealed class TestHelper : IDisposable
     private const string PackageId = "JJ.AutoIncrementVersion";
     private const string TestProjectName = "JJ.AutoIncrementVersion.Test";
 
-    // File Helpers
-
-    public bool   BuildNumXmlExists()                      => File.Exists(BuildNumXmlFilePath);
-    public bool   DirectoryBuildPropsExists()              => File.Exists(DirPropsFilePath);
-    public string ReadBuildNumXml()                        => ReadAllText(BuildNumXmlFilePath);
-    public string ReadDirectoryBuildProps()                => ReadAllText(DirPropsFilePath);
-    public void   WriteBuildNumXml(string content)         => WriteAllText(BuildNumXmlFilePath, content);
-    public void   WriteDirectoryBuildProps(string content) => WriteAllText(DirPropsFilePath, content);
-    public void   DeleteBuildNumXml()                      => Delete(BuildNumXmlFilePath);
-    public void   DeleteDirectoryBuildProps()              => Delete(DirPropsFilePath);
-
     // Init / Cleanup
 
     public TestHelper()
@@ -40,28 +29,28 @@ internal sealed class TestHelper : IDisposable
         // Create a random isolated folder in the system temp directory
         // (outside the repo tree, so MSBuild won't pick up the repo's Directory.Build.props).
         //SolutionDir       = Path.Combine(Environment.CurrentDirectory, Guid.NewGuid().ToString());
-        SolutionDir         = Combine(GetTempPath(), "JJ.AutoIncrementVersion.TestRuns", Guid.NewGuid().ToString("N"));
-        ProjectDir          = Combine(SolutionDir, TestProjectName);
-        CsprojFilePath      = Combine(ProjectDir, $"{TestProjectName}.csproj");
-        BuildNumXmlFilePath = Combine(SolutionDir, "BuildNum.xml");
-        DirPropsFilePath    = Combine(SolutionDir, "Directory.Build.props");
-        DummyTxtFilePath    = Combine(ProjectDir, "Dummy.txt");
-        ReadmeMDFilePath    = Combine(SolutionDir, "README.md");
-        NuGetConfigFilePath = Combine(SolutionDir, "NuGet.config");
+        SolutionDir         = Path.Combine(Path.GetTempPath(), "JJ.AutoIncrementVersion.TestRuns", Guid.NewGuid().ToString("N"));
+        ProjectDir          = Path.Combine(SolutionDir, TestProjectName);
+        CsprojFilePath      = Path.Combine(ProjectDir, $"{TestProjectName}.csproj");
+        BuildNumXmlFilePath = Path.Combine(SolutionDir, "BuildNum.xml");
+        DirPropsFilePath    = Path.Combine(SolutionDir, "Directory.Build.props");
+        DummyTxtFilePath    = Path.Combine(ProjectDir, "Dummy.txt");
+        ReadmeMDFilePath    = Path.Combine(SolutionDir, "README.md");
+        NuGetConfigFilePath = Path.Combine(SolutionDir, "NuGet.config");
     }
 
     /// <summary>
     /// Re-extracts all embedded test files to the isolated folder,
     /// restoring them to their original state (replaces git restore).
     /// </summary>
-    public void SetInstalledState()
+    public void InitInstalledState()
     {
-        Log("Set installed state");
+        Log("Init installed state");
         Directory.CreateDirectory(SolutionDir);
         Directory.CreateDirectory(ProjectDir);
+        InitCsproj();
         InitBuildNumXml();
         InitDirectoryBuildProps();
-        InitCsproj();
         InitDummyTxt();
         InitReadMe();
         InitNuGetConfig();
@@ -73,9 +62,9 @@ internal sealed class TestHelper : IDisposable
     /// uninstall package, delete BuildNum.xml &amp; Directory.Build.props,
     /// replace $(BuildNum) with 0 in csproj.
     /// </summary>
-    public void SetUninstalledState()
+    public void InitUninstalled()
     {
-        Log("Set uninstalled state");
+        Log("Init uninstalled");
         Directory.CreateDirectory(SolutionDir);
         Directory.CreateDirectory(ProjectDir);
         InitCsproj();
@@ -87,21 +76,28 @@ internal sealed class TestHelper : IDisposable
         Restore();
     }
 
-    private void InitBuildNumXml        () => WriteAllText(BuildNumXmlFilePath, GetResource("BuildNum.xml"));
-    private void InitDirectoryBuildProps() => WriteAllText(DirPropsFilePath,    GetResource("Directory.Build.props"));
-    private void InitCsproj             () => WriteAllText(CsprojFilePath,      GetResource(TestProjectName + ".csproj"));
-    private void InitDummyTxt           () => WriteAllText(DummyTxtFilePath,    GetResource("Dummy.txt"));
-    private void InitReadMe             () => WriteAllText(ReadmeMDFilePath,    GetResource("README.md"));
-    private void InitNuGetConfig        () => WriteAllText(NuGetConfigFilePath, GetResource("NuGet.config"));
+    private void InitCsproj             () => ExtractResource(ProjectDir, TestProjectName + ".csproj");
+    private void InitDirectoryBuildProps() => ExtractResource(SolutionDir, "Directory.Build.props");
+    private void InitBuildNumXml        () => ExtractResource(SolutionDir, "BuildNum.xml");
+    private void InitDummyTxt           () => ExtractResource(ProjectDir, "Dummy.txt");
+    private void InitReadMe             () => ExtractResource(SolutionDir, "README.md");
+    private void InitNuGetConfig        () => ExtractResource(SolutionDir, "NuGet.config");
 
-    private static string GetResource(string resourceName) 
-        => GetEmbeddedResourceText(GetExecutingAssembly(), "TestResources", resourceName);
+    private void ExtractResource(string targetFolder, string fileName)
+    {
+        Log($"Init file: {fileName} => {targetFolder}");
+        WriteAllText(Path.Combine(targetFolder, fileName), GetResource(fileName));
+    }
+
+    private static string GetResource(string fileName) 
+        => GetEmbeddedResourceText(GetExecutingAssembly(), "TestResources", fileName);
 
     /// <summary>
     /// Deletes the isolated temp folder and all its contents.
     /// </summary>
     public void Cleanup()
     {
+        Log("Clean up");
         try
         {
             if (Directory.Exists(SolutionDir))
@@ -122,7 +118,7 @@ internal sealed class TestHelper : IDisposable
     }
 
     ~TestHelper() => Cleanup();
-
+  
     // Logging
 
     public void Log(string message)
@@ -137,8 +133,69 @@ internal sealed class TestHelper : IDisposable
     public void LogStep(string step) => Log($"── STEP: {step}");
     public void LogResult(string result) => Log($"   ✓ {result}");
     public void LogWarning(string warning) => Log($"   ⚠ {warning}");
+      
+    // File Helpers
+
+    public bool   BuildNumXmlExists()                      => Exists(BuildNumXmlFilePath);
+    public bool   DirectoryBuildPropsExists()              => Exists(DirPropsFilePath);
+    public string ReadBuildNumXml()                        => ReadAllText(BuildNumXmlFilePath);
+    public string ReadDirectoryBuildProps()                => ReadAllText(DirPropsFilePath);
+    public void   WriteBuildNumXml(string content)         => WriteAllText(BuildNumXmlFilePath, content);
+    public void   WriteDirectoryBuildProps(string content) => WriteAllText(DirPropsFilePath, content);
+    public void   DeleteBuildNumXml()                      => Delete(BuildNumXmlFilePath);
+    public void   DeleteDirectoryBuildProps()              => Delete(DirPropsFilePath);
+
+    private bool Exists(string filePath)
+    {
+        bool exists = File.Exists(filePath);
+        if (!exists)
+        {
+            return false;
+        }
+    
+        long length = new FileInfo(filePath).Length;
+        if (length == 0)
+        {
+            return false;
+        }
+
+        string fileName = Path.GetFileName(filePath);
+        Log($"File exists: {fileName} ({filePath})");
+
+        return true;
+    }
 
     // Run Processes
+
+    public void RebuildExpectingInvalidVersion()
+    {
+        try
+        {
+            Rebuild();
+        }
+        catch (Exception ex)
+        {
+            // TODO: Log
+
+            // The first build may fail because $(BuildNum) resolves to empty.
+            // This is expected per the manual plan.
+            const string expectedMessage = "is not a valid version string";
+
+            bool hasExpectedError =
+                ex.Message.Contains(expectedMessage, OrdinalIgnoreCase) ||
+                ex.Message.Contains("NETSDK1018", OrdinalIgnoreCase);
+
+            IsTrue(hasExpectedError, $"First build failed but not with the expected '{expectedMessage}' error.");
+
+            if (hasExpectedError)
+            {
+                Log("Build failed with error: 'not a valid version string'");
+                return;
+            }
+        }
+
+        Log("Build succeeded while expecting error: 'not a valid version string'.");
+    }
 
     public string Rebuild()
     {
@@ -146,7 +203,7 @@ internal sealed class TestHelper : IDisposable
         return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:Normal");
     }
 
-    public string RebuildWithArgs(string? extraArgs = null)
+    public string Rebuild(string? extraArgs)
     {
         Log($"Rebuild with {extraArgs}");
         return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:Normal {extraArgs}");
@@ -250,6 +307,7 @@ internal sealed class TestHelper : IDisposable
     /// </summary>
     public void SetCsprojVersion(string version)
     {
+        Log($"Set .csproj Version = {version}");
         string text = ReadAllText(CsprojFilePath);
         text = Regex.Replace(text, @"<Version>[^<]*</Version>", $"<Version>{version}</Version>");
         WriteAllText(CsprojFilePath, text);
@@ -308,10 +366,19 @@ internal sealed class TestHelper : IDisposable
     /// Extracts the nupkg file name (e.g. "JJ.AutoIncrementVersion.Test.4.3.5.nupkg")
     /// from build output.
     /// </summary>
-    public string? ExtractNupkgName(string output)
+    public string ExtractPackageFileName(string output)
     {
         var match = Regex.Match(output, @"(JJ\.AutoIncrementVersion\.Test\.\S+\.nupkg)");
-        return match.Success ? match.Groups[1].Value : null;
+        var packageFileName = match.Success ? match.Groups[1].Value : null;
+
+        if (string.IsNullOrWhiteSpace(packageFileName))
+        {
+            throw new Exception($"Package file name '{TestProjectName}*.nupkg' not found in output: " + output);
+        }
+
+        Log($"Package file name = {packageFileName}");
+
+        return packageFileName;
     }
 
     /// <summary>
@@ -326,7 +393,7 @@ internal sealed class TestHelper : IDisposable
 
     public bool OutputContainsNupkgEndingWith(string output, string suffix)
     {
-        string? name = ExtractNupkgName(output);
+        string? name = ExtractPackageFileName(output);
         return name is not null && name.EndsWith(suffix, OrdinalIgnoreCase);
     }
 
@@ -368,6 +435,9 @@ internal sealed class TestHelper : IDisposable
         }
 
         var packageVersion = match.Groups[1].Value;
+
+        Log($"Package version = {packageVersion}");
+
         return packageVersion;
     }
 }

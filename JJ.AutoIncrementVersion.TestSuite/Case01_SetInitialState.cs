@@ -7,6 +7,6 @@ public class Case01_SetInitialState
     public void Case01_SetInitialState_ShouldNotCrash()
     {
         using var testHelper = new TestHelper();
-        testHelper.SetUninstalledState();
+        testHelper.InitUninstalled();
     }
 }

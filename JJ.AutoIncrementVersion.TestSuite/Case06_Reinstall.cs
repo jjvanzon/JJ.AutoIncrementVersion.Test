@@ -16,7 +16,7 @@ public class Case06_Reinstall
     {
         using var testHelper = new TestHelper();
 
-        testHelper.SetInstalledState();
+        testHelper.InitInstalledState();
         testHelper.Rebuild();
         testHelper.UninstallPackage();
         testHelper.InstallPackage();

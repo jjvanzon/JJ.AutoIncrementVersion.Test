@@ -17,7 +17,7 @@ public class Case05_Uninstall
     public void Case05_Uninstall_FilesRemainAndVersionFreezes()
     {
         using var testHelper = new TestHelper();
-        testHelper.SetInstalledState();
+        testHelper.InitInstalledState();
 
         IsTrue(testHelper.CsprojHasPackageReference());
 

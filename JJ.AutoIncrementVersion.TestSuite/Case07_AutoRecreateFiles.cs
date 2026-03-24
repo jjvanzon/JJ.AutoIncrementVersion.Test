@@ -18,29 +18,14 @@ public class Case07_AutoRecreateFiles
     {
         using var testHelper = new TestHelper();
 
-        testHelper.SetInstalledState();
+        testHelper.InitInstalledState();
         testHelper.Rebuild();
 
         testHelper.DeleteDirectoryBuildProps();
         IsFalse(testHelper.DirectoryBuildPropsExists());
 
-        // TODO: Assertion code could be made reusable.
-        try
-        {
-            testHelper.Rebuild();
-        }
-        catch (Exception ex)
-        {
-            // The first build may fail because $(BuildNum) resolves to empty.
-            // This is expected per the manual plan.
-            const string expectedMessage = "is not a valid version string";
+        testHelper.RebuildExpectingInvalidVersion();
 
-            bool hasExpectedError =
-                ex.Message.Contains("NETSDK1018", OrdinalIgnoreCase) ||
-                ex.Message.Contains(expectedMessage, OrdinalIgnoreCase);
-
-            IsTrue(hasExpectedError, $"First build failed but not with the expected '{expectedMessage}' error.");
-        }
 
         IsTrue(testHelper.DirectoryBuildPropsExists());
 
@@ -61,8 +46,6 @@ public class Case07_AutoRecreateFiles
 
             previousBuildNum = nextBuildNum;
         }
-
-        testHelper.LogResult("PASS – Delete Directory.Build.props: fail → recreate → increment");
     }
 
     /// <summary>
@@ -79,7 +62,7 @@ public class Case07_AutoRecreateFiles
     {
         using var testHelper = new TestHelper();
 
-        testHelper.SetInstalledState();
+        testHelper.InitInstalledState();
         testHelper.Rebuild();
         testHelper.DeleteBuildNumXml();
         IsFalse(testHelper.BuildNumXmlExists());
@@ -98,7 +81,7 @@ public class Case07_AutoRecreateFiles
     {
         using var testHelper = new TestHelper();
 
-        testHelper.SetInstalledState();
+        testHelper.InitInstalledState();
         testHelper.Rebuild();
         testHelper.DeleteBuildNumXml();
         testHelper.DeleteDirectoryBuildProps();

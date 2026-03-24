@@ -22,29 +22,12 @@ public class Case04_FirstUse
     {
         using var testHelper = new TestHelper();
 
-        testHelper.SetUninstalledState();
+        testHelper.InitUninstalled();
         testHelper.InstallPackage();
         testHelper.SetCsprojVersion("4.3.$(BuildNum)");
+        testHelper.RebuildExpectingInvalidVersion();
 
-        try
-        {
-            testHelper.Rebuild();
-        }
-        catch (Exception ex)
-        {
-            // The first build may fail because $(BuildNum) resolves to empty.
-            // This is expected per the manual plan.
-            const string expectedMessage = "is not a valid version string";
-
-            bool hasExpectedError =
-                ex.Message.Contains(expectedMessage, OrdinalIgnoreCase) ||
-                ex.Message.Contains("NETSDK1018", OrdinalIgnoreCase);
-
-            IsTrue(hasExpectedError, $"First build failed but not with the expected '{expectedMessage}' error.");
-        }
-
-        // 2nd build should succeed
-        string buildOutput2 = testHelper.Rebuild();
+        string buildOutput = testHelper.Rebuild();
 
         IsTrue(testHelper.BuildNumXmlExists());
         string buildNumContent = testHelper.ReadBuildNumXml();
@@ -53,10 +36,11 @@ public class Case04_FirstUse
 
         IsTrue(testHelper.DirectoryBuildPropsExists());
         string dirPropsContent = testHelper.ReadDirectoryBuildProps();
-        // TODO: Check some content
+        IsTrue(dirPropsContent.Contains("<BuildNum>0</BuildNum>"));
+        IsTrue(dirPropsContent.Contains("Import Project=\"BuildNum.xml\""));
 
         // ── Subsequent builds should auto-increment ──
-        int? previousBuildNum = testHelper.ExtractBuildNumFromNupkgName(buildOutput2);
+        int? previousBuildNum = testHelper.ExtractBuildNumFromNupkgName(buildOutput);
 
         for (int i = 0; i < 3; i++)
         {
