@@ -161,21 +161,18 @@ internal sealed class TestHelper : IDisposable
 
     public string Rebuild()
     {
-        //Restore(); // JJ added
         Log("Rebuild");
         return RunDotNet($"msbuild \"{CsprojPath}\" /t:Rebuild /p:Configuration=Release /v:Normal");
     }
 
     public string RebuildWithArgs(string? extraArgs = null)
     {
-        //Restore(); // JJ added
         Log($"Rebuild with {extraArgs}");
         return RunDotNet($"msbuild \"{CsprojPath}\" /t:Rebuild /p:Configuration=Release /v:Normal {extraArgs}");
     }
 
     public string RebuildDebug()
     {
-        //Restore(); // JJ added
         Log("Rebuild Debug");
         return RunDotNet($"msbuild \"{CsprojPath}\" /t:Rebuild /p:Configuration=Debug /v:Normal");
     }
@@ -184,16 +181,14 @@ internal sealed class TestHelper : IDisposable
     {
         Log("Install package");
         RunDotNet($"add \"{CsprojPath}\" package {PackageId} --version {PackageVersion}");
-        // dotnet add package includes its own restore (matching VS NuGet UI behavior).
-        // Or maybe not
-        Restore(); // JJ added
-      }
+        Restore();    
+    }
 
     public void UninstallPackage()
     {
         Log("Uninstall package");
         RunDotNet($"remove \"{CsprojPath}\" package {PackageId}");
-        Restore(); // AI added
+        Restore(); // Or uninstall isn't finalized somehow.
     }
     
     private void Restore()
