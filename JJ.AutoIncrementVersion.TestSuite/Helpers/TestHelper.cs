@@ -18,7 +18,6 @@ internal sealed class TestHelper : IDisposable
 
     private const string PackageId = "JJ.AutoIncrementVersion";
     // TODO: Fixed version number not good. Latest from Pre-Release-Package-Feed is better. Kinda bad, because if we keep this, we'd assume the tests test the latest, which it never would.
-    private const string PackageVersion = "4.2.5746";
     private const string TestProjectName = "JJ.AutoIncrementVersion.Test";
 
     // Embedded resource logical names
@@ -179,7 +178,8 @@ internal sealed class TestHelper : IDisposable
     public void InstallPackage()
     {
         Log("Install package");
-        RunProcess("dotnet", $"add \"{CsprojPath}\" package {PackageId} --version {PackageVersion}");
+        string version = GetEmbeddedPackageVersion();
+        RunProcess("dotnet", $"add \"{CsprojPath}\" package {PackageId} --version {version}");
         Restore();
       }
 
@@ -371,5 +371,30 @@ internal sealed class TestHelper : IDisposable
         }
 
         WriteDirectoryBuildProps(updated);
+    }
+
+    private string GetEmbeddedPackageVersion()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+        using var stream = assembly.GetManifestResourceStream(CsprojResourceName);
+
+        if (stream == null)
+        {
+            throw new InvalidOperationException(
+                $"Embedded resource '{CsprojResourceName}' not found.");
+        }
+
+        using var reader = new StreamReader(stream);
+        string content = reader.ReadToEnd();
+
+        Match match = Regex.Match(content, @"<PackageReference\s+Include=""JJ\.AutoIncrementVersion""\s+Version=""([^""]+)""", IgnoreCase);
+        if (!match.Success)
+        {
+            throw new InvalidOperationException(
+                "Could not extract JJ.AutoIncrementVersion package version from embedded csproj.");
+        }
+
+        var packageVersion = match.Groups[1].Value;
+        return packageVersion;
     }
 }
