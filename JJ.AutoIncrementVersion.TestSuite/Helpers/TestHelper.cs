@@ -74,7 +74,7 @@ internal sealed class TestHelper : IDisposable
         InitReadMe();
         InitNuGetConfig();
         RemovePackageReferenceFromCsproj();
-        SetCsProjPatchNum("0");
+        SetProjPatchNum("0");
         Restore();
         Log("Init done");
         Log();
@@ -333,10 +333,11 @@ internal sealed class TestHelper : IDisposable
         doc.WriteTo(writer);
     }
 
+    
     /// <summary>
     /// Replaces the <c>&lt;Version&gt;</c> value in the csproj.
     /// </summary>
-    public void SetCsprojVersion(string version)
+    private void SetCsprojVersion(string version)
     {
         Log($"Set ver = {version}");
         string text = ReadAllText(CsprojFilePath);
@@ -365,7 +366,7 @@ internal sealed class TestHelper : IDisposable
     /// Sets csproj Version to &lt;major&gt;.&lt;minor&gt;.0,
     /// extracting major.minor from the current csproj Version value.
     /// </summary>
-    public void SetCsProjPatchNum(string patch)
+    public void SetProjPatchNum(string patch)
     {
         string majorMinor = GetCsprojMajorMinor();
         SetCsprojVersion($"{majorMinor}.{patch}");
@@ -407,7 +408,7 @@ internal sealed class TestHelper : IDisposable
             throw new Exception($"Package '{TestProjectName}*.nupkg' not found in output: " + output);
         }
 
-        Log($"Package = {packageFileName}");
+        Log($"Package name = {packageFileName}");
 
         return packageFileName;
     }

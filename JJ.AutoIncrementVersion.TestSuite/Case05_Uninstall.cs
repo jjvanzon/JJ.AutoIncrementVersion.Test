@@ -17,29 +17,33 @@ public class Case05_Uninstall
     public void Case05_Uninstall_FilesRemainAndVersionFreezes()
     {
         using var testHelper = new TestHelper();
+
         testHelper.InitInstalledState();
-
-        IsTrue(testHelper.CsprojHasPackageReference());
-
-        testHelper.Rebuild();
-
-        int buildNumBefore = testHelper.GetBuildNumFromXml();
-        testHelper.LogResult($"BuildNum before uninstall: {buildNumBefore}");
-
-        testHelper.UninstallPackage();
-        IsFalse(testHelper.CsprojHasPackageReference());
-
         IsTrue(testHelper.BuildNumXmlExists());
         IsTrue(testHelper.DirPropsExists());
-
-        // ── Build should succeed ──
-        string buildOutput = testHelper.Rebuild();
-
-        // ── Version should be frozen ──
+        IsTrue(testHelper.CsprojHasPackageReference());
+        
+        testHelper.GetBuildNumFromXml();
+        string outputInit = testHelper.Rebuild();
+        testHelper.ExtractPackageFileName(outputInit);
+        // Don't assert: After 1st build BuildNum still increments
+        
+        testHelper.UninstallPackage();
+        IsFalse(testHelper.CsprojHasPackageReference());
+        IsTrue(testHelper.BuildNumXmlExists());
+        IsTrue(testHelper.DirPropsExists());
+        
         int buildNum1 = testHelper.GetBuildNumFromXml();
-        string buildOutput2 = testHelper.Rebuild();
+        string output1 = testHelper.Rebuild();
+        string packageName1 = testHelper.ExtractPackageFileName(output1);
+        IsTrue(packageName1.EndsWith($".{buildNum1}.nupkg"));
+        
         int buildNum2 = testHelper.GetBuildNumFromXml();
-
+        string output2 = testHelper.Rebuild();
+        string packageName2 = testHelper.ExtractPackageFileName(output2);
+        IsTrue(packageName2.EndsWith($".{buildNum2}.nupkg"));
+            
         IsTrue(buildNum1 == buildNum2);
+        IsTrue(string.Equals(packageName1, packageName2));
     }
 }
