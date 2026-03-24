@@ -2,7 +2,8 @@
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]
-public class Case07_AutoRecreateFiles
+[DoNotParallelize]
+public class Case07_AutoRecreateFiles : TestHelper
 {
     /// <summary>
     /// Manual Test Plan → "Auto-Recreate Files" (Directory.Build.props deleted)
@@ -16,26 +17,24 @@ public class Case07_AutoRecreateFiles
     [TestMethod]
     public void Case07_DeleteDirectoryBuildProps_FailsThenRecreatesAndIncrements()
     {
-        using var testHelper = new TestHelper();
+        InitInstalledState();
+        Rebuild();
 
-        testHelper.InitInstalledState();
-        testHelper.Rebuild();
+        DeleteDirectoryBuildProps();
+        IsFalse(DirPropsExists());
 
-        testHelper.DeleteDirectoryBuildProps();
-        IsFalse(testHelper.DirPropsExists());
-
-        testHelper.RebuildExpectFail();
+        RebuildExpectFail();
 
 
-        IsTrue(testHelper.DirPropsExists());
+        IsTrue(DirPropsExists());
 
         // Subsequent builds succeed and increment
         int? previousBuildNum = null;
         for (int i = 0; i < 3; i++) // TODO: I like the retry loop and that it checks for increments.
         {
-            string nextBuildOutput = testHelper.Rebuild();
+            string nextBuildOutput = Rebuild();
 
-            int? nextBuildNum = testHelper.ExtractPackageBuildNum(nextBuildOutput);
+            int? nextBuildNum = ExtractPackageBuildNum(nextBuildOutput);
 
             // WOuld be nice if it checked for increments by exactly 1.
 
@@ -60,16 +59,14 @@ public class Case07_AutoRecreateFiles
     [TestMethod]
     public void Case07_DeleteBuildNumXml_RecreatesToZeroOrOne()
     {
-        using var testHelper = new TestHelper();
+        InitInstalledState();
+        Rebuild();
+        DeleteBuildNumXml();
+        IsFalse(BuildNumXmlExists());
+        Rebuild();
+        IsTrue(BuildNumXmlExists());
 
-        testHelper.InitInstalledState();
-        testHelper.Rebuild();
-        testHelper.DeleteBuildNumXml();
-        IsFalse(testHelper.BuildNumXmlExists());
-        testHelper.Rebuild();
-        IsTrue(testHelper.BuildNumXmlExists());
-
-        int newBuildNum = testHelper.GetBuildNumFromXml();
+        int newBuildNum = GetBuildNumFromXml();
         IsTrue(newBuildNum <= 1, $"After recreation, BuildNum should be 0 or 1 but was {newBuildNum}.");
     }
 
@@ -79,24 +76,22 @@ public class Case07_AutoRecreateFiles
     [TestMethod]
     public void Case07_DeleteBoth_ShowsSimilarEffect()
     {
-        using var testHelper = new TestHelper();
-
-        testHelper.InitInstalledState();
-        testHelper.Rebuild();
-        testHelper.DeleteBuildNumXml();
-        testHelper.DeleteDirectoryBuildProps();
+        InitInstalledState();
+        Rebuild();
+        DeleteBuildNumXml();
+        DeleteDirectoryBuildProps();
 
         try
         {
-            testHelper.Rebuild();
+            Rebuild();
         }
         catch
         {
             // 1st build may fail
         }
 
-        testHelper.Rebuild();
-        IsTrue(testHelper.BuildNumXmlExists());
-        IsTrue(testHelper.DirPropsExists());
+        Rebuild();
+        IsTrue(BuildNumXmlExists());
+        IsTrue(DirPropsExists());
     }
 }
