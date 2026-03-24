@@ -3,10 +3,11 @@ namespace JJ.AutoIncrementVersion.TestSuite.Helpers;
 /// <summary>
 /// Helpers for running dotnet CLI commands, manipulating project files,
 /// and inspecting build output — used by the automated test-plan tests.
+/// Logs the actions to Console or Debug output.
 /// Each instance creates an isolated copy of the test files under a random
 /// temp folder so that tests do not interfere with each other or the repo.
 /// </summary>
-internal sealed class TestHelper : IDisposable
+public class TestHelper : IDisposable
 {
     // Paths
 
@@ -56,7 +57,6 @@ internal sealed class TestHelper : IDisposable
         InitNuGetConfig();
         Restore();
         Log("Init done");
-        Log();
     }
 
     /// <summary>
@@ -77,7 +77,6 @@ internal sealed class TestHelper : IDisposable
         SetProjPatchNum("0");
         Restore();
         Log("Init done");
-        Log();
     }
 
     private void CreateDir(string path)
@@ -95,7 +94,7 @@ internal sealed class TestHelper : IDisposable
 
     private void ExtractResource(string targetFolder, string fileName)
     {
-        Log($"Init file: {fileName}");
+        Log($"Init file => {fileName}");
         WriteAllText(Path.Combine(targetFolder, fileName), GetResource(fileName));
     }
 
@@ -111,6 +110,7 @@ internal sealed class TestHelper : IDisposable
         return;
         #endif
 
+        #pragma warning disable CS0162 // Unreachable code detected
         Log("Clean up");
         try
         {
@@ -123,6 +123,7 @@ internal sealed class TestHelper : IDisposable
         {
             LogWarning($"Could not delete isolated folder: {ex.Message}");
         }
+        #pragma warning restore CS0162 // Unreachable code detected
     }
 
     public void Dispose()
@@ -135,12 +136,16 @@ internal sealed class TestHelper : IDisposable
   
     // Logging
 
+    /// <summary>
+    /// Logs a line to the Debug or Console output.
+    /// </summary>
+    /// <param name="message"></param>
     public void Log(string message = "")
     {
         #if DEBUG
         Debug.WriteLine(message);
         #else
-        WriteLine(message);
+        Console.WriteLine(message);
         #endif
     }
 

@@ -1,7 +1,7 @@
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]
-public class Case02_RunWithoutPackage
+public class Case02_RunWithoutPackage : TestHelper
 {
     /// <summary>
     /// Manual Test Plan → "Set Initial State" + "Run Without Package"
@@ -16,11 +16,21 @@ public class Case02_RunWithoutPackage
     [TestMethod]
     public void Case02_RunWithoutPackage_ProducesVersionEndingWithZero()
     {
-        using var testHelper = new TestHelper();
-        testHelper.InitUninstalled();
-        string buildOutput = testHelper.Rebuild();
-        string? packageFileName = testHelper.ExtractPackageFileName(buildOutput);
-        IsNotNull(packageFileName);
-        IsTrue(packageFileName.EndsWith(".0.nupkg"));
+        InitUninstalled();
+        Log();
+        {
+            string buildOutput = Rebuild();
+            string packageFileName = ExtractPackageFileName(buildOutput);
+            IsNotNull(packageFileName);
+            IsTrue(packageFileName.EndsWith(".0.nupkg"));
+            Log();
+        }
+        {
+            string buildOutput = Rebuild();
+            string packageFileName = ExtractPackageFileName(buildOutput);
+            IsNotNull(packageFileName);
+            IsTrue(packageFileName.EndsWith(".0.nupkg"));
+            Log();
+        }
     }
 }

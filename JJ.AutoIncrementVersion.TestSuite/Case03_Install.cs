@@ -1,7 +1,7 @@
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]
-public class Case03_Install
+public class Case03_Install : TestHelper
 {
     /// <summary>
     /// Manual Test Plan → "Install"
@@ -16,24 +16,25 @@ public class Case03_Install
     [TestMethod]
     public void Case03_Install_AutoCreatesFilesAndBuildsWithZero()
     {
-        using var testHelper = new TestHelper();
-        testHelper.InitUninstalled();
-        testHelper.InstallPackage();
+        InitUninstalled();
+        InstallPackage();
+        Log();
 
-        string buildOutput = testHelper.Rebuild();
+        string buildOutput = Rebuild();
 
-        IsTrue(testHelper.BuildNumXmlExists());
-        string buildNumContent = testHelper.ReadBuildNumXml();
+        IsTrue(BuildNumXmlExists());
+        string buildNumContent = ReadBuildNumXml();
         IsTrue(buildNumContent.Contains("<BuildNum>"));
         IsTrue(buildNumContent.Contains("<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>"));
         IsTrue(buildNumContent.Contains("<BuildNumWasFromXmljj>True</BuildNumWasFromXmljj>"));
 
-        IsTrue(testHelper.DirPropsExists());
-        string dirPropsContent = testHelper.ReadDirectoryBuildProps();
+        IsTrue(DirPropsExists());
+        string dirPropsContent = ReadDirectoryBuildProps();
         IsTrue(dirPropsContent.Contains("<BuildNum>0</BuildNum>"));
         IsTrue(dirPropsContent.Contains("Import Project=\"BuildNum.xml\""));
 
-        string packageFileName = testHelper.ExtractPackageFileName(buildOutput);
+        string packageFileName = ExtractPackageFileName(buildOutput);
         IsTrue(packageFileName.EndsWith(".0.nupkg"));
+        Log();
     }
 }

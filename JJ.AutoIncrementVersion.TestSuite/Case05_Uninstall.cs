@@ -1,7 +1,7 @@
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]
-public class Case05_Uninstall
+public class Case05_Uninstall : TestHelper
 {
     /// <summary>
     /// Manual Test Plan → "Uninstall"
@@ -16,34 +16,38 @@ public class Case05_Uninstall
     [TestMethod]
     public void Case05_Uninstall_FilesRemainAndVersionFreezes()
     {
-        using var testHelper = new TestHelper();
-
-        testHelper.InitInstalledState();
-        IsTrue(testHelper.BuildNumXmlExists());
-        IsTrue(testHelper.DirPropsExists());
-        IsTrue(testHelper.CsprojHasPackageReference());
+        InitInstalledState();
+        IsTrue(BuildNumXmlExists());
+        IsTrue(DirPropsExists());
+        IsTrue(CsprojHasPackageReference());
+        Log();
         
-        testHelper.GetBuildNumFromXml();
-        string outputInit = testHelper.Rebuild();
-        testHelper.ExtractPackageFileName(outputInit);
-        // Don't assert: After 1st build BuildNum still increments
+        GetBuildNumFromXml(); // Logs BuildNum
+        string outputInit = Rebuild();
+        ExtractPackageFileName(outputInit); // Logs package name
+        // Don't assert equals: After 1st build BuildNum increments
+        Log();
         
-        testHelper.UninstallPackage();
-        IsFalse(testHelper.CsprojHasPackageReference());
-        IsTrue(testHelper.BuildNumXmlExists());
-        IsTrue(testHelper.DirPropsExists());
+        UninstallPackage();
+        IsFalse(CsprojHasPackageReference());
+        IsTrue(BuildNumXmlExists());
+        IsTrue(DirPropsExists());
+        Log();
         
-        int buildNum1 = testHelper.GetBuildNumFromXml();
-        string output1 = testHelper.Rebuild();
-        string packageName1 = testHelper.ExtractPackageFileName(output1);
+        int buildNum1 = GetBuildNumFromXml();
+        string output1 = Rebuild();
+        string packageName1 = ExtractPackageFileName(output1);
         IsTrue(packageName1.EndsWith($".{buildNum1}.nupkg"));
+        Log();
         
-        int buildNum2 = testHelper.GetBuildNumFromXml();
-        string output2 = testHelper.Rebuild();
-        string packageName2 = testHelper.ExtractPackageFileName(output2);
+        int buildNum2 = GetBuildNumFromXml();
+        string output2 = Rebuild();
+        string packageName2 = ExtractPackageFileName(output2);
         IsTrue(packageName2.EndsWith($".{buildNum2}.nupkg"));
+        Log();
             
         IsTrue(buildNum1 == buildNum2);
         IsTrue(string.Equals(packageName1, packageName2));
+        Log();
     }
 }
