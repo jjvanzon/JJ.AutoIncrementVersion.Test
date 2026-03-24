@@ -25,29 +25,29 @@ public class Case04_FirstUse
         testHelper.InitUninstalled();
         testHelper.InstallPackage();
         testHelper.SetCsprojVersion("4.3.$(BuildNum)");
-        testHelper.RebuildExpectingInvalidVersion();
+        testHelper.RebuildExpectFail();
 
-        string buildOutput = testHelper.Rebuild();
+        IsFalse(testHelper.BuildNumXmlExists());
+        IsTrue(testHelper.DirPropsExists()); // There anyway
+
+        string buildOutput0 = testHelper.Rebuild();
 
         IsTrue(testHelper.BuildNumXmlExists());
-        string buildNumContent = testHelper.ReadBuildNumXml();
-        IsTrue(buildNumContent.Contains("<BuildNum>"));
-        IsTrue(buildNumContent.Contains("<BuildNumWasFromXmljj>True</BuildNumWasFromXmljj>"));
+        IsTrue(testHelper.DirPropsExists());
 
-        IsTrue(testHelper.DirectoryBuildPropsExists());
-        string dirPropsContent = testHelper.ReadDirectoryBuildProps();
-        IsTrue(dirPropsContent.Contains("<BuildNum>0</BuildNum>"));
-        IsTrue(dirPropsContent.Contains("Import Project=\"BuildNum.xml\""));
+        string packageName0 = testHelper.ExtractPackageFileName(buildOutput0);
+        IsTrue(packageName0.EndsWith(".0.nupkg"));
 
-        int buildNumFromOutput = testHelper.ExtractPackageBuildNum(buildOutput);
-        int buildNumFroXml = testHelper.GetBuildNumFromXml();
+        int xmlBuildNum1 = testHelper.GetBuildNumFromXml();
+        AreEqual(1, xmlBuildNum1);
+        string buildOutput1 = testHelper.Rebuild();
+        string packageName1 = testHelper.ExtractPackageFileName(buildOutput1);
+        IsTrue(packageName1.EndsWith(".1.nupkg"));
 
-        for (int i = 0; i < 3; i++)
-        {
-            var nextBuildOutput = testHelper.Rebuild();
-            int nextBuildNum = testHelper.ExtractPackageBuildNum(nextBuildOutput);
-            IsTrue(nextBuildNum > buildNumFromOutput);
-            buildNumFromOutput = nextBuildNum;
-        }
+        int xmlBuildNum2 = testHelper.GetBuildNumFromXml();
+        AreEqual(2, xmlBuildNum2);
+        string buildOutput2 = testHelper.Rebuild();
+        string packageName2 = testHelper.ExtractPackageFileName(buildOutput2);
+        IsTrue(packageName2.EndsWith(".2.nupkg"));
     }
 }

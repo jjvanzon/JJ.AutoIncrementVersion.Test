@@ -22,12 +22,12 @@ public class Case07_AutoRecreateFiles
         testHelper.Rebuild();
 
         testHelper.DeleteDirectoryBuildProps();
-        IsFalse(testHelper.DirectoryBuildPropsExists());
+        IsFalse(testHelper.DirPropsExists());
 
-        testHelper.RebuildExpectingInvalidVersion();
+        testHelper.RebuildExpectFail();
 
 
-        IsTrue(testHelper.DirectoryBuildPropsExists());
+        IsTrue(testHelper.DirPropsExists());
 
         // Subsequent builds succeed and increment
         int? previousBuildNum = null;
@@ -97,6 +97,6 @@ public class Case07_AutoRecreateFiles
 
         testHelper.Rebuild();
         IsTrue(testHelper.BuildNumXmlExists());
-        IsTrue(testHelper.DirectoryBuildPropsExists());
+        IsTrue(testHelper.DirPropsExists());
     }
 }

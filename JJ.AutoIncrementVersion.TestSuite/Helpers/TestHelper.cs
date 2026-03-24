@@ -46,8 +46,8 @@ internal sealed class TestHelper : IDisposable
     public void InitInstalledState()
     {
         Log("Init installed state");
-        Directory.CreateDirectory(SolutionDir);
-        Directory.CreateDirectory(ProjectDir);
+        CreateDir(SolutionDir);
+        CreateDir(ProjectDir);
         InitCsproj();
         InitBuildNumXml();
         InitDirectoryBuildProps();
@@ -55,6 +55,8 @@ internal sealed class TestHelper : IDisposable
         InitReadMe();
         InitNuGetConfig();
         Restore();
+        Log("Init done");
+        Log();
     }
 
     /// <summary>
@@ -65,8 +67,8 @@ internal sealed class TestHelper : IDisposable
     public void InitUninstalled()
     {
         Log("Init uninstalled");
-        Directory.CreateDirectory(SolutionDir);
-        Directory.CreateDirectory(ProjectDir);
+        CreateDir(SolutionDir);
+        CreateDir(ProjectDir);
         InitCsproj();
         InitDummyTxt();
         InitReadMe();
@@ -74,6 +76,14 @@ internal sealed class TestHelper : IDisposable
         RemovePackageReferenceFromCsproj();
         SetCsProjPatchNum("0");
         Restore();
+        Log("Init done");
+        Log();
+    }
+
+    private void CreateDir(string path)
+    {
+        Log($"Create dir => {path}");
+        Directory.CreateDirectory(path);
     }
 
     private void InitCsproj             () => ExtractResource(ProjectDir, TestProjectName + ".csproj");
@@ -85,7 +95,7 @@ internal sealed class TestHelper : IDisposable
 
     private void ExtractResource(string targetFolder, string fileName)
     {
-        Log($"Init file: {fileName} => {targetFolder}");
+        Log($"Init file: {fileName}");
         WriteAllText(Path.Combine(targetFolder, fileName), GetResource(fileName));
     }
 
@@ -97,6 +107,10 @@ internal sealed class TestHelper : IDisposable
     /// </summary>
     public void Cleanup()
     {
+        #if DEBUG
+        return;
+        #endif
+
         Log("Clean up");
         try
         {
@@ -121,7 +135,7 @@ internal sealed class TestHelper : IDisposable
   
     // Logging
 
-    public void Log(string message)
+    public void Log(string message = "")
     {
         #if DEBUG
         Debug.WriteLine(message);
@@ -137,7 +151,7 @@ internal sealed class TestHelper : IDisposable
     // File Helpers
 
     public bool   BuildNumXmlExists()                      => Exists(BuildNumXmlFilePath);
-    public bool   DirectoryBuildPropsExists()              => Exists(DirPropsFilePath);
+    public bool   DirPropsExists()                         => Exists(DirPropsFilePath);
     public string ReadBuildNumXml()                        => ReadAllText(BuildNumXmlFilePath);
     public string ReadDirectoryBuildProps()                => ReadAllText(DirPropsFilePath);
     public void   WriteBuildNumXml(string content)         => WriteAllText(BuildNumXmlFilePath, content);
@@ -147,27 +161,30 @@ internal sealed class TestHelper : IDisposable
 
     private bool Exists(string filePath)
     {
+        string fileName = Path.GetFileName(filePath);
+
         bool exists = File.Exists(filePath);
         if (!exists)
         {
+            Log($"{fileName} missing");
             return false;
         }
     
         long length = new FileInfo(filePath).Length;
         if (length == 0)
         {
+            Log($"{fileName} empty");
             return false;
         }
 
-        string fileName = Path.GetFileName(filePath);
-        Log($"File exists: {fileName} ({filePath})");
+        Log($"{fileName} exists");
 
         return true;
     }
 
     // Run Processes
 
-    public void RebuildExpectingInvalidVersion()
+    public void RebuildExpectFail()
     {
         try
         {
@@ -189,7 +206,7 @@ internal sealed class TestHelper : IDisposable
 
             if (hasExpectedError)
             {
-                Log("Build failed with error: 'not a valid version string'");
+                Log("Build failed: 'not a valid version string'");
                 return;
             }
         }
@@ -282,11 +299,25 @@ internal sealed class TestHelper : IDisposable
 
     // Inspect/Write Values
 
+    
+    public string GetBuildNumElement()
+    {
+        var doc = XDocument.Load(BuildNumXmlFilePath);
+        string text = doc.Descendants("BuildNum").Single().ToString();
+        Log($"BuildNum.xml element = {text}");
+        return text;
+    }
+
     public int GetBuildNumFromXml()
     {
         var doc = XDocument.Load(BuildNumXmlFilePath);
-        string? val = doc.Descendants("BuildNum").FirstOrDefault()?.Value;
-        return int.Parse(val ?? "0");
+        var elements = doc.Descendants("BuildNum").ToArray();
+        AreEqual(1, elements.Length);
+        IsNotNull(elements[0]);
+        string str = elements[0].Value;
+        Log($"BuildNum.xml = {str}");
+        var value = int.Parse(str);
+        return value;
     }
 
     public void SetBuildNumInXml(int num)
@@ -307,7 +338,7 @@ internal sealed class TestHelper : IDisposable
     /// </summary>
     public void SetCsprojVersion(string version)
     {
-        Log($"Set .csproj Version = {version}");
+        Log($"Set ver = {version}");
         string text = ReadAllText(CsprojFilePath);
         text = Regex.Replace(text, @"<Version>[^<]*</Version>", $"<Version>{version}</Version>");
         WriteAllText(CsprojFilePath, text);
@@ -355,7 +386,7 @@ internal sealed class TestHelper : IDisposable
     /// </summary>
     public void RemovePackageReferenceFromCsproj()
     {
-        Log($"Remove package reference");
+        Log("Remove package ref");
         string text = ReadAllText(CsprojFilePath);
         const string pattern = @"\s*<PackageReference\s+Include=""JJ\.AutoIncrementVersion""[^/]*/>\s*";
         text = Regex.Replace(text, pattern, "\n");
@@ -373,10 +404,10 @@ internal sealed class TestHelper : IDisposable
 
         if (string.IsNullOrWhiteSpace(packageFileName))
         {
-            throw new Exception($"Package file name '{TestProjectName}*.nupkg' not found in output: " + output);
+            throw new Exception($"Package '{TestProjectName}*.nupkg' not found in output: " + output);
         }
 
-        Log($"Package file name = {packageFileName}");
+        Log($"Package = {packageFileName}");
 
         return packageFileName;
     }
@@ -397,7 +428,7 @@ internal sealed class TestHelper : IDisposable
 
         int buildNum = int.Parse(match.Groups[1].Value);
         
-        Log($"Output BuildNum = {buildNum}");
+        Log($"BuildNum = {buildNum} (in output)");
 
         return buildNum;
     }
@@ -447,7 +478,7 @@ internal sealed class TestHelper : IDisposable
 
         var packageVersion = match.Groups[1].Value;
 
-        Log($"Package version = {packageVersion}");
+        Log($"Package ver = {packageVersion}");
 
         return packageVersion;
     }

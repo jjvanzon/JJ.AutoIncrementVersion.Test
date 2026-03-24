@@ -1,11 +1,11 @@
 ﻿<SolutionConfiguration>
   <Settings>
-    <AllowParallelTestExecution>False</AllowParallelTestExecution>
-    <AllowTestsToRunInParallelWithThemselves>False</AllowTestsToRunInParallelWithThemselves>
+    <AllowCodeAnalysis>False</AllowCodeAnalysis>
     <EnableRDI>False</EnableRDI>
-    <FastLaneThreads>0</FastLaneThreads>
-    <MaxNumberOfProcessingThreads>1</MaxNumberOfProcessingThreads>
+    <FastLaneThreads>1</FastLaneThreads>
+    <MaxNumberOfProcessingThreads>2</MaxNumberOfProcessingThreads>
     <RdiConfigured>True</RdiConfigured>
+    <SlidingBuildDelayInMilliseconds>15000</SlidingBuildDelayInMilliseconds>
     <SolutionConfigured>True</SolutionConfigured>
   </Settings>
 </SolutionConfiguration>

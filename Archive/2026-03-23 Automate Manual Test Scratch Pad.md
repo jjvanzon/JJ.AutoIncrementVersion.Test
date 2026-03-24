@@ -151,3 +151,19 @@
     //private const string ReadMeFileName = "README.md";
     //private const string DummyTxtFileName = "Dummy.txt";
     //private const string NuGetConfigFileName = "NuGet.config";
+
+
+        return;
+
+        int buildNumFromXml = testHelper.GetBuildNumFromXml();
+        AreEqual(1, buildNumFromXml);
+
+        int buildNumFromOutput = testHelper.ExtractPackageBuildNum(buildOutput0);
+
+        for (int i = 0; i < 3; i++)
+        {
+            var nextBuildOutput = testHelper.Rebuild();
+            int nextBuildNum = testHelper.ExtractPackageBuildNum(nextBuildOutput);
+            IsTrue(nextBuildNum > buildNumFromOutput);
+            buildNumFromOutput = nextBuildNum;
+        }

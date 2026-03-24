@@ -30,7 +30,7 @@ public class Case05_Uninstall
         IsFalse(testHelper.CsprojHasPackageReference());
 
         IsTrue(testHelper.BuildNumXmlExists());
-        IsTrue(testHelper.DirectoryBuildPropsExists());
+        IsTrue(testHelper.DirPropsExists());
 
         // ── Build should succeed ──
         string buildOutput = testHelper.Rebuild();

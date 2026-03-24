@@ -28,7 +28,7 @@ public class Case03_Install
         IsTrue(buildNumContent.Contains("<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>"));
         IsTrue(buildNumContent.Contains("<BuildNumWasFromXmljj>True</BuildNumWasFromXmljj>"));
 
-        IsTrue(testHelper.DirectoryBuildPropsExists());
+        IsTrue(testHelper.DirPropsExists());
         string dirPropsContent = testHelper.ReadDirectoryBuildProps();
         IsTrue(dirPropsContent.Contains("<BuildNum>0</BuildNum>"));
         IsTrue(dirPropsContent.Contains("Import Project=\"BuildNum.xml\""));
