@@ -16,6 +16,9 @@ internal sealed class TestHelper : IDisposable
     private string CsprojFilePath { get; }
     private string BuildNumXmlFilePath { get; }
     private string DirPropsFilePath { get; }
+    private string DummyTxtFilePath { get; }
+    private string ReadmeMDFilePath { get; }
+    private string NuGetConfigFilePath { get; }
 
     private const string PackageId = "JJ.AutoIncrementVersion";
     // TODO: Fixed version number not good. Latest from Pre-Release-Package-Feed is better. Kinda bad, because if we keep this, we'd assume the tests test the latest, which it never would.
@@ -46,13 +49,15 @@ internal sealed class TestHelper : IDisposable
     {
         // Create a random isolated folder in the system temp directory
         // (outside the repo tree, so MSBuild won't pick up the repo's Directory.Build.props).
-        string basePath = Path.Combine(Path.GetTempPath(), "JJ.AutoIncrementVersion.TestRuns", Guid.NewGuid().ToString("N"));
-        //string basePath = Path.Combine(Environment.CurrentDirectory, Guid.NewGuid().ToString());
-        SolutionDir = basePath;
+        SolutionDir = Path.Combine(Path.GetTempPath(), "JJ.AutoIncrementVersion.TestRuns", Guid.NewGuid().ToString("N"));
+        //SolutionDir= Path.Combine(Environment.CurrentDirectory, Guid.NewGuid().ToString());
         ProjectDir = Path.Combine(SolutionDir, TestProjectName);
         CsprojFilePath = Path.Combine(ProjectDir, $"{TestProjectName}.csproj");
         BuildNumXmlFilePath = Path.Combine(SolutionDir, "BuildNum.xml");
         DirPropsFilePath = Path.Combine(SolutionDir, "Directory.Build.props");
+        DummyTxtFilePath = Path.Combine(ProjectDir, "Dummy.txt");
+        ReadmeMDFilePath = Path.Combine(SolutionDir, "README.md");
+        NuGetConfigFilePath = Path.Combine(SolutionDir, "NuGet.config");
     }
 
     /// <summary>
@@ -94,22 +99,18 @@ internal sealed class TestHelper : IDisposable
 
     private void ExtractResourceBuildNumXml() => ExtractResource("BuildNum.xml", BuildNumXmlFilePath);
     private void ExtractResourceDirectoryBuildProps() => ExtractResource("Directory.Build.props", DirPropsFilePath);
-    private void ExtractResourceCsproj() => ExtractResource(CsprojFileName, CsprojFilePath);
-    private void ExtractResourceDummyTxt() => ExtractResource("Dummy.txt", Path.Combine(ProjectDir, "Dummy.txt"));
-    private void ExtractResourceReadMe() => ExtractResource("README.md", Path.Combine(SolutionDir, "README.md"));
-    private void ExtractResourceNuGetConfig() => ExtractResource("NuGet.config", Path.Combine(SolutionDir, "NuGet.config"));
+    private void ExtractResourceCsproj() => ExtractResource(TestProjectName + ".csproj", CsprojFilePath);
+    private void ExtractResourceDummyTxt() => ExtractResource("Dummy.txt", DummyTxtFilePath);
+    private void ExtractResourceReadMe() => ExtractResource("README.md", ReadmeMDFilePath);
+    private void ExtractResourceNuGetConfig() => ExtractResource("NuGet.config", NuGetConfigFilePath);
 
     private static void ExtractResource(string resourceName, string targetPath)
     {
-        var text = GetTestResource(resourceName);
-        WriteAllText(targetPath, text);
+        WriteAllText(targetPath, GetTestResource(resourceName));
     }
 
-    private static string GetTestResource(string resourceName)
-    {
-        string text = GetEmbeddedResourceText(GetExecutingAssembly(), "TestResources", resourceName);
-        return text;
-    }
+    private static string GetTestResource(string resourceName) 
+        => GetEmbeddedResourceText(GetExecutingAssembly(), "TestResources", resourceName);
 
     /// <summary>
     /// Deletes the isolated temp folder and all its contents.
@@ -372,7 +373,7 @@ internal sealed class TestHelper : IDisposable
 
     private string GetEmbeddedPackageVersion()
     {
-        string content = GetTestResource("JJ.AutoIncrementVersion.Test.csproj");
+        string content = GetTestResource(TestProjectName + ".csproj");
 
         Match match = Regex.Match(content, @"<PackageReference\s+Include=""JJ\.AutoIncrementVersion""\s+Version=""([^""]+)""", IgnoreCase);
         if (!match.Success)
