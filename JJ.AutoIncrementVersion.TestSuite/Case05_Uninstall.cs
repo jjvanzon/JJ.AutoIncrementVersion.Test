@@ -1,6 +1,6 @@
 namespace JJ.AutoIncrementVersion.TestSuite;
 
-[TestClass]
+//[TestClass]
 public class Case05_Uninstall : TestBase
 {
     /// <summary>

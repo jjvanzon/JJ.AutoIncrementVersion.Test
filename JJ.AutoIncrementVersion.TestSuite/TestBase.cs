@@ -1,4 +1,5 @@
 
+
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 /// <summary>
@@ -16,7 +17,7 @@ public class TestBase : IDisposable
     /// - <c>Normal</c> and <c>Minimal</c> will only check silently for errors internally.<br/>
     /// - <c>Quiet</c> won't work, because it'll swallow diagnostics used by the logic.
     /// </summary>
-    private const string Verbosity = "Detailed";
+    private const string Verbosity = Diagnostic;
 
     // Paths
 

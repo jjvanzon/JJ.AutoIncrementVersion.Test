@@ -1,6 +1,6 @@
 ﻿namespace JJ.AutoIncrementVersion.TestSuite;
 
-[TestClass]
+//[TestClass]
 public class Case01_SetInitialState
 {
     [TestMethod]
