@@ -231,3 +231,20 @@ Literal repeat Rebuilds:
         AreEqual(buildNum2 + 1, buildNum3);
         Log();
 ```
+
+
+Working on Case07_AutoRecreateFiles:
+
+```cs
+
+        try
+        {
+            Rebuild();
+        }
+        catch
+        {
+            // 1st build may fail
+            int dum = 1;
+        }
+
+```
