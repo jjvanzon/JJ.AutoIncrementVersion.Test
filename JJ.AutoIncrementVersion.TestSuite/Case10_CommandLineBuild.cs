@@ -1,7 +1,7 @@
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]
-public class Case10_CommandLineBuild
+public class Case10_CommandLineBuild : TestHelper
 {
     /// <summary>
     /// Manual Test Plan → "Command Line Build"
@@ -13,21 +13,16 @@ public class Case10_CommandLineBuild
     [TestMethod]
     public void Case10_CommandLineBuild_OverridesBuildNumAndSavesNext()
     {
-        using var testHelper = new TestHelper();
-
-        testHelper.InitInstalledState();
-
-        string buildOutput = testHelper.Rebuild("/p:BuildNum=9999");
-
-        // ── Verify output contains 9999 ──
-        testHelper.LogStep("Verify nupkg ends with .9999.nupkg");
-        string? nupkg = testHelper.ExtractPackageFileName(buildOutput);
-        // TODO: Dpn't just log. Assert.
-        testHelper.LogResult($"Nupkg: {nupkg ?? "(none)"}");
-
-        IsTrue(testHelper.OutputContainsNupkgEndingWith(buildOutput, ".9999.nupkg"));
-
-        int savedNum = testHelper.GetBuildNumFromXml();
-        AreEqual(10000, savedNum);
+        {
+            InitInstalledState();
+            
+            string buildOutput = Rebuild("/p:BuildNum=9999");
+            string? nupkg = ExtractPackageFileName(buildOutput);
+            IsTrue(OutputContainsNupkgEndingWith(buildOutput, ".9999.nupkg"));
+            
+            int savedNum = GetBuildNumFromXml();
+            AreEqual(10000, savedNum);
+            Log();
+        }
     }
 }
