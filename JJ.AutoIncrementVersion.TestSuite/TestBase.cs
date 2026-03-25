@@ -12,11 +12,13 @@ namespace JJ.AutoIncrementVersion.TestSuite;
 public class TestBase : IDisposable
 {
     /// <summary>
+    /// <para>Verbosity is passed to the build processes executed in this helper.</para>
+    /// Plus:<br/>
     /// - <c>Diagnostic</c> or <c>Detailed</c> will log all build output.<br/>
     /// - <c>Normal</c> and <c>Minimal</c> will only check silently for errors internally.<br/>
     /// - <c>Quiet</c> won't work, because it'll swallow diagnostics used by the logic.
     /// </summary>
-    private const string Verbosity = Verbosities.Detailed;
+    private const string Verbosity = Verbosities.Minimal;
 
     // Paths
 
@@ -228,44 +230,38 @@ public class TestBase : IDisposable
         }
     }
 
+    /// <summary>
+    /// The first build may fail because $(BuildNum) resolves to empty.
+    /// This is expected per the manual plan.
+    /// </summary>
     public void RebuildExpectFail()
     {
-        string output = "";
+        const string expected = "is not a valid version string";
+
+        string output;
         try
         {
             output = Rebuild();
         } // ncrunch: no coverage
         catch (Exception ex)
         {
-            // The first build may fail because $(BuildNum) resolves to empty.
-            // This is expected per the manual plan.
-            const string expectedMessage = "is not a valid version string";
 
             bool hasExpectedError =
-                ex.Message.Contains(expectedMessage, OrdinalIgnoreCase) ||
+                ex.Message.Contains(expected, OrdinalIgnoreCase) ||
                 ex.Message.Contains("NETSDK1018", OrdinalIgnoreCase);
 
             // ncrunch: no coverage start
             if (!hasExpectedError)
             {
-                // TODO: Use InnerException instead?
-                //Log(output);
-                string text = ex.Message;
-                if (!text.Contains(output))
-                {
-                    text += $"Output: {output}";
-                }
-
-                throw new Exception(
-                    $"First build failed but not with the expected error '{expectedMessage}'. {text}");
+                throw new Exception($"First build failed but not with the expected error '{expected}'.", ex);
             }
-            // ncrunch: no coverage end
 
-            Log("Build failed: 'not a valid version string'");
+            Log($"Build failed successfully: '{expected}'");
             return;
+
         } // ncrunch: no coverage
 
-        Log($"Build succeeded while expecting error: 'not a valid version string'. Output: {output}"); // ncrunch: no coverage
+        Log($"Build succeeded while expecting error: '{expected}'. Output: {output}"); // ncrunch: no coverage
     }
 
     public string Rebuild()

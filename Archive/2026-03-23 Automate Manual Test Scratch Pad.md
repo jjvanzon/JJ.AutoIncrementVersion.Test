@@ -340,9 +340,50 @@ Deprecated helpers:
         // TODO: Suspicious code line. Restore/install/uninstall/build results may block/continue behavior on varying conditions.
 ```
 
+More outtakes:
 
-
-```
+```cs
 
         //output += Rebuild(); // Build twice for luck.
+    /*
+    public void RebuildExpectFail()
+    {
+        string output = "";
+        try
+        {
+            output = Rebuild();
+        } // ncrunch: no coverage
+        catch (Exception ex)
+        {
+            // The first build may fail because $(BuildNum) resolves to empty.
+            // This is expected per the manual plan.
+            const string expectedMessage = "is not a valid version string";
+
+            bool hasExpectedError =
+                ex.Message.Contains(expectedMessage, OrdinalIgnoreCase) ||
+                ex.Message.Contains("NETSDK1018", OrdinalIgnoreCase);
+
+            // ncrunch: no coverage start
+            if (!hasExpectedError)
+            {
+                // TODO: Use InnerException instead?
+                //Log(output);
+                string text = ex.Message;
+                if (!text.Contains(output))
+                {
+                    text += $"Output: {output}";
+                }
+
+                throw new Exception(
+                    $"First build failed but not with the expected error '{expectedMessage}'. {text}");
+            }
+            // ncrunch: no coverage end
+
+            Log("Build failed: 'not a valid version string'");
+            return;
+        } // ncrunch: no coverage
+
+        Log($"Build succeeded while expecting error: 'not a valid version string'. Output: {output}"); // ncrunch: no coverage
+    }
+    */
 ```
