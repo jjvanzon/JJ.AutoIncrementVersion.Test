@@ -129,7 +129,7 @@ public class TestHelper : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    ~TestHelper() => Cleanup();
+    ~TestHelper() => Cleanup(); // ncrunch: no coverage
   
     // Logging
 
@@ -171,11 +171,13 @@ public class TestHelper : IDisposable
         }
     
         long length = new FileInfo(filePath).Length;
+        // ncrunch: no coverage start
         if (length == 0)
         {
             Log($"{fileName} empty");
             return false;
         }
+        // ncrunch: no coverage end
 
         Log($"{fileName} exists");
 
@@ -308,11 +310,13 @@ public class TestHelper : IDisposable
         process.BeginErrorReadLine();
 
         const int timeoutSeconds = 120;
+        // ncrunch: no coverage start
         if (!process.WaitForExit(timeoutSeconds * 1000))
         {
             process.Kill(entireProcessTree: true);
             throw new TimeoutException($"{fileName} {arguments} timed out after {timeoutSeconds}s");
         }
+        // ncrunch: no coverage end
 
         // .NET may flush async after WaitForExit(int); call the parameterless overload.
         process.WaitForExit();
@@ -378,10 +382,12 @@ public class TestHelper : IDisposable
         string text = ReadAllText(CsprojFilePath);
         Match versionMatch = Regex.Match(text, @"<Version>\s*(\d+\.\d+)", IgnoreCase);
         
+        // ncrunch: no coverage start
         if (!versionMatch.Success)
         {
             throw new InvalidOperationException("Could not extract major.minor from csproj Version element.");
         }
+        // ncrunch: no coverage end
 
         return versionMatch.Groups[1].Value;
     }
@@ -427,10 +433,12 @@ public class TestHelper : IDisposable
         var match = Regex.Match(output, @"(JJ\.AutoIncrementVersion\.Test\.\S+\.nupkg)");
         var packageFileName = match.Success ? match.Groups[1].Value : null;
 
+        // ncrunch: no coverage start
         if (string.IsNullOrWhiteSpace(packageFileName))
         {
             throw new Exception($"Package '{TestProjectName}*.nupkg' not found in output: " + output);
         }
+        // ncrunch: no coverage end
 
         Log($"Package name = {packageFileName}");
 
@@ -445,11 +453,13 @@ public class TestHelper : IDisposable
     {
         string content = ReadDirProps();
 
+        // ncrunch: no coverage start
         if (content.Contains("$(Configuration)=='Release'", OrdinalIgnoreCase))
         {
             Log("Directory.Build.props contains condition: $(Configuration)=='Release'");
             return;
         }
+        // ncrunch: no coverage end
 
         Log("Adding condition to Directory.Build.props: $(Configuration)=='Release'");
 
@@ -458,10 +468,12 @@ public class TestHelper : IDisposable
 
         string updated = Regex.Replace(content, pattern, replacement, IgnoreCase);
 
+        // ncrunch: no coverage start
         if (updated == content)
         {
             throw new InvalidOperationException("Could not inject Release condition into Directory.Build.props.");
         }
+        // ncrunch: no coverage end
 
         WriteDirProps(updated);
     }
@@ -471,11 +483,14 @@ public class TestHelper : IDisposable
         string content = GetResource(TestProjectName + ".csproj");
 
         Match match = Regex.Match(content, @"<PackageReference\s+Include=""JJ\.AutoIncrementVersion""\s+Version=""([^""]+)""", IgnoreCase);
+
+        // ncrunch: no coverage start
         if (!match.Success)
         {
             throw new InvalidOperationException(
                 "Could not extract JJ.AutoIncrementVersion package version from embedded csproj.");
         }
+        // ncrunch: no coverage end
 
         var packageVersion = match.Groups[1].Value;
 
