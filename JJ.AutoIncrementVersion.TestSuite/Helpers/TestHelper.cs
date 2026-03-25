@@ -230,8 +230,6 @@ public class TestHelper : IDisposable
         } // ncrunch: no coverage
         catch (Exception ex)
         {
-            // TODO: Log
-
             // The first build may fail because $(BuildNum) resolves to empty.
             // This is expected per the manual plan.
             const string expectedMessage = "is not a valid version string";
@@ -264,21 +262,21 @@ public class TestHelper : IDisposable
     public string Rebuild()
     {
         Log("Rebuild");
-        return RunProcess("dotnet", $"build \"{CsprojFilePath}\" -c Release -v {Verbosity} --no-incremental --no-restore");
+        //return RunProcess("dotnet", $"build \"{CsprojFilePath}\" -c Release -v {Verbosity} --no-incremental --no-restore");
         return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{Verbosity}");
     }
 
     public string Rebuild(string? extraArgs)
     {
         Log($"Rebuild with {extraArgs}");
-        return RunProcess("dotnet", $"build \"{CsprojFilePath}\" -c Release -v {Verbosity} --no-incremental --no-restore {extraArgs}");
+        //return RunProcess("dotnet", $"build \"{CsprojFilePath}\" -c Release -v {Verbosity} --no-incremental --no-restore {extraArgs}");
         return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{Verbosity} {extraArgs}");
     }
 
     public string RebuildDebug()
     {
         Log("Rebuild Debug");
-        return RunProcess("dotnet", $"build \"{CsprojFilePath}\" -c Debug -v {Verbosity} --no-incremental --no-restore");
+        //return RunProcess("dotnet", $"build \"{CsprojFilePath}\" -c Debug -v {Verbosity} --no-incremental --no-restore");
         return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Debug /v:{Verbosity}");
     }
 
