@@ -22,7 +22,7 @@ public class Case03_Install : TestBase
         InstallPackage();
         Log();
 
-        string buildOutput = Rebuild();
+        string output = Rebuild();
 
         IsTrue(BuildNumXmlExists());
         string buildNumContent = ReadBuildNumXml();
@@ -35,7 +35,7 @@ public class Case03_Install : TestBase
         IsTrue(dirPropsContent.Contains("<BuildNum>0</BuildNum>"));
         IsTrue(dirPropsContent.Contains("Import Project=\"BuildNum.xml\""));
 
-        string packageFileName = ExtractPackageFileName(buildOutput);
+        string packageFileName = ExtractPackageFileName(output);
         IsTrue(packageFileName.EndsWith(".0.nupkg"));
         Log();
     }

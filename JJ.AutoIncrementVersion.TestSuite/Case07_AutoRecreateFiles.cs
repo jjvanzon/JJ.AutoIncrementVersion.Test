@@ -1,6 +1,6 @@
 namespace JJ.AutoIncrementVersion.TestSuite;
 
-//[TestClass]
+[TestClass]
 [DoNotParallelize]
 public class Case07_AutoRecreateFiles : TestBase
 {
