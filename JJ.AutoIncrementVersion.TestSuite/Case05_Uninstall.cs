@@ -1,7 +1,7 @@
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]
-public class Case05_Uninstall : TestHelper
+public class Case05_Uninstall : TestBase
 {
     /// <summary>
     /// Manual Test Plan → "Uninstall"

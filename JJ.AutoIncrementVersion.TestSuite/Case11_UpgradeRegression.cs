@@ -1,7 +1,7 @@
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]
-public class Case11_UpgradeRegression : TestHelper
+public class Case11_UpgradeRegression : TestBase
 {
     /// <summary>
     /// Manual Test Plan → "Upgrade Regression"

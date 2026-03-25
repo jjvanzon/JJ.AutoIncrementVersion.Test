@@ -6,7 +6,7 @@ public class Case01_SetInitialState
     [TestMethod]
     public void Case01_SetInitialState_ShouldNotCrash()
     {
-        using var testHelper = new TestHelper();
+        using var testHelper = new TestBase();
         testHelper.InitUninstalled();
     }
 }

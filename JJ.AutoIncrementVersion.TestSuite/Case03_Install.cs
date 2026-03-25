@@ -1,7 +1,7 @@
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]
-public class Case03_Install : TestHelper
+public class Case03_Install : TestBase
 {
     /// <summary>
     /// Manual Test Plan → "Install"

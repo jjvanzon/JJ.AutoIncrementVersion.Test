@@ -1,4 +1,4 @@
-namespace JJ.AutoIncrementVersion.TestSuite.Helpers;
+namespace JJ.AutoIncrementVersion.TestSuite;
 
 /// <summary>
 /// Helpers for running dotnet CLI commands, manipulating project files,
@@ -7,7 +7,7 @@ namespace JJ.AutoIncrementVersion.TestSuite.Helpers;
 /// Each instance creates an isolated copy of the test files under a random
 /// temp folder so that tests do not interfere with each other or the repo.
 /// </summary>
-public class TestHelper : IDisposable
+public class TestBase : IDisposable
 {
     private const string Verbosity = "Minimal";
 
@@ -24,7 +24,7 @@ public class TestHelper : IDisposable
 
     // Init / Cleanup
 
-    public TestHelper()
+    public TestBase()
     {
         // Create a random isolated folder in the system temp directory
         // (outside the repo tree, so MSBuild won't pick up the repo's Directory.Build.props).
@@ -131,7 +131,7 @@ public class TestHelper : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    ~TestHelper() => Cleanup(); // ncrunch: no coverage
+    ~TestBase() => Cleanup(); // ncrunch: no coverage
   
     // Logging
 

@@ -1,8 +1,7 @@
-
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]
-public class Case04_FirstUse : TestHelper
+public class Case04_FirstUse : TestBase
 {
     /// <summary>
     /// Manual Test Plan → "First Use"

@@ -1,7 +1,7 @@
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]
-public class Case02_RunWithoutPackage : TestHelper
+public class Case02_RunWithoutPackage : TestBase
 {
     /// <summary>
     /// Manual Test Plan → "Set Initial State" + "Run Without Package"

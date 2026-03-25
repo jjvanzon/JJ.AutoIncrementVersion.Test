@@ -1,7 +1,7 @@
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]
-public class Case10_CommandLineBuild : TestHelper
+public class Case10_CommandLineBuild : TestBase
 {
     /// <summary>
     /// Manual Test Plan → "Command Line Build"

@@ -1,7 +1,7 @@
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]
-public class Case09_Conditionals : TestHelper
+public class Case09_Conditionals : TestBase
 {
     /// <summary>
     /// Manual Test Plan → "Conditionals"

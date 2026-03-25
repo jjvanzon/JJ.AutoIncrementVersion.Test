@@ -3,7 +3,6 @@ global using System.Text;
 global using System.Text.RegularExpressions;
 global using System.Xml.Linq;
 global using Microsoft.VisualStudio.TestTools.UnitTesting;
-global using JJ.AutoIncrementVersion.TestSuite.Helpers;
 global using static System.String;
 global using static System.StringComparison;
 global using static System.Text.RegularExpressions.Regex;
