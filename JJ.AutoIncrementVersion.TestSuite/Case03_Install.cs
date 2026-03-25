@@ -17,6 +17,8 @@ public class Case03_Install : TestHelper
     public void Case03_Install_AutoCreatesFilesAndBuildsWithZero()
     {
         InitUninstalled();
+        Log();
+
         InstallPackage();
         Log();
 
@@ -29,7 +31,7 @@ public class Case03_Install : TestHelper
         IsTrue(buildNumContent.Contains("<BuildNumWasFromXmljj>True</BuildNumWasFromXmljj>"));
 
         IsTrue(DirPropsExists());
-        string dirPropsContent = ReadDirectoryBuildProps();
+        string dirPropsContent = ReadDirProps();
         IsTrue(dirPropsContent.Contains("<BuildNum>0</BuildNum>"));
         IsTrue(dirPropsContent.Contains("Import Project=\"BuildNum.xml\""));
 

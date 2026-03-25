@@ -1,7 +1,7 @@
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]
-public class Case09_Conditionals
+public class Case09_Conditionals : TestHelper
 {
     /// <summary>
     /// Manual Test Plan → "Conditionals"
@@ -17,79 +17,65 @@ public class Case09_Conditionals
     [TestMethod]
     public void Case09_Conditionals_ReleaseIncrementsDebugUsesZero()
     {
-        using var testHelper = new TestHelper();
-
-        testHelper.InitInstalledState();
-        testHelper.EnsureDirectoryBuildPropsHasReleaseCondition();
-
-        string dirPropsContent = testHelper.ReadDirectoryBuildProps();
-        IsTrue(dirPropsContent.Contains("$(Configuration)=='Release'", OrdinalIgnoreCase));
-
-        // ── Release build – should increment ──
-        string releaseBuildOutput1 = testHelper.Rebuild();
-        int? releaseBuildNum1 = testHelper.ExtractPackageBuildNum(releaseBuildOutput1);
-        testHelper.LogResult($"Release build 1: nupkg num={releaseBuildNum1}");
-
-        string releaseBuildOutput2 = testHelper.Rebuild();
-        int? releaseBuildNum2 = testHelper.ExtractPackageBuildNum(releaseBuildOutput2);
-        testHelper.LogResult($"Release build 2: nupkg num={releaseBuildNum2}");
-
-        // TODO: Assert exact increment by 1
-        if (releaseBuildNum1 is not null && releaseBuildNum2 is not null)
         {
-            IsTrue(releaseBuildNum2 > releaseBuildNum1);
+            InitInstalledState();
+            Log();
         }
-
-        // ── Debug build – should use BuildNum 0 ──
-        testHelper.LogStep("Debug build – should use BuildNum 0");
-        string debugBuildOutput = testHelper.RebuildDebug();
-        int? debugBuildNum = testHelper.ExtractPackageBuildNum(debugBuildOutput);
-        testHelper.LogResult($"Debug build: nupkg num={debugBuildNum}");
-
-        // Debug build may or may not produce a nupkg depending on GeneratePackageOnBuild,
-        // but if it does, the BuildNum portion should be 0.
-        if (debugBuildNum is not null)
         {
-            AreEqual(0, debugBuildNum.Value, $"Debug build should use BuildNum 0 but got {debugBuildNum}");
+            EnsureDirPropsReleaseCondition();
+            string content = ReadDirProps();
+            IsTrue(content.Contains("$(Configuration)=='Release'", OrdinalIgnoreCase));
+            Log();
         }
-        else
         {
-            testHelper.LogWarning("Debug build did not produce a nupkg name in output – checking not possible.");
+            Log("Release builds increment:");
+            Log();
+            RebuildsIncrement();
         }
-
-        // ── Swap back to Release – should continue incrementing ──
-        testHelper.LogStep("Back to Release – should continue from where it left off");
-        var rel3 = testHelper.Rebuild();
-        int? relNum3 = testHelper.ExtractPackageBuildNum(rel3);
-        testHelper.LogResult($"Release build 3: nupkg num={relNum3}");
-
-        if (releaseBuildNum2 is not null && relNum3 is not null)
         {
-            IsTrue(relNum3 > releaseBuildNum2,
-                $"Release should continue incrementing: rel2={releaseBuildNum2}, rel3={relNum3}");
+            Log("Debug builds use 0:");
+            Log();
         }
-
-        // ── One more Debug to confirm ──
-        testHelper.LogStep("Debug again – still BuildNum 0");
-        var dbg2 = testHelper.RebuildDebug();
-        int? dbgNum2 = testHelper.ExtractPackageBuildNum(dbg2);
-        testHelper.LogResult($"Debug build 2: nupkg num={dbgNum2}");
-
-        if (dbgNum2 is not null)
         {
-            AreEqual(0, dbgNum2.Value, $"Debug build should still use BuildNum 0 but got {dbgNum2}");
+            int buildNum = GetBuildNumFromXml();
+            IsTrue(buildNum != 0);
+            string output = RebuildDebug();
+            string packageName = ExtractPackageFileName(output);
+            IsTrue(packageName.EndsWith(".0.nupkg"));
+            Log();
         }
-
-        // ── One more Release ──
-        testHelper.LogStep("Release again – still incrementing");
-        var rel4 = testHelper.Rebuild();
-        int? relNum4 = testHelper.ExtractPackageBuildNum(rel4);
-        testHelper.LogResult($"Release build 4: nupkg num={relNum4}");
-
-        if (relNum3 is not null && relNum4 is not null)
         {
-            IsTrue(relNum4 > relNum3,
-                $"Release should keep incrementing: rel3={relNum3}, rel4={relNum4}");
+            int buildNum = GetBuildNumFromXml();
+            IsTrue(buildNum != 0);
+            string output = RebuildDebug();
+            string packageName = ExtractPackageFileName(output);
+            IsTrue(packageName.EndsWith(".0.nupkg"));
+            Log();
+        }
+        {
+            Log("Release continues incrementing:");
+            Log();
+            RebuildsIncrement();
+        }
+        {
+            Log("Debug deactivates BuildNum again:");
+            Log();
+        }
+        {
+            int buildNum = GetBuildNumFromXml();
+            IsTrue(buildNum != 0);
+            string output = RebuildDebug();
+            string packageName = ExtractPackageFileName(output);
+            IsTrue(packageName.EndsWith(".0.nupkg"));
+            Log();
+        }
+        {
+            int buildNum = GetBuildNumFromXml();
+            IsTrue(buildNum != 0);
+            string output = RebuildDebug();
+            string packageName = ExtractPackageFileName(output);
+            IsTrue(packageName.EndsWith(".0.nupkg"));
+            Log();
         }
     }
 }

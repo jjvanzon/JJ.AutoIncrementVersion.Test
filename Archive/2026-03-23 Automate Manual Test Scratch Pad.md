@@ -279,3 +279,16 @@ Working on Case08_ManualEdit:
     public void LogStep(string step) => Log($"── STEP: {step}");
     public void LogResult(string result) => Log($"   ✓ {result}");
 ```
+
+
+Working on Case09_Conditionals:
+
+```cs
+    public string GetBuildNumElement()
+    {
+        var doc = XDocument.Load(BuildNumXmlFilePath);
+        string text = doc.Descendants("BuildNum").Single().ToString();
+        Log($"BuildNum.xml element = {text}");
+        return text;
+    }
+```

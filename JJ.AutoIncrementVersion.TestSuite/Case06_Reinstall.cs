@@ -15,6 +15,8 @@ public class Case06_Reinstall : TestHelper
     public void Case06_Reinstall_BuildSucceedsAndIncrements()
     {
         InitInstalledState();
+        Log();
+
         IsTrue(BuildNumXmlExists());
         IsTrue(DirPropsExists());
         IsTrue(CsprojHasPackageReference());

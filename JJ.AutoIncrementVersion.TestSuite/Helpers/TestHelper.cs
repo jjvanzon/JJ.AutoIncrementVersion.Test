@@ -94,8 +94,7 @@ public class TestHelper : IDisposable
 
     private void ExtractResource(string targetFolder, string fileName)
     {
-        Log($"Init file => {fileName}");
-        WriteAllText(Path.Combine(targetFolder, fileName), GetResource(fileName));
+        Save(Path.Combine(targetFolder, fileName), GetResource(fileName));
     }
 
     private static string GetResource(string fileName) 
@@ -156,9 +155,9 @@ public class TestHelper : IDisposable
     public bool   BuildNumXmlExists()                      => Exists(BuildNumXmlFilePath);
     public bool   DirPropsExists()                         => Exists(DirPropsFilePath);
     public string ReadBuildNumXml()                        => ReadAllText(BuildNumXmlFilePath);
-    public string ReadDirectoryBuildProps()                => ReadAllText(DirPropsFilePath);
-    public void   WriteBuildNumXml(string content)         => WriteAllText(BuildNumXmlFilePath, content);
-    public void   WriteDirectoryBuildProps(string content) => WriteAllText(DirPropsFilePath, content);
+    public string ReadDirProps()                => ReadAllText(DirPropsFilePath);
+    public void   WriteBuildNumXml(string content)         => Save(BuildNumXmlFilePath, content);
+    public void   WriteDirectoryBuildProps(string content) => Save(DirPropsFilePath, content);
     public void   DeleteBuildNumXml()                      => Delete(BuildNumXmlFilePath);
     public void   DeleteDirectoryBuildProps()              => Delete(DirPropsFilePath);
 
@@ -183,6 +182,13 @@ public class TestHelper : IDisposable
         Log($"{fileName} exists");
 
         return true;
+    }
+
+    private void Save(string filePath, string content)
+    {
+        string fileName = Path.GetFileName(filePath);
+        Log("Save " + fileName);
+        WriteAllText(filePath, content);
     }
 
     private void Delete(string filePath)
@@ -329,13 +335,6 @@ public class TestHelper : IDisposable
     // Inspect/Write Values
 
     
-    public string GetBuildNumElement()
-    {
-        var doc = XDocument.Load(BuildNumXmlFilePath);
-        string text = doc.Descendants("BuildNum").Single().ToString();
-        Log($"BuildNum.xml element = {text}");
-        return text;
-    }
 
     public int GetBuildNumFromXml()
     {
@@ -356,7 +355,7 @@ public class TestHelper : IDisposable
         var el = doc.Descendants("BuildNum").First();
         el.Value = num.ToString();
         // Write back as single-line XML (matching original format)
-        WriteAllText(BuildNumXmlFilePath, doc.Declaration?.ToString() ?? "");
+        Save(BuildNumXmlFilePath, doc.Declaration?.ToString() ?? "");
         using var writer = new System.Xml.XmlTextWriter(BuildNumXmlFilePath, Encoding.UTF8);
         writer.Formatting = System.Xml.Formatting.None;
         doc.WriteTo(writer);
@@ -371,7 +370,7 @@ public class TestHelper : IDisposable
         Log($"Set ver = {version}");
         string text = ReadAllText(CsprojFilePath);
         text = Regex.Replace(text, @"<Version>[^<]*</Version>", $"<Version>{version}</Version>");
-        WriteAllText(CsprojFilePath, text);
+        Save(CsprojFilePath, text);
     }
 
     /// <summary>
@@ -420,7 +419,7 @@ public class TestHelper : IDisposable
         string text = ReadAllText(CsprojFilePath);
         const string pattern = @"\s*<PackageReference\s+Include=""JJ\.AutoIncrementVersion""[^/]*/>\s*";
         text = Regex.Replace(text, pattern, "\n");
-        WriteAllText(CsprojFilePath, text);
+        Save(CsprojFilePath, text);
     }
 
     /// <summary>
@@ -474,14 +473,17 @@ public class TestHelper : IDisposable
     /// Ensures Directory.Build.props imports BuildNum.xml only for Release configuration.
     /// If the Release condition is missing, it is inserted.
     /// </summary>
-    public void EnsureDirectoryBuildPropsHasReleaseCondition()
+    public void EnsureDirPropsReleaseCondition()
     {
-        string content = ReadDirectoryBuildProps();
+        string content = ReadDirProps();
 
         if (content.Contains("$(Configuration)=='Release'", OrdinalIgnoreCase))
         {
+            Log("Directory.Build.props contains condition: $(Configuration)=='Release'");
             return;
         }
+
+        Log("Adding condition to Directory.Build.props: $(Configuration)=='Release'");
 
         const string pattern = "Condition\\s*=\\s*\"Exists\\('BuildNum\\.xml'\\)\"";
         const string replacement = "Condition=\"Exists('BuildNum.xml') And $(Configuration)=='Release'\"";

@@ -18,6 +18,7 @@ public class Case08_ManualEdit : TestHelper
     {
         {
             InitInstalledState();
+            Log();
             RebuildsIncrement();
         }
 
