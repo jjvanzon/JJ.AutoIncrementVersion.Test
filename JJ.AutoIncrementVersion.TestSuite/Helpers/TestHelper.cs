@@ -16,9 +16,6 @@ public class TestHelper : IDisposable
     private string CsprojFilePath { get; }
     private string BuildNumXmlFilePath { get; }
     private string DirPropsFilePath { get; }
-    private string DummyTxtFilePath { get; }
-    private string ReadmeMDFilePath { get; }
-    private string NuGetConfigFilePath { get; }
 
     private const string PackageId = "JJ.AutoIncrementVersion";
     private const string TestProjectName = "JJ.AutoIncrementVersion.Test";
@@ -35,9 +32,6 @@ public class TestHelper : IDisposable
         CsprojFilePath      = Path.Combine(ProjectDir, $"{TestProjectName}.csproj");
         BuildNumXmlFilePath = Path.Combine(SolutionDir, "BuildNum.xml");
         DirPropsFilePath    = Path.Combine(SolutionDir, "Directory.Build.props");
-        DummyTxtFilePath    = Path.Combine(ProjectDir, "Dummy.txt");
-        ReadmeMDFilePath    = Path.Combine(SolutionDir, "README.md");
-        NuGetConfigFilePath = Path.Combine(SolutionDir, "NuGet.config");
     }
 
     /// <summary>
@@ -109,7 +103,9 @@ public class TestHelper : IDisposable
         return;
         #endif
 
-        #pragma warning disable CS0162 // Unreachable code detected
+        // ReSharper disable HeuristicUnreachableCode
+        #pragma warning disable CS0162 // Unreachable code
+
         Log("Clean up");
         try
         {
@@ -120,9 +116,11 @@ public class TestHelper : IDisposable
         }
         catch (Exception ex)
         {
-            LogWarning($"Could not delete isolated folder: {ex.Message}");
+            Log($"⚠ Could not delete isolated folder: {ex.Message}");
         }
-        #pragma warning restore CS0162 // Unreachable code detected
+
+        // ReSharper restore HeuristicUnreachableCode
+        #pragma warning restore CS0162 // Unreachable code
     }
 
     public void Dispose()
@@ -138,7 +136,6 @@ public class TestHelper : IDisposable
     /// <summary>
     /// Logs a line to the Debug or Console output.
     /// </summary>
-    /// <param name="message"></param>
     public void Log(string message = "")
     {
         #if DEBUG
@@ -147,8 +144,6 @@ public class TestHelper : IDisposable
         Console.WriteLine(message);
         #endif
     }
-
-    public void LogWarning(string warning) => Log($"   ⚠ {warning}");
       
     // File Helpers
 
@@ -334,8 +329,6 @@ public class TestHelper : IDisposable
 
     // Inspect/Write Values
 
-    
-
     public int GetBuildNumFromXml()
     {
         var doc = XDocument.Load(BuildNumXmlFilePath);
@@ -439,34 +432,6 @@ public class TestHelper : IDisposable
         Log($"Package name = {packageFileName}");
 
         return packageFileName;
-    }
-
-    /// <summary>
-    /// Extracts the last segment of the version from the nupkg name.
-    /// E.g. "JJ.AutoIncrementVersion.Test.4.3.7.nupkg" → 7
-    /// </summary>
-    [Obsolete("Use ExtractPackageFileName instead.")]
-    public int ExtractPackageBuildNum(string output)
-    {
-        var match = Regex.Match(output, @"JJ\.AutoIncrementVersion\.Test\.[\d]+\.[\d]+\.([\d]+)\.nupkg");
-        if (!match.Success)
-        {
-            throw new InvalidOperationException(
-                $"Could not extract BuildNum from " +
-                $"JJ.AutoIncrementVersion.Test build: {output}");
-        }
-
-        int buildNum = int.Parse(match.Groups[1].Value);
-        
-        Log($"BuildNum = {buildNum} (in output)");
-
-        return buildNum;
-    }
-
-    public bool OutputContainsNupkgEndingWith(string output, string suffix)
-    {
-        string? name = ExtractPackageFileName(output);
-        return name is not null && name.EndsWith(suffix, OrdinalIgnoreCase);
     }
 
     /// <summary>

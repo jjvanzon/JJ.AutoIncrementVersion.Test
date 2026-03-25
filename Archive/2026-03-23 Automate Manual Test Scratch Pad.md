@@ -292,3 +292,47 @@ Working on Case09_Conditionals:
         return text;
     }
 ```
+
+
+Deprecated helpers:
+
+```cs
+    private string DummyTxtFilePath { get; }
+    private string ReadmeMDFilePath { get; }
+    private string NuGetConfigFilePath { get; }
+
+        DummyTxtFilePath    = Path.Combine(ProjectDir, "Dummy.txt");
+        ReadmeMDFilePath    = Path.Combine(SolutionDir, "README.md");
+        NuGetConfigFilePath = Path.Combine(SolutionDir, "NuGet.config");
+
+    public void LogWarning(string warning) => Log($"   ⚠ {warning}");
+
+
+    /// <summary>
+    /// Extracts the last segment of the version from the nupkg name.
+    /// E.g. "JJ.AutoIncrementVersion.Test.4.3.7.nupkg" → 7
+    /// </summary>
+    [Obsolete("Use ExtractPackageFileName instead.")]
+    public int ExtractPackageBuildNum(string output)
+    {
+        var match = Regex.Match(output, @"JJ\.AutoIncrementVersion\.Test\.[\d]+\.[\d]+\.([\d]+)\.nupkg");
+        if (!match.Success)
+        {
+            throw new InvalidOperationException(
+                $"Could not extract BuildNum from " +
+                $"JJ.AutoIncrementVersion.Test build: {output}");
+        }
+
+        int buildNum = int.Parse(match.Groups[1].Value);
+        
+        Log($"BuildNum = {buildNum} (in output)");
+
+        return buildNum;
+    }
+
+    public bool OutputContainsNupkgEndingWith(string output, string suffix)
+    {
+        string? name = ExtractPackageFileName(output);
+        return name is not null && name.EndsWith(suffix, OrdinalIgnoreCase);
+    }
+```
