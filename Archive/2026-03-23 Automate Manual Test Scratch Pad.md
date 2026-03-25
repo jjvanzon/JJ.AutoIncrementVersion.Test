@@ -247,4 +247,35 @@ Working on Case07_AutoRecreateFiles:
             int dum = 1;
         }
 
+IsTrue(newBuildNum <= 1, $"After recreation, BuildNum should be 0 or 1 but was {newBuildNum}.");
+```
+
+Working on Case08_ManualEdit:
+
+```cs
+            GetBuildNumFromXml();
+            string buildOutput1 = Rebuild();
+            int? nupkgNum1 = ExtractPackageBuildNum(buildOutput1);
+            
+            string buildOutput2 = Rebuild();
+            int? nupkgNum2 = ExtractPackageBuildNum(buildOutput2);
+            
+            IsTrue(nupkgNum2 > nupkgNum1);
+            Log();
+
+            // ...
+
+            int previousBuildNum = ExtractPackageBuildNum(Rebuild());
+            for (int i = 0; i < 2; i++)
+            {
+                string nextBuildOutput = Rebuild();
+                int currentBuildNum = ExtractPackageBuildNum(nextBuildOutput);
+
+                IsTrue(currentBuildNum > previousBuildNum);
+                previousBuildNum = currentBuildNum;
+            }
+            Log();
+
+    public void LogStep(string step) => Log($"── STEP: {step}");
+    public void LogResult(string result) => Log($"   ✓ {result}");
 ```

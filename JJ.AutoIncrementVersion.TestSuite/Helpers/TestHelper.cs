@@ -149,8 +149,6 @@ public class TestHelper : IDisposable
         #endif
     }
 
-    public void LogStep(string step) => Log($"── STEP: {step}");
-    public void LogResult(string result) => Log($"   ✓ {result}");
     public void LogWarning(string warning) => Log($"   ⚠ {warning}");
       
     // File Helpers
@@ -207,9 +205,11 @@ public class TestHelper : IDisposable
             IsTrue(packageName.EndsWith($".{buildNum}.nupkg"));
             Log();
 
-            if (i != 0) IsTrue(buildNum == prevBuildNum + 1);
+            if (i != 0)
+            {
+                IsTrue(buildNum == prevBuildNum + 1);
+            }
             prevBuildNum = buildNum;
-
         }
     }
 
@@ -446,6 +446,7 @@ public class TestHelper : IDisposable
     /// Extracts the last segment of the version from the nupkg name.
     /// E.g. "JJ.AutoIncrementVersion.Test.4.3.7.nupkg" → 7
     /// </summary>
+    [Obsolete("Use ExtractPackageFileName instead.")]
     public int ExtractPackageBuildNum(string output)
     {
         var match = Regex.Match(output, @"JJ\.AutoIncrementVersion\.Test\.[\d]+\.[\d]+\.([\d]+)\.nupkg");
