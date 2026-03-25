@@ -9,6 +9,8 @@ namespace JJ.AutoIncrementVersion.TestSuite.Helpers;
 /// </summary>
 public class TestHelper : IDisposable
 {
+    private const string Verbosity = "Minimal";
+
     // Paths
 
     private string SolutionDir { get; }
@@ -240,9 +242,16 @@ public class TestHelper : IDisposable
 
             if (!hasExpectedError)
             {
-                Log(output);
+                // TODO: Use InnerException instead?
+                //Log(output);
+                string text = ex.Message;
+                if (!text.Contains(output))
+                {
+                    text += $"Output: {output}";
+                }
+
                 throw new Exception(
-                    $"First build failed but not with the expected error '{expectedMessage}'. Output: {output}");
+                    $"First build failed but not with the expected error '{expectedMessage}'. {text}");
             }
 
             Log("Build failed: 'not a valid version string'");
@@ -255,22 +264,22 @@ public class TestHelper : IDisposable
     public string Rebuild()
     {
         Log("Rebuild");
-        return RunProcess("dotnet", $"build \"{CsprojFilePath}\" -c Release -v Normal --no-incremental --no-restore");
-        return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:Normal");
+        return RunProcess("dotnet", $"build \"{CsprojFilePath}\" -c Release -v {Verbosity} --no-incremental --no-restore");
+        return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{Verbosity}");
     }
 
     public string Rebuild(string? extraArgs)
     {
         Log($"Rebuild with {extraArgs}");
-        return RunProcess("dotnet", $"build \"{CsprojFilePath}\" -c Release -v Normal --no-incremental --no-restore {extraArgs}");
-        return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:Normal {extraArgs}");
+        return RunProcess("dotnet", $"build \"{CsprojFilePath}\" -c Release -v {Verbosity} --no-incremental --no-restore {extraArgs}");
+        return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{Verbosity} {extraArgs}");
     }
 
     public string RebuildDebug()
     {
         Log("Rebuild Debug");
-        return RunProcess("dotnet", $"build \"{CsprojFilePath}\" -c Debug -v Normal --no-incremental --no-restore");
-        return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Debug /v:Normal");
+        return RunProcess("dotnet", $"build \"{CsprojFilePath}\" -c Debug -v {Verbosity} --no-incremental --no-restore");
+        return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Debug /v:{Verbosity}");
     }
 
     public void InstallPackage()
