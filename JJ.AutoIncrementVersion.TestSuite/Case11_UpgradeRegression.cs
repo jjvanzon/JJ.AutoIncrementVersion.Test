@@ -1,7 +1,7 @@
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]
-public class Case11_UpgradeRegression
+public class Case11_UpgradeRegression : TestHelper
 {
     /// <summary>
     /// Manual Test Plan → "Upgrade Regression"
@@ -14,47 +14,40 @@ public class Case11_UpgradeRegression
     [TestMethod]
     public void Case11_UpgradeRegression_RestoresBuildNumWasFromXmljjAndIncrements()
     {
-        using var testHelper = new TestHelper();
-
-        testHelper.LogStep("Restore committed state and build once");
-        testHelper.InitInstalledState();
-        testHelper.Rebuild();
-
-        // ── Remove BuildNumWasFromXmljj ──
-        testHelper.LogStep("Remove BuildNumWasFromXmljj from BuildNum.xml");
-        string xml = testHelper.ReadBuildNumXml();
-        testHelper.LogResult($"Before: {xml.Trim()}");
-
-        // TODO: Assert it was in there before.
-
-        string modified = xml.Replace(
-            "<BuildNumWasFromXmljj>True</BuildNumWasFromXmljj>", "");
-        testHelper.WriteBuildNumXml(modified);
-        testHelper.LogResult($"After removal: {testHelper.ReadBuildNumXml().Trim()}");
-
-        IsFalse(testHelper.ReadBuildNumXml().Contains("BuildNumWasFromXmljj"));
-
-        // ── Build ──
-        testHelper.LogStep("Build – should restore BuildNumWasFromXmljj");
-        var buildOutput1 = testHelper.Rebuild();
-
-        string buildNumAfterBuild = testHelper.ReadBuildNumXml();
-        IsTrue(buildNumAfterBuild.Contains("BuildNumWasFromXmljj"));
-
-        // ── Verify continued increment ──
-        testHelper.LogStep("Verify continued increment");
-        int? previousBuildNum = testHelper.ExtractPackageBuildNum(buildOutput1);
-        for (int i = 0; i < 2; i++)
         {
-            string nextBuildOutput = testHelper.Rebuild();
-            int? nextBuildNum = testHelper.ExtractPackageBuildNum(nextBuildOutput);
-
-            // TODO: Assert exact increments by 1.
-            if (previousBuildNum is not null && nextBuildNum is not null)
-            {
-                IsTrue(nextBuildNum > previousBuildNum);
-            }
-            previousBuildNum = nextBuildNum;
+            InitInstalledState();
+            Log("UpgradeRegression: simulate old BuildNum.xml without BuildNumWasFromXmljj.");
+            IsTrue(BuildNumXmlExists());
+            IsTrue(DirPropsExists());
+            GetBuildNumFromXml();
+            string output = Rebuild();
+            ExtractPackageFileName(output);
+            GetBuildNumFromXml();
+            Log();
+        }
+        {
+            Log("Remove BuildNumWasFromXmljj from BuildNum.xml.");
+            string xml = ReadBuildNumXml();
+            IsTrue(xml.Contains("BuildNumWasFromXmljj"));
+            string modified = xml.Replace("<BuildNumWasFromXmljj>True</BuildNumWasFromXmljj>", "");
+            WriteBuildNumXml(modified);
+            IsFalse(ReadBuildNumXml().Contains("BuildNumWasFromXmljj"));
+            GetBuildNumFromXml();
+            Log();
+        }
+        {
+            Log("Build should restore BuildNumWasFromXmljj.");
+            int buildNum = GetBuildNumFromXml();
+            string output = Rebuild();
+            string packageName = ExtractPackageFileName(output);
+            IsTrue(packageName.EndsWith($".{buildNum}.nupkg"));
+            IsTrue(ReadBuildNumXml().Contains("BuildNumWasFromXmljj"));
+            GetBuildNumFromXml();
+            Log();
+        }
+        {
+            Log("After restore, builds should keep incrementing.");
+            RebuildsIncrement();
         }
     }
 }
