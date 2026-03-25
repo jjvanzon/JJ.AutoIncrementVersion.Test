@@ -238,6 +238,7 @@ public class TestHelper : IDisposable
                 ex.Message.Contains(expectedMessage, OrdinalIgnoreCase) ||
                 ex.Message.Contains("NETSDK1018", OrdinalIgnoreCase);
 
+            // ncrunch: no coverage start
             if (!hasExpectedError)
             {
                 // TODO: Use InnerException instead?
@@ -251,6 +252,7 @@ public class TestHelper : IDisposable
                 throw new Exception(
                     $"First build failed but not with the expected error '{expectedMessage}'. {text}");
             }
+            // ncrunch: no coverage end
 
             Log("Build failed: 'not a valid version string'");
             return;
@@ -334,17 +336,18 @@ public class TestHelper : IDisposable
         // .NET may flush async after WaitForExit(int); call the parameterless overload.
         process.WaitForExit();
 
-        var result = new CommandLineResult(process.ExitCode, stdout.ToString(), stderr.ToString());
+        var output = stdout.ToString();
+        var error = stderr.ToString();
 
         // TODO: This is still not enough? Build might have exit code 0 and no error text? But error in the output?
         // TODO: Suspicious code line. Restore/install/uninstall/build results may block/continue behavior on varying conditions.
-        bool hasError = result.ExitCode != 0 || !string.IsNullOrWhiteSpace(result.Error);
+        bool hasError = process.ExitCode != 0 || !IsNullOrWhiteSpace(error) || IsMatch(output, "\\berror\\b");
         if (hasError)
         {
-            throw new Exception($"{fileName} {arguments} failed: Exit code {result.ExitCode} {result.Error} {result.Output}");
+            throw new Exception($"{fileName} {arguments} failed: Exit code {process.ExitCode} {error} {output}");
         }
 
-        return $"{result.Error} {result.Output}";
+        return $"{error} {output}";
     }
 
     // Inspect/Write Values
@@ -393,7 +396,7 @@ public class TestHelper : IDisposable
     private string GetCsprojMajorMinor()
     {
         string text = ReadAllText(CsprojFilePath);
-        Match versionMatch = Regex.Match(text, @"<Version>\s*(\d+\.\d+)", IgnoreCase);
+        Match versionMatch = Match(text, @"<Version>\s*(\d+\.\d+)", IgnoreCase);
         
         // ncrunch: no coverage start
         if (!versionMatch.Success)
@@ -443,11 +446,11 @@ public class TestHelper : IDisposable
     /// </summary>
     public string ExtractPackageFileName(string output)
     {
-        var match = Regex.Match(output, @"(JJ\.AutoIncrementVersion\.Test\.\S+\.nupkg)");
+        var match = Match(output, @"(JJ\.AutoIncrementVersion\.Test\.\S+\.nupkg)");
         var packageFileName = match.Success ? match.Groups[1].Value : null;
 
         // ncrunch: no coverage start
-        if (string.IsNullOrWhiteSpace(packageFileName))
+        if (IsNullOrWhiteSpace(packageFileName))
         {
             throw new Exception($"Package '{TestProjectName}*.nupkg' not found in output: " + output);
         }
@@ -479,7 +482,7 @@ public class TestHelper : IDisposable
         const string pattern = "Condition\\s*=\\s*\"Exists\\('BuildNum\\.xml'\\)\"";
         const string replacement = "Condition=\"Exists('BuildNum.xml') And $(Configuration)=='Release'\"";
 
-        string updated = Regex.Replace(content, pattern, replacement, IgnoreCase);
+        string updated = Replace(content, pattern, replacement, IgnoreCase);
 
         // ncrunch: no coverage start
         if (updated == content)
@@ -495,7 +498,7 @@ public class TestHelper : IDisposable
     {
         string content = GetResource(TestProjectName + ".csproj");
 
-        Match match = Regex.Match(content, @"<PackageReference\s+Include=""JJ\.AutoIncrementVersion""\s+Version=""([^""]+)""", IgnoreCase);
+        Match match = Match(content, @"<PackageReference\s+Include=""JJ\.AutoIncrementVersion""\s+Version=""([^""]+)""", IgnoreCase);
 
         // ncrunch: no coverage start
         if (!match.Success)
