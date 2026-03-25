@@ -138,6 +138,9 @@ public class TestHelper : IDisposable
     /// </summary>
     public void Log(string message = "")
     {
+        Trace.WriteLine(message);
+        return;
+
         #if DEBUG
         Debug.WriteLine(message);
         #else
