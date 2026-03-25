@@ -221,10 +221,11 @@ public class TestHelper : IDisposable
 
     public void RebuildExpectFail()
     {
+        string output = "";
         try
         {
-            Rebuild();
-        }
+            output = Rebuild();
+        } // ncrunch: no coverage
         catch (Exception ex)
         {
             // TODO: Log
@@ -237,16 +238,18 @@ public class TestHelper : IDisposable
                 ex.Message.Contains(expectedMessage, OrdinalIgnoreCase) ||
                 ex.Message.Contains("NETSDK1018", OrdinalIgnoreCase);
 
-            IsTrue(hasExpectedError, $"First build failed but not with the expected '{expectedMessage}' error.");
-
-            if (hasExpectedError)
+            if (!hasExpectedError)
             {
-                Log("Build failed: 'not a valid version string'");
-                return;
+                Log(output);
+                throw new Exception(
+                    $"First build failed but not with the expected error '{expectedMessage}'. Output: {output}");
             }
-        }
 
-        Log("Build succeeded while expecting error: 'not a valid version string'.");
+            Log("Build failed: 'not a valid version string'");
+            return;
+        } // ncrunch: no coverage
+
+        Log($"Build succeeded while expecting error: 'not a valid version string'. Output: {output}"); // ncrunch: no coverage
     }
 
     public string Rebuild()
@@ -331,7 +334,7 @@ public class TestHelper : IDisposable
             throw new Exception($"{fileName} {arguments} failed: Exit code {result.ExitCode} {result.Error} {result.Output}");
         }
 
-        return result.Output;
+        return $"{result.Error} {result.Output}";
     }
 
     // Inspect/Write Values
