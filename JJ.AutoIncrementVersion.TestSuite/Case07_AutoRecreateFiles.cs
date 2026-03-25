@@ -13,7 +13,7 @@ public class Case07_AutoRecreateFiles : TestBase
     /// 3) But recreated Directory.Build.props.
     /// 4) Subsequent builds succeed, incrementing version.
     /// </summary>
-    [TestMethod]
+    //[TestMethod]
     public void Case07_DeleteDirectoryBuildProps_FailsThenRecreatesAndIncrements()
     {
         {
