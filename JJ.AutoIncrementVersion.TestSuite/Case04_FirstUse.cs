@@ -1,6 +1,6 @@
 namespace JJ.AutoIncrementVersion.TestSuite;
 
-[TestClass]
+//[TestClass]
 public class Case04_FirstUse : TestBase
 {
     /// <summary>
@@ -16,7 +16,7 @@ public class Case04_FirstUse : TestBase
     ///   7. Output shows .0.nupkg.
     ///   8. Subsequent builds auto-increment (.1, .2, …).
     /// </summary>
-    //[TestMethod]
+    [TestMethod]
     public void Case04_FirstUse_FailsThenSucceedsThenIncrements()
     {
         InitUninstalled();
