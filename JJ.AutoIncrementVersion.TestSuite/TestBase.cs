@@ -11,7 +11,6 @@ namespace JJ.AutoIncrementVersion.TestSuite;
 /// </summary>
 public class TestBase : IDisposable
 {
-    // TODO: Should I relate Verbosity to the value this test suite's compiled with?
     /// <summary>
     /// - <c>Diagnostic</c> or <c>Detailed</c> will log all build output.<br/>
     /// - <c>Normal</c> and <c>Minimal</c> will only check silently for errors internally.<br/>
