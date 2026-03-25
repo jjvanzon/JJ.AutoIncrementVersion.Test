@@ -5,6 +5,7 @@ global using System.Xml.Linq;
 global using Microsoft.VisualStudio.TestTools.UnitTesting;
 global using static System.String;
 global using static System.StringComparison;
+global using static System.Guid;
 global using static System.Text.RegularExpressions.Regex;
 global using static System.Text.RegularExpressions.RegexOptions;
 global using static System.IO.File;

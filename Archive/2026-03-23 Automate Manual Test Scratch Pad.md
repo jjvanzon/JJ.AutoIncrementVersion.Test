@@ -335,4 +335,7 @@ Deprecated helpers:
         string? name = ExtractPackageFileName(output);
         return name is not null && name.EndsWith(suffix, OrdinalIgnoreCase);
     }
+
+        // TODO: This is still not enough? Build might have exit code 0 and no error text? But error in the output?
+        // TODO: Suspicious code line. Restore/install/uninstall/build results may block/continue behavior on varying conditions.
 ```

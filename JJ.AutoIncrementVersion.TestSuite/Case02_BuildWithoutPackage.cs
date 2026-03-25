@@ -1,7 +1,7 @@
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 [TestClass]
-public class Case02_RunWithoutPackage : TestBase
+public class Case02_BuildWithoutPackage : TestBase
 {
     /// <summary>
     /// Manual Test Plan → "Set Initial State" + "Run Without Package"
@@ -14,7 +14,7 @@ public class Case02_RunWithoutPackage : TestBase
     ///   5. Output shows .0.nupkg
     /// </summary>
     [TestMethod]
-    public void Case02_RunWithoutPackage_ProducesVersionEndingWithZero()
+    public void Case02_BuildWithoutPackage_ProducesVersionEndingWithZero()
     {
         InitUninstalled();
         Log();

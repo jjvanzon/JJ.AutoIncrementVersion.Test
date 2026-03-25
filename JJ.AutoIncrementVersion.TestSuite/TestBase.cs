@@ -1,3 +1,4 @@
+
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 /// <summary>
@@ -9,7 +10,13 @@ namespace JJ.AutoIncrementVersion.TestSuite;
 /// </summary>
 public class TestBase : IDisposable
 {
-    private const string Verbosity = "Minimal";
+    // TODO: Should I relate Verbosity to the value this test suite's compiled with?
+    /// <summary>
+    /// - <c>Diagnostic</c> or <c>Detailed</c> will log all build output.<br/>
+    /// - <c>Normal</c> and <c>Minimal</c> will only check silently for errors internally.<br/>
+    /// - <c>Quiet</c> won't work, because it'll swallow diagnostics used by the logic.
+    /// </summary>
+    private const string Verbosity = "Detailed";
 
     // Paths
 
@@ -29,7 +36,7 @@ public class TestBase : IDisposable
         // Create a random isolated folder in the system temp directory
         // (outside the repo tree, so MSBuild won't pick up the repo's Directory.Build.props).
         //SolutionDir       = Path.Combine(Environment.CurrentDirectory, Guid.NewGuid().ToString());
-        SolutionDir         = Path.Combine(Path.GetTempPath(), "JJ.AutoIncrementVersion.TestRuns", Guid.NewGuid().ToString("N"));
+        SolutionDir         = Path.Combine(Path.GetTempPath(), "JJ.AutoIncrementVersion.TestRuns", NewGuid().ToString("N"));
         ProjectDir          = Path.Combine(SolutionDir, TestProjectName);
         CsprojFilePath      = Path.Combine(ProjectDir, $"{TestProjectName}.csproj");
         BuildNumXmlFilePath = Path.Combine(SolutionDir, "BuildNum.xml");
@@ -271,7 +278,7 @@ public class TestBase : IDisposable
     public string Rebuild(string? extraArgs)
     {
         Log($"Rebuild with {extraArgs}");
-        //return RunProcess("dotnet", $"build \"{CsprojFilePath}\" -c Release -v {Verbosity} --no-incremental --no-restore {extraArgs}");
+        //return RunProcess("dotnet"`, $"build \"{CsprojFilePath}\" -c Release -v {Verbosity} --no-incremental --no-restore {extraArgs}");
         return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{Verbosity} {extraArgs}");
     }
 
@@ -316,11 +323,11 @@ public class TestBase : IDisposable
             CreateNoWindow = true
         })!;
 
-        var stdout = new StringBuilder();
-        var stderr = new StringBuilder();
+        var outputSB = new StringBuilder();
+        var errorSB = new StringBuilder();
 
-        process.OutputDataReceived += (_, e) => { stdout.AppendLine(e.Data ?? ""); };
-        process.ErrorDataReceived += (_, e) => { stderr.AppendLine(e.Data ?? ""); };
+        process.OutputDataReceived += (_, e) => outputSB.AppendLine(e.Data ?? "");
+        process.ErrorDataReceived += (_, e) => errorSB.AppendLine(e.Data ?? "");
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
 
@@ -336,15 +343,28 @@ public class TestBase : IDisposable
         // .NET may flush async after WaitForExit(int); call the parameterless overload.
         process.WaitForExit();
 
-        var output = stdout.ToString();
-        var error = stderr.ToString();
+        var output = outputSB.ToString().TrimEnd();
+        var error = errorSB.ToString().Trim();
 
-        // TODO: This is still not enough? Build might have exit code 0 and no error text? But error in the output?
-        // TODO: Suspicious code line. Restore/install/uninstall/build results may block/continue behavior on varying conditions.
-        bool hasError = process.ExitCode != 0 || !IsNullOrWhiteSpace(error) || IsMatch(output, "\\berror\\b");
+        if (string.Equals(Verbosity, "Diagnostic", OrdinalIgnoreCase) ||
+            string.Equals(Verbosity, "Detailed", OrdinalIgnoreCase))
+        {
+            Log($"Exit Code = {process.ExitCode}");
+            Log($"Error = {error}");
+            Log($"Output = {output}");
+        }
+
+        bool hasExitCode = process.ExitCode != 0;
+        bool hasErrorText = !IsNullOrWhiteSpace(error);
+        bool hasErrorInOutput = output.Contains("[error]");
+        bool hasError = hasExitCode  || hasErrorText || hasErrorInOutput;
+
         if (hasError)
         {
-            throw new Exception($"{fileName} {arguments} failed: Exit code {process.ExitCode} {error} {output}");
+            throw new Exception(
+                $"{fileName} {arguments} failed " +
+                $"{new { hasExitCode, hasErrorText, hasErrorInOutput }}: " +
+                $"Exit code {process.ExitCode} {error} {output}");
         }
 
         return $"{error} {output}";
