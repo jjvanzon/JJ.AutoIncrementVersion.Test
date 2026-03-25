@@ -417,7 +417,7 @@ public class TestHelper : IDisposable
     /// </summary>
     public void RemovePackageReferenceFromCsproj()
     {
-        Log("Remove package ref");
+        Log("Remove package reference");
         string text = ReadAllText(CsprojFilePath);
         const string pattern = @"\s*<PackageReference\s+Include=""JJ\.AutoIncrementVersion""[^/]*/>\s*";
         text = Regex.Replace(text, pattern, "\n");
@@ -494,7 +494,7 @@ public class TestHelper : IDisposable
 
         var packageVersion = match.Groups[1].Value;
 
-        Log($"Package ver = {packageVersion}");
+        Log($"Package version = {packageVersion}");
 
         return packageVersion;
     }
