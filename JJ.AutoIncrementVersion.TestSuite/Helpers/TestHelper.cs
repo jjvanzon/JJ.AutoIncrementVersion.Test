@@ -147,14 +147,14 @@ public class TestHelper : IDisposable
       
     // File Helpers
 
-    public bool   BuildNumXmlExists()                      => Exists(BuildNumXmlFilePath);
-    public bool   DirPropsExists()                         => Exists(DirPropsFilePath);
-    public string ReadBuildNumXml()                        => ReadAllText(BuildNumXmlFilePath);
-    public string ReadDirProps()                => ReadAllText(DirPropsFilePath);
-    public void   WriteBuildNumXml(string content)         => Save(BuildNumXmlFilePath, content);
-    public void   WriteDirectoryBuildProps(string content) => Save(DirPropsFilePath, content);
-    public void   DeleteBuildNumXml()                      => Delete(BuildNumXmlFilePath);
-    public void   DeleteDirectoryBuildProps()              => Delete(DirPropsFilePath);
+    public bool   BuildNumXmlExists()              => Exists(BuildNumXmlFilePath);
+    public bool   DirPropsExists()                 => Exists(DirPropsFilePath);
+    public string ReadBuildNumXml()                => ReadAllText(BuildNumXmlFilePath);
+    public string ReadDirProps()                   => ReadAllText(DirPropsFilePath);
+    public void   WriteBuildNumXml(string content) => Save(BuildNumXmlFilePath, content);
+    public void   WriteDirProps(string content)    => Save(DirPropsFilePath, content);
+    public void   DeleteBuildNumXml()              => Delete(BuildNumXmlFilePath);
+    public void   DeleteDirProps()                 => Delete(DirPropsFilePath);
 
     private bool Exists(string filePath)
     {
@@ -460,7 +460,7 @@ public class TestHelper : IDisposable
             throw new InvalidOperationException("Could not inject Release condition into Directory.Build.props.");
         }
 
-        WriteDirectoryBuildProps(updated);
+        WriteDirProps(updated);
     }
 
     private string GetEmbeddedPackageVersion()

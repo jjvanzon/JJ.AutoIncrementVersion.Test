@@ -27,7 +27,7 @@ public class Case07_AutoRecreateFiles : TestHelper
             Log();
         }
         {
-            DeleteDirectoryBuildProps();
+            DeleteDirProps();
             IsFalse(DirPropsExists());
             RebuildExpectFail();
             IsTrue(DirPropsExists());
@@ -90,7 +90,7 @@ public class Case07_AutoRecreateFiles : TestHelper
         {
             DeleteBuildNumXml();
             IsFalse(BuildNumXmlExists());
-            DeleteDirectoryBuildProps();
+            DeleteDirProps();
             IsFalse(DirPropsExists());
             Log();
         }
