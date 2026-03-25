@@ -15,11 +15,10 @@ public class Case10_CommandLineBuild : TestHelper
     {
         {
             InitInstalledState();
-            
+            GetBuildNumFromXml();
             string buildOutput = Rebuild("/p:BuildNum=9999");
-            string? nupkg = ExtractPackageFileName(buildOutput);
-            IsTrue(OutputContainsNupkgEndingWith(buildOutput, ".9999.nupkg"));
-            
+            string packageName = ExtractPackageFileName(buildOutput);
+            IsTrue(packageName.EndsWith(".9999.nupkg"));
             int savedNum = GetBuildNumFromXml();
             AreEqual(10000, savedNum);
             Log();
