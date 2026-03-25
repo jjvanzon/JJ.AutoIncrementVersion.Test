@@ -255,18 +255,21 @@ public class TestHelper : IDisposable
     public string Rebuild()
     {
         Log("Rebuild");
+        return RunProcess("dotnet", $"build \"{CsprojFilePath}\" -c Release -v Normal --no-incremental --no-restore");
         return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:Normal");
     }
 
     public string Rebuild(string? extraArgs)
     {
         Log($"Rebuild with {extraArgs}");
+        return RunProcess("dotnet", $"build \"{CsprojFilePath}\" -c Release -v Normal --no-incremental --no-restore {extraArgs}");
         return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:Normal {extraArgs}");
     }
 
     public string RebuildDebug()
     {
         Log("Rebuild Debug");
+        return RunProcess("dotnet", $"build \"{CsprojFilePath}\" -c Debug -v Normal --no-incremental --no-restore");
         return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Debug /v:Normal");
     }
 
