@@ -1,5 +1,3 @@
-
-
 namespace JJ.AutoIncrementVersion.TestSuite;
 
 /// <summary>
@@ -141,7 +139,7 @@ public class TestBase : IDisposable
     }
 
     ~TestBase() => Cleanup(); // ncrunch: no coverage
-  
+    
     // Logging
 
     /// <summary>
@@ -158,7 +156,15 @@ public class TestBase : IDisposable
         Console.WriteLine(message);
         #endif
     }
-      
+
+    public void LogTitle(string title = "")
+    {
+        Log();
+        Log(title);
+        string line = "-".Repeat(title.Length);
+        Log(line);
+    }
+
     // File Helpers
 
     public bool   BuildNumXmlExists()              => Exists(BuildNumXmlFilePath);

@@ -14,40 +14,48 @@ public class Case11_UpgradeRegression : TestBase
     [TestMethod]
     public void Case11_UpgradeRegression_RestoresBuildNumWasFromXmljjAndIncrements()
     {
+        LogTitle("Initialize");
         {
             InitInstalledState();
-            Log("UpgradeRegression: simulate old BuildNum.xml without BuildNumWasFromXmljj.");
             IsTrue(BuildNumXmlExists());
             IsTrue(DirPropsExists());
-            GetBuildNumFromXml();
-            string output = Rebuild();
-            ExtractPackageFileName(output);
-            GetBuildNumFromXml();
-            Log();
         }
+
+        LogTitle("Verify Working State");
         {
-            Log("Remove BuildNumWasFromXmljj from BuildNum.xml.");
+            RebuildsIncrement(repeats: 2);
+            string xml = ReadBuildNumXml();
+            IsTrue(xml.Contains("BuildNumWasFromXmljj"));
+            Log($"BuildNum.xml = {xml.RemoveExcessiveWhiteSpace()}");
+        }
+        LogTitle("Remove Control Flag");
+        {
+            Log("Might influence behavior considerably.");
             string xml = ReadBuildNumXml();
             IsTrue(xml.Contains("BuildNumWasFromXmljj"));
             string modified = xml.Replace("<BuildNumWasFromXmljj>True</BuildNumWasFromXmljj>", "");
             WriteBuildNumXml(modified);
-            IsFalse(ReadBuildNumXml().Contains("BuildNumWasFromXmljj"));
-            GetBuildNumFromXml();
-            Log();
+            string readBack = ReadBuildNumXml();
+            IsFalse(readBack.Contains("BuildNumWasFromXmljj"));
+            Log("BuildNumWasFromXmljj flag removed.");
+            Log($"BuildNum.xml = {readBack.RemoveExcessiveWhiteSpace()}");
         }
+        LogTitle("Verify Flag Restores");
         {
-            Log("Build should restore BuildNumWasFromXmljj.");
             int buildNum = GetBuildNumFromXml();
             string output = Rebuild();
             string packageName = ExtractPackageFileName(output);
             IsTrue(packageName.EndsWith($".{buildNum}.nupkg"));
-            IsTrue(ReadBuildNumXml().Contains("BuildNumWasFromXmljj"));
-            GetBuildNumFromXml();
+            string readBack = ReadBuildNumXml();
+            IsTrue(readBack.Contains("BuildNumWasFromXmljj"));
+            
             Log();
+            Log("BuildNumWasFromXmljj flag restored.");
+            Log($"BuildNum.xml = {readBack.RemoveExcessiveWhiteSpace()}");
         }
+        LogTitle("Verify Continued Working");
         {
-            Log("After restore, builds should keep incrementing.");
-            RebuildsIncrement();
+            RebuildsIncrement(repeats: 2);
         }
     }
 }
