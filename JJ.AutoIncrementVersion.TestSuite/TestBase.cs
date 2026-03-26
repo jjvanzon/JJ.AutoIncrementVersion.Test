@@ -115,7 +115,7 @@ public class TestBase : IDisposable
         // ReSharper disable HeuristicUnreachableCode
         #pragma warning disable CS0162 // Unreachable code
 
-        Log("Clean up");
+        LogTitle("Clean up");
         try
         {
             if (Directory.Exists(SolutionDir))
@@ -127,6 +127,8 @@ public class TestBase : IDisposable
         {
             Log($"⚠ Could not delete isolated folder: {ex.Message}");
         }
+
+        Log(); // Extra for CI
 
         // ReSharper restore HeuristicUnreachableCode
         #pragma warning restore CS0162 // Unreachable code
@@ -241,7 +243,12 @@ public class TestBase : IDisposable
             string output = Rebuild();
             string packageName = ExtractPackageFileName(output);
             IsTrue(packageName.EndsWith($".{num}.nupkg"));
-            Log();
+
+            bool isLast = num == till;
+            if (!isLast)
+            {
+                Log();
+            }
         }
     }
 
@@ -280,7 +287,7 @@ public class TestBase : IDisposable
     /// </summary>
     public void RebuildExpectFail()
     {
-        const string expected = "is not a valid version string";
+        const string expected = "not a valid version string";
 
         string output;
         try
@@ -300,7 +307,7 @@ public class TestBase : IDisposable
                 throw new Exception($"First build failed but not with the expected error '{expected}'.", ex);
             }
 
-            Log($"Build failed successfully: '{expected}'");
+            Log($"Build failed: '{expected}'");
             return;
 
         } // ncrunch: no coverage

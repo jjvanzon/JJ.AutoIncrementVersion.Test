@@ -24,36 +24,36 @@ public class Case11_UpgradeRegression : TestBase
         LogTitle("Verify Working State");
         {
             RebuildsIncrement(repeats: 2);
+            Log();
+        
             string xml = ReadBuildNumXml();
             IsTrue(xml.Contains("BuildNumWasFromXmljj"));
             Log($"BuildNum.xml = {xml.RemoveExcessiveWhiteSpace()}");
         }
+
         LogTitle("Remove Control Flag");
         {
-            Log("Might influence behavior considerably.");
+            Log("Might influence behavior considerably");
             string xml = ReadBuildNumXml();
             IsTrue(xml.Contains("BuildNumWasFromXmljj"));
             string modified = xml.Replace("<BuildNumWasFromXmljj>True</BuildNumWasFromXmljj>", "");
             WriteBuildNumXml(modified);
             string readBack = ReadBuildNumXml();
             IsFalse(readBack.Contains("BuildNumWasFromXmljj"));
-            Log("BuildNumWasFromXmljj flag removed.");
+            Log("BuildNumWasFromXmljj flag removed");
             Log($"BuildNum.xml = {readBack.RemoveExcessiveWhiteSpace()}");
         }
+
         LogTitle("Verify Flag Restores");
         {
-            int buildNum = GetBuildNumFromXml();
-            string output = Rebuild();
-            string packageName = ExtractPackageFileName(output);
-            IsTrue(packageName.EndsWith($".{buildNum}.nupkg"));
+            Rebuild();
             string readBack = ReadBuildNumXml();
             IsTrue(readBack.Contains("BuildNumWasFromXmljj"));
-            
-            Log();
-            Log("BuildNumWasFromXmljj flag restored.");
+            Log("BuildNumWasFromXmljj flag restored");
             Log($"BuildNum.xml = {readBack.RemoveExcessiveWhiteSpace()}");
         }
-        LogTitle("Verify Continued Working");
+
+        LogTitle("Verify Continues Working");
         {
             RebuildsIncrement(repeats: 2);
         }

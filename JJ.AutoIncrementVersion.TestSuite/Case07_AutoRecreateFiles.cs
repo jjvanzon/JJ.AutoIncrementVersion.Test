@@ -16,24 +16,31 @@ public class Case07_AutoRecreateFiles : TestBase
     [TestMethod]
     public void Case07_DeleteDirectoryBuildProps_FailsThenRecreatesAndIncrements()
     {
+        LogTitle("Verify Working State");
         {
             InitInstalledState();
             IsTrue(DirPropsExists());
-            GetBuildNumFromXml();
-            string output = Rebuild();
-            ExtractPackageFileName(output);
-            GetBuildNumFromXml();
             Log();
+            RebuildsIncrement();
         }
+
+        LogTitle("Delete Dir.Props");
         {
             DeleteDirProps();
             IsFalse(DirPropsExists());
+        }
+
+        LogTitle("Auto-Create Dir.Props");
+        {
             RebuildExpectFail();
             IsTrue(DirPropsExists());
+        }
+
+        LogTitle("Continues Operation");
+        {
+            RebuildsIncrement();
             Log();
         }
-        
-        RebuildsIncrement();
     }
 
     /// <summary>
@@ -48,6 +55,7 @@ public class Case07_AutoRecreateFiles : TestBase
     [TestMethod]
     public void Case07_DeleteBuildNumXml_RecreatesToZeroOrOne()
     {
+        // TODO
         {
             InitInstalledState();
             IsTrue(BuildNumXmlExists());
@@ -114,5 +122,6 @@ public class Case07_AutoRecreateFiles : TestBase
         }
     
         RebuildsIncrement();
+        
     }
 }

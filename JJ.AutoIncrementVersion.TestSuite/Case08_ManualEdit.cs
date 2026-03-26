@@ -16,29 +16,27 @@ public class Case08_ManualEdit : TestBase
     [TestMethod]
     public void Case08_ManualEdit_ContinuesFromRestoredValueThenFromManualValue()
     {
+        LogTitle("Verify Initial State");
         {
             InitInstalledState();
             Log();
-            RebuildsIncrement();
+            RebuildsIncrement(repeats: 2);
+            Log();
+            var xml = ReadBuildNumXml();
+            Log("BuildNum.xml = " + xml.TrimEnd());
         }
 
-        const int manualValue = 100;
+        LogTitle("Edit BuildNum.xml");
+        {
+            SetBuildNumInXml(100);
+            var xml = ReadBuildNumXml();
+            Log("BuildNum.xml = " + xml);
+        }
 
+        LogTitle("Continues from Manual BuildNum");
         {
-            SetBuildNumInXml(manualValue);
-            GetBuildNumFromXml();
+            RebuildsIncrement(from: 100, till:102);
             Log();
-        }
-        {
-            var output = Rebuild();
-            string packageName = ExtractPackageFileName(output);
-            var buildNum = GetBuildNumFromXml();
-            IsTrue(packageName.EndsWith($".{manualValue}.nupkg"));
-            IsTrue(buildNum == manualValue + 1);
-            Log();
-        }
-        {
-            RebuildsIncrement();
         }
     }
 }

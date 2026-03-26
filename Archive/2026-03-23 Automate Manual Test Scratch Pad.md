@@ -387,6 +387,8 @@ More outtakes:
     }
 
 
+        if (repeats > 10) throw new Exception("repeats > 10");
+
         for (int num = from; num < from + repeats; num++)
         {
             int buildNum = GetBuildNumFromXml();
@@ -396,4 +398,17 @@ More outtakes:
             IsTrue(packageName.EndsWith($".{num}.nupkg"));
             Log();
         }
+
+        {
+            var output = Rebuild();
+            string packageName = ExtractPackageFileName(output);
+            var buildNum = GetBuildNumFromXml();
+            IsTrue(packageName.EndsWith($".{manualValue}.nupkg"));
+            IsTrue(buildNum == manualValue + 1);
+            Log();
+        }
+
+            GetBuildNumFromXml();
+            string output = Rebuild();
+            ExtractPackageFileName(output);
 ```
