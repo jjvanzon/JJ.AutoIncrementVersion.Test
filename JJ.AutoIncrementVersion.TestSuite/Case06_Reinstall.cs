@@ -14,29 +14,42 @@ public class Case06_Reinstall : TestBase
     [TestMethod]
     public void Case06_Reinstall_BuildSucceedsAndIncrements()
     {
-        InitInstalledState();
-        Log();
-
-        IsTrue(BuildNumXmlExists());
-        IsTrue(DirPropsExists());
-        IsTrue(CsprojHasPackageReference());
-        GetBuildNumFromXml();
-        Rebuild();
-        GetBuildNumFromXml();
-        Log();
-
-        UninstallPackage();
-        IsFalse(CsprojHasPackageReference());
-        IsTrue(BuildNumXmlExists());
-        IsTrue(DirPropsExists());
-        GetBuildNumFromXml();
-        Rebuild();
-        GetBuildNumFromXml();
-        Log();
+        LogTitle("Verify Installed State");
+        {
+            InitInstalledState();
+            Log();
+            IsTrue(BuildNumXmlExists());
+            IsTrue(DirPropsExists());
+            IsTrue(CsprojHasPackageReference());
+            Log();
+            RebuildsIncrement(repeats: 2);
+        }
         
-        InstallPackage();
-        Log();
+        LogTitle("Uninstall");
+        {
+            UninstallPackage();
+            IsFalse(CsprojHasPackageReference());
+        }
+        
+        LogTitle("Files Remain");
+        {
+            IsTrue(BuildNumXmlExists());
+            IsTrue(DirPropsExists());
+        }
 
-        RebuildsIncrement();
+        LogTitle("Version Freezes");
+        {
+            RebuildsWithFrozenVersion(repeats: 2);
+        }
+
+        LogTitle("Reinstall");
+        {
+            InstallPackage();
+        }
+
+        LogTitle("Rebuilds Increment Again");
+        { 
+            RebuildsIncrement();
+        }
     }
 }

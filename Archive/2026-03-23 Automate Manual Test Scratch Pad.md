@@ -437,4 +437,16 @@ During Case07_AutoRecreateFiles Rework:
         RebuildsIncrement(from, till: from + repeats - 1);
     }
     
+            GetBuildNumFromXml();
+            Rebuild();
+            GetBuildNumFromXml();
+
+            // TODO: Rebuild multiple times. Centralized check that BuildNum is frozen.
+            GetBuildNumFromXml();
+            string output = Rebuild();
+            GetBuildNumFromXml();
+            ExtractPackageFileName(output);
+
+        int initBuildNum = GetBuildNumFromXml();
+        Log();
 ```

@@ -230,6 +230,33 @@ public class TestBase : IDisposable
         if (condition) throw new Exception(argExpress);
     }
 
+    public void RebuildsWithFrozenVersion(int repeats = 3)
+    {
+        int initBuildNum;
+        {
+            initBuildNum = GetBuildNumFromXml();
+            string output = Rebuild();
+            string packageName = ExtractPackageFileName(output);
+            IsTrue(packageName.EndsWith($".{initBuildNum}.nupkg"));
+            Log();
+        }
+
+        for (int i = 1; i < repeats; i++)
+        {
+            bool isLast = i == repeats - 1;
+            
+            int buildNum = GetBuildNumFromXml();
+            IsTrue(buildNum == initBuildNum);
+            
+            string output = Rebuild();
+
+            string packageName = ExtractPackageFileName(output);
+            IsTrue(packageName.EndsWith($".{initBuildNum}.nupkg"));
+
+            if (!isLast) Log();
+        }    
+    }
+
     // TODO: Params int[] would also be nice, but clash with repoeats param of other overlod.
     public void RebuildsIncrement(int from, int till)
     {
