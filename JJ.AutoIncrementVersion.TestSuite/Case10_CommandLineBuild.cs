@@ -27,7 +27,7 @@ public class Case10_CommandLineBuild : TestBase
         }
         LogTitle("Continues New Range");
         {
-            RebuildsIncrement(from: 10000, till: 10002);
+            RebuildsIncrement(from: 10000, to: 10002);
         }
     }
 }

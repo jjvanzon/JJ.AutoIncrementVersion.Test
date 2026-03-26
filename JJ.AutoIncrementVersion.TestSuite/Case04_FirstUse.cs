@@ -19,47 +19,36 @@ public class Case04_FirstUse : TestBase
     [TestMethod]
     public void Case04_FirstUse_FailsThenSucceedsThenIncrements()
     {
-        InitUninstalled();
-        Log();
+        LogTitle("Initialize");
+        {
+            InitUninstalled();
+        }
+
+        LogTitle("Install");
         {
             InstallPackage();
+        }
+
+        LogTitle("First Use");
+        {
             SetProjPatchNum("$(BuildNum)");
             RebuildExpectFail();
             IsFalse(BuildNumXmlExists());
             IsTrue(DirPropsExists()); // There anyway
-            Log();
         }
+
+        LogTitle("2nd Build Succeeds");
         {
             string output = Rebuild();
             IsTrue(BuildNumXmlExists());
             IsTrue(DirPropsExists());
             string packageName = ExtractPackageFileName(output);
             IsTrue(packageName.EndsWith(".0.nupkg"));
-            Log();
         }
+
+        LogTitle("Next Builds Increment");
         {
-            int buildNum = GetBuildNumFromXml();
-            AreEqual(1, buildNum);
-            string output = Rebuild();
-            string packageName = ExtractPackageFileName(output);
-            IsTrue(packageName.EndsWith(".1.nupkg"));
-            Log();
-        }
-        {
-            int buildNum = GetBuildNumFromXml();
-            AreEqual(2, buildNum);
-            string output = Rebuild();
-            string packageName = ExtractPackageFileName(output);
-            IsTrue(packageName.EndsWith(".2.nupkg"));
-            Log();
-        }
-        {
-            int buildNum = GetBuildNumFromXml();
-            AreEqual(3, buildNum);
-            string output = Rebuild();
-            string packageName = ExtractPackageFileName(output);
-            IsTrue(packageName.EndsWith(".3.nupkg"));
-            Log();
+            RebuildsIncrement(from: 1, to: 3);
         }
     }
 }

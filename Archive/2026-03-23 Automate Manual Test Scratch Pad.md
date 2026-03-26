@@ -476,3 +476,36 @@ More outtakes:
         IsTrue(string.Equals(packageName1, packageName2));
         Log();
 ```
+
+### During Case04_FirstUse refac
+
+```cs
+        var version = $"{majorMinor}.{patch}";
+        Log("Set csproj version = " + version);
+        SetCsprojVersion(version);
+
+        {
+            int buildNum = GetBuildNumFromXml();
+            AreEqual(1, buildNum);
+            string output = Rebuild();
+            string packageName = ExtractPackageFileName(output);
+            IsTrue(packageName.EndsWith(".1.nupkg"));
+            Log();
+        }
+        {
+            int buildNum = GetBuildNumFromXml();
+            AreEqual(2, buildNum);
+            string output = Rebuild();
+            string packageName = ExtractPackageFileName(output);
+            IsTrue(packageName.EndsWith(".2.nupkg"));
+            Log();
+        }
+        {
+            int buildNum = GetBuildNumFromXml();
+            AreEqual(3, buildNum);
+            string output = Rebuild();
+            string packageName = ExtractPackageFileName(output);
+            IsTrue(packageName.EndsWith(".3.nupkg"));
+            Log();
+        }
+```

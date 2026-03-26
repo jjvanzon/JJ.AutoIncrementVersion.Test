@@ -258,12 +258,12 @@ public class TestBase : IDisposable
     }
 
     // TODO: Params int[] would also be nice, but clash with repoeats param of other overlod.
-    public void RebuildsIncrement(int from, int till)
+    public void RebuildsIncrement(int from, int to)
     {
-        ThrowIf(from > till);
-        ThrowIf(till - from > 11);
+        ThrowIf(from > to);
+        ThrowIf(to - from > 11);
 
-        for (int num = from; num <= till; num++)
+        for (int num = from; num <= to; num++)
         {
             int buildNum = GetBuildNumFromXml();
             AreEqual(num, buildNum);
@@ -271,7 +271,7 @@ public class TestBase : IDisposable
             string packageName = ExtractPackageFileName(output);
             IsTrue(packageName.EndsWith($".{num}.nupkg"));
 
-            bool isLast = num == till;
+            bool isLast = num == to;
             if (!isLast)
             {
                 Log();
@@ -528,7 +528,7 @@ public class TestBase : IDisposable
     public void SetProjPatchNum(string patch)
     {
         string majorMinor = GetCsprojMajorMinor();
-        SetCsprojVersion($"{majorMinor}.{patch}");
+        SetCsprojVersion($"{majorMinor}.{patch}"); // Logs
     }
 
     /// <summary>
