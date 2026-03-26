@@ -509,3 +509,23 @@ More outtakes:
             Log();
         }
 ```
+
+### During Case03_Install refac
+
+```cs
+            IsTrue(buildNumContent.Contains("<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>"));
+            IsTrue(buildNumContent.Contains("<BuildNumWasFromXmljj>True</BuildNumWasFromXmljj>"));
+
+            IsTrue(dirPropsContent.Contains("<BuildNum>0</BuildNum>"));
+
+    // TODO: Reuse this?
+    public void RebuildsWithBuildNum(int expectedBuildNum)
+    {
+        int buildNum = GetBuildNumFromXml();
+        IsTrue(buildNum == expectedBuildNum);
+        string output = Rebuild();
+        string packageName = ExtractPackageFileName(output);
+        IsTrue(packageName.EndsWith($".{expectedBuildNum}.nupkg"));
+    }
+
+```

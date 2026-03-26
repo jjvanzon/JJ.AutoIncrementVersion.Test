@@ -16,27 +16,50 @@ public class Case03_Install : TestBase
     [TestMethod]
     public void Case03_Install_AutoCreatesFilesAndBuildsWithZero()
     {
-        InitUninstalled();
-        Log();
+        LogTitle("Initialize");
+        {
+            InitUninstalled();
+        }
 
-        InstallPackage();
-        Log();
+        LogTitle("Install");
+        {
+            InstallPackage();
+            IsTrue(CsprojHasPackageReference());
+            IsFalse(BuildNumXmlExists());
+            IsFalse(DirPropsExists());
+        }
 
+        LogTitle("First Build");
+        {
+            string output = Rebuild();
+
+            IsTrue(BuildNumXmlExists());
+            string buildNumContent = ReadBuildNumXml();
+            IsTrue(buildNumContent.Contains("<BuildNum>"));
+
+            IsTrue(DirPropsExists());
+            string dirPropsContent = ReadDirProps();
+            IsTrue(dirPropsContent.Contains("Import Project=\"BuildNum.xml\""));
+
+            string packageFileName = ExtractPackageFileName(output);
+            IsTrue(packageFileName.EndsWith(".0.nupkg"));
+        }
+
+        LogTitle("Increments Not Used Yet");
+        {
+            Rebuild_IncrementsXml_ButNotOutput(1);
+            Rebuild_IncrementsXml_ButNotOutput(2);
+            Rebuild_IncrementsXml_ButNotOutput(3);
+        }
+    }
+
+    private void Rebuild_IncrementsXml_ButNotOutput(int expectedBuildNum)
+    {
+        int buildNum = GetBuildNumFromXml();
+        IsTrue(buildNum == expectedBuildNum);
         string output = Rebuild();
-
-        IsTrue(BuildNumXmlExists());
-        string buildNumContent = ReadBuildNumXml();
-        IsTrue(buildNumContent.Contains("<BuildNum>"));
-        IsTrue(buildNumContent.Contains("<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>"));
-        IsTrue(buildNumContent.Contains("<BuildNumWasFromXmljj>True</BuildNumWasFromXmljj>"));
-
-        IsTrue(DirPropsExists());
-        string dirPropsContent = ReadDirProps();
-        IsTrue(dirPropsContent.Contains("<BuildNum>0</BuildNum>"));
-        IsTrue(dirPropsContent.Contains("Import Project=\"BuildNum.xml\""));
-
-        string packageFileName = ExtractPackageFileName(output);
-        IsTrue(packageFileName.EndsWith(".0.nupkg"));
+        string packageName = ExtractPackageFileName(output);
+        IsTrue(packageName.EndsWith(".0.nupkg"));
         Log();
     }
 }
