@@ -344,8 +344,8 @@ More outtakes:
 
 ```cs
 
-        //output += Rebuild(); // Build twice for luck.
-    /*
+    output += Rebuild(); // Build twice for luck.
+
     public void RebuildExpectFail()
     {
         string output = "";
@@ -385,5 +385,15 @@ More outtakes:
 
         Log($"Build succeeded while expecting error: 'not a valid version string'. Output: {output}"); // ncrunch: no coverage
     }
-    */
+
+
+        for (int num = from; num < from + repeats; num++)
+        {
+            int buildNum = GetBuildNumFromXml();
+            AreEqual(num, buildNum);
+            string output = Rebuild();
+            string packageName = ExtractPackageFileName(output);
+            IsTrue(packageName.EndsWith($".{num}.nupkg"));
+            Log();
+        }
 ```

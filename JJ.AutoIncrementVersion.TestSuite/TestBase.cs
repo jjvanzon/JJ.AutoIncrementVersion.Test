@@ -216,9 +216,39 @@ public class TestBase : IDisposable
     }
 
     // Run Processes
+    
+    public void RebuildsIncrementFrom(int from, int repeats = 3)
+    {
+        ThrowIf(repeats > 10);
+        RebuildsIncrement(from, till: from + repeats - 1);
+    }
+    
+    public void RebuildsIncrement(int from, int till)
+    {
+        ThrowIf(from > till);
+        ThrowIf(till - from > 11);
+
+        for (int num = from; num <= till; num++)
+        {
+            int buildNum = GetBuildNumFromXml();
+            AreEqual(num, buildNum);
+            string output = Rebuild();
+            string packageName = ExtractPackageFileName(output);
+            IsTrue(packageName.EndsWith($".{num}.nupkg"));
+            Log();
+        }
+    }
+
+    // TODO: Move to JJ.Framework.
+    private void ThrowIf(bool condition, [CallerArgumentExpression("condition")] string? argExpress = null)
+    {
+        if (condition) throw new Exception(argExpress);
+    }
 
     public void RebuildsIncrement(int repeats = 3)
     {
+        ThrowIf(repeats > 10);
+
         int prevBuildNum = default;
         for (int i = 0; i < repeats; i++)
         {

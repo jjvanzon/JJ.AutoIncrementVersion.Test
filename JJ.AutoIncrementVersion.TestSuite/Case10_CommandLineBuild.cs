@@ -13,14 +13,21 @@ public class Case10_CommandLineBuild : TestBase
     [TestMethod]
     public void Case10_CommandLineBuild_OverridesBuildNumAndSavesNext()
     {
-        InitInstalledState();
-        Log();
+        LogTitle("Initialize");
+        {
+            InitInstalledState();
+        }
 
-        GetBuildNumFromXml();
-        string buildOutput = Rebuild("/p:BuildNum=9999");
-        string packageName = ExtractPackageFileName(buildOutput);
-        IsTrue(packageName.EndsWith(".9999.nupkg"));
-        int savedNum = GetBuildNumFromXml();
-        AreEqual(10000, savedNum);
+        LogTitle("Explicit BuildNum from Command Line");
+        {
+            GetBuildNumFromXml();
+            string buildOutput = Rebuild("/p:BuildNum=9999");
+            string packageName = ExtractPackageFileName(buildOutput);
+            IsTrue(packageName.EndsWith(".9999.nupkg"));
+        }
+        LogTitle("Continues New Range");
+        {
+            RebuildsIncrement(from: 10000, till: 10002);
+        }
     }
 }

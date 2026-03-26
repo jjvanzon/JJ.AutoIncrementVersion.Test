@@ -2,6 +2,7 @@
 global using System.Text;
 global using System.Text.RegularExpressions;
 global using System.Xml.Linq;
+global using System.Runtime.CompilerServices;
 global using Microsoft.VisualStudio.TestTools.UnitTesting;
 global using JJ.Framework.Common.Legacy;
 global using JJ.Framework.Text.Core;
@@ -14,4 +15,4 @@ global using static System.IO.File;
 global using static System.Reflection.Assembly;
 global using static JJ.Framework.Common.Legacy.EmbeddedResourceHelper;
 global using static JJ.Framework.Testing.Core.AssertCore;
-//global using static JJ.AutoIncrementVersion.TestSuite.Verbosities;
+
