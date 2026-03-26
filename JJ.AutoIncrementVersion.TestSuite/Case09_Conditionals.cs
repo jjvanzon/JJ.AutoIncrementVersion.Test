@@ -17,25 +17,21 @@ public class Case09_Conditionals : TestBase
     [TestMethod]
     public void Case09_Conditionals_ReleaseIncrementsDebugUsesZero()
     {
+        LogTitle("Initialize");
         {
             InitInstalledState();
-            Log();
         }
+        LogTitle("Set Condition");
         {
             EnsureDirPropsReleaseCondition();
             string content = ReadDirProps();
             IsTrue(content.Contains("$(Configuration)=='Release'", OrdinalIgnoreCase));
-            Log();
         }
+        LogTitle("Release Builds Still Increment");
         {
-            Log("Release builds increment:");
-            Log();
             RebuildsIncrement();
         }
-        {
-            Log("Debug builds use 0:");
-            Log();
-        }
+        LogTitle("But Debug Uses 0");
         {
             int buildNum = GetBuildNumFromXml();
             IsTrue(buildNum != 0);
@@ -50,17 +46,12 @@ public class Case09_Conditionals : TestBase
             string output = RebuildDebug();
             string packageName = ExtractPackageFileName(output);
             IsTrue(packageName.EndsWith(".0.nupkg"));
-            Log();
         }
+        LogTitle("Release Continues Incrementing");
         {
-            Log("Release continues incrementing:");
-            Log();
             RebuildsIncrement();
         }
-        {
-            Log("Debug deactivates BuildNum again:");
-            Log();
-        }
+        LogTitle("Debug Deactivates BuildNum Again");
         {
             int buildNum = GetBuildNumFromXml();
             IsTrue(buildNum != 0);
@@ -75,7 +66,6 @@ public class Case09_Conditionals : TestBase
             string output = RebuildDebug();
             string packageName = ExtractPackageFileName(output);
             IsTrue(packageName.EndsWith(".0.nupkg"));
-            Log();
         }
     }
 }

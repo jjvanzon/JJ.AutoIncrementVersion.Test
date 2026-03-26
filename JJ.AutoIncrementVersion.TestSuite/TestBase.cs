@@ -217,6 +217,12 @@ public class TestBase : IDisposable
 
     // Run Processes
     
+    // TODO: Move to JJ.Framework.
+    public static void ThrowIf(bool condition, [CallerArgumentExpression("condition")] string? argExpress = null)
+    {
+        if (condition) throw new Exception(argExpress);
+    }
+
     public void RebuildsIncrementFrom(int from, int repeats = 3)
     {
         ThrowIf(repeats > 10);
@@ -239,12 +245,6 @@ public class TestBase : IDisposable
         }
     }
 
-    // TODO: Move to JJ.Framework.
-    private void ThrowIf(bool condition, [CallerArgumentExpression("condition")] string? argExpress = null)
-    {
-        if (condition) throw new Exception(argExpress);
-    }
-
     public void RebuildsIncrement(int repeats = 3)
     {
         ThrowIf(repeats > 10);
@@ -252,17 +252,25 @@ public class TestBase : IDisposable
         int prevBuildNum = default;
         for (int i = 0; i < repeats; i++)
         {
+            bool isFirst = i != 0;
+            bool isLast = i == repeats - 1;
+
             int buildNum = GetBuildNumFromXml();
             string output = Rebuild();
             string packageName = ExtractPackageFileName(output);
             IsTrue(packageName.EndsWith($".{buildNum}.nupkg"));
-            Log();
 
-            if (i != 0)
+            if (isFirst)
             {
                 IsTrue(buildNum == prevBuildNum + 1);
             }
+
             prevBuildNum = buildNum;
+
+            if (!isLast)
+            {
+                Log();
+            }
         }
     }
 
