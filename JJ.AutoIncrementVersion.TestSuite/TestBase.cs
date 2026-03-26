@@ -537,7 +537,19 @@ public class TestBase : IDisposable
     public bool CsprojHasPackageReference()
     {
         string text = ReadAllText(CsprojFilePath);
-        return text.Contains($"Include=\"{PackageId}\"", StringComparison.OrdinalIgnoreCase);
+        var hasRef = text.Contains($"Include=\"{PackageId}\"", OrdinalIgnoreCase);
+        string csprojFileName = Path.GetFileName(CsprojFilePath);
+
+        if (hasRef)
+        {
+            Log($"{PackageId} ref exists in {csprojFileName}");
+        }
+        else
+        {
+            Log($"{PackageId} ref missing from {csprojFileName}");
+        }
+           
+        return hasRef;
     }
 
     /// <summary>

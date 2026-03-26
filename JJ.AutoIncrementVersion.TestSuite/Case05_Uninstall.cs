@@ -16,38 +16,34 @@ public class Case05_Uninstall : TestBase
     [TestMethod]
     public void Case05_Uninstall_FilesRemainAndVersionFreezes()
     {
-        InitInstalledState();
-        IsTrue(BuildNumXmlExists());
-        IsTrue(DirPropsExists());
-        IsTrue(CsprojHasPackageReference());
-        Log();
+        LogTitle("Initialize");
+        {
+            InitInstalledState();
+            IsTrue(BuildNumXmlExists());
+            IsTrue(DirPropsExists());
+            IsTrue(CsprojHasPackageReference());
+        }
+
+        LogTitle("Verify Working State");
+        {
+            RebuildsIncrement();
+        }
+
+        LogTitle("Uninstall");
+        {
+            UninstallPackage();
+            IsFalse(CsprojHasPackageReference());
+        }
         
-        GetBuildNumFromXml(); // Logs BuildNum
-        string outputInit = Rebuild();
-        ExtractPackageFileName(outputInit); // Logs package name
-        // Don't assert equals: After 1st build BuildNum increments
-        Log();
+        LogTitle("Files Remain");
+        {
+            IsTrue(BuildNumXmlExists());
+            IsTrue(DirPropsExists());
+        }
         
-        UninstallPackage();
-        IsFalse(CsprojHasPackageReference());
-        IsTrue(BuildNumXmlExists());
-        IsTrue(DirPropsExists());
-        Log();
-        
-        int buildNum1 = GetBuildNumFromXml();
-        string output1 = Rebuild();
-        string packageName1 = ExtractPackageFileName(output1);
-        IsTrue(packageName1.EndsWith($".{buildNum1}.nupkg"));
-        Log();
-        
-        int buildNum2 = GetBuildNumFromXml();
-        string output2 = Rebuild();
-        string packageName2 = ExtractPackageFileName(output2);
-        IsTrue(packageName2.EndsWith($".{buildNum2}.nupkg"));
-        Log();
-            
-        IsTrue(buildNum1 == buildNum2);
-        IsTrue(string.Equals(packageName1, packageName2));
-        Log();
+        LogTitle("Version Freezes");
+        {
+            RebuildsWithFrozenVersion();
+        }
     }
 }

@@ -413,7 +413,7 @@ More outtakes:
             ExtractPackageFileName(output);
 ```
 
-During Case07_AutoRecreateFiles Rework:
+### During Case07_AutoRecreateFiles Rework
 
 ```cs
             //int newBuildNum = GetBuildNumFromXml();
@@ -448,5 +448,31 @@ During Case07_AutoRecreateFiles Rework:
             ExtractPackageFileName(output);
 
         int initBuildNum = GetBuildNumFromXml();
+        Log();
+```
+
+### Case05_Uninstall Outtakes
+
+```cs
+            GetBuildNumFromXml(); // Logs BuildNum
+            string outputInit = Rebuild();
+            ExtractPackageFileName(outputInit); // Logs package name
+            // Don't assert equals: After 1st build BuildNum increments
+
+
+        int buildNum1 = GetBuildNumFromXml();
+        string output1 = Rebuild();
+        string packageName1 = ExtractPackageFileName(output1);
+        IsTrue(packageName1.EndsWith($".{buildNum1}.nupkg"));
+        Log();
+        
+        int buildNum2 = GetBuildNumFromXml();
+        string output2 = Rebuild();
+        string packageName2 = ExtractPackageFileName(output2);
+        IsTrue(packageName2.EndsWith($".{buildNum2}.nupkg"));
+        Log();
+            
+        IsTrue(buildNum1 == buildNum2);
+        IsTrue(string.Equals(packageName1, packageName2));
         Log();
 ```
