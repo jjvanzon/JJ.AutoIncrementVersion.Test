@@ -120,12 +120,17 @@ public class TestBase : IDisposable
         {
             if (Directory.Exists(SolutionDir))
             {
+                Log($"Deleting temp dir: {SolutionDir}");
                 Directory.Delete(SolutionDir, recursive: true);
+            }
+            else
+            {
+                Log($"Temp dir did not exist: {SolutionDir}");
             }
         }
         catch (Exception ex)
         {
-            Log($"⚠ Could not delete isolated folder: {ex.Message}");
+            Log($"Could not delete temp dir: {ex.Message}");
         }
 
         Log(); // Extra for CI
@@ -225,12 +230,7 @@ public class TestBase : IDisposable
         if (condition) throw new Exception(argExpress);
     }
 
-    public void RebuildsIncrementFrom(int from, int repeats = 3)
-    {
-        ThrowIf(repeats > 10);
-        RebuildsIncrement(from, till: from + repeats - 1);
-    }
-    
+    // TODO: Params int[] would also be nice, but clash with repoeats param of other overlod.
     public void RebuildsIncrement(int from, int till)
     {
         ThrowIf(from > till);
@@ -252,6 +252,25 @@ public class TestBase : IDisposable
         }
     }
 
+    /// <summary>
+    /// <para>
+    ///   Repeats rebulds and checks BuildNum increases.
+    /// </para>
+    /// <para>
+    ///   <list type="number">
+    ///     <item>Reads the existing BuildNum.xml</item>
+    ///     <item>Rebuilds</item>
+    ///     <item>Gets the output package file name.</item>
+    ///   </list>
+    /// </para>
+    /// <para>
+    ///   Checks:
+    ///   <list type="bullet">
+    ///     <item>If package name has BuidNum.</item>
+    ///     <item>If BuildNum.xml increments by 1.</item>
+    ///   </list>
+    /// </para>
+    /// </summary>
     public void RebuildsIncrement(int repeats = 3)
     {
         ThrowIf(repeats > 10);
@@ -261,7 +280,7 @@ public class TestBase : IDisposable
         {
             bool isFirst = i != 0;
             bool isLast = i == repeats - 1;
-
+            
             int buildNum = GetBuildNumFromXml();
             string output = Rebuild();
             string packageName = ExtractPackageFileName(output);
