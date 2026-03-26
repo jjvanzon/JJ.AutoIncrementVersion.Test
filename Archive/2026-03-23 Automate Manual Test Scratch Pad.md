@@ -412,3 +412,29 @@ More outtakes:
             string output = Rebuild();
             ExtractPackageFileName(output);
 ```
+
+During Case07_AutoRecreateFiles Rework:
+
+```cs
+            //int newBuildNum = GetBuildNumFromXml();
+            //IsTrue(newBuildNum <= 1);
+
+            GetBuildNumFromXml();
+            string output = Rebuild();
+            ExtractPackageFileName(output);
+            Log();
+
+        LogTitle("Check 1st BuildNum");
+        {
+            int newBuildNum = GetBuildNumFromXml();
+            IsTrue(newBuildNum <= 1);
+            Log("BuildNum starts low");
+        }
+
+    public void RebuildsIncrementFrom(int from, int repeats = 3)
+    {
+        ThrowIf(repeats > 10);
+        RebuildsIncrement(from, till: from + repeats - 1);
+    }
+    
+```

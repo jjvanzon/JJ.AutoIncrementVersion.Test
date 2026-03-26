@@ -21,11 +21,12 @@ public class Case07_AutoRecreateFiles : TestBase
             InitInstalledState();
             IsTrue(DirPropsExists());
             Log();
-            RebuildsIncrement();
+            RebuildsIncrement(repeats: 2);
         }
 
         LogTitle("Delete Dir.Props");
         {
+            IsTrue(DirPropsExists());
             DeleteDirProps();
             IsFalse(DirPropsExists());
         }
@@ -53,31 +54,35 @@ public class Case07_AutoRecreateFiles : TestBase
     /// 4) Versions start at BuildNum 0 or 1 again.
     /// </summary>
     [TestMethod]
-    public void Case07_DeleteBuildNumXml_RecreatesToZeroOrOne()
+    public void Case07_DeleteBuildNumXml_RecreatesResetsToZeroOrOne()
     {
-        // TODO
+        LogTitle("Verify Working State");
         {
             InitInstalledState();
             IsTrue(BuildNumXmlExists());
-            GetBuildNumFromXml();
-            string output = Rebuild();
-            ExtractPackageFileName(output);
             Log();
-        }
-        {
-            DeleteBuildNumXml();
-            IsFalse(BuildNumXmlExists());
-            string output = Rebuild();
-            ExtractPackageFileName(output);
-            IsTrue(BuildNumXmlExists());
-        }
-        {
-            int newBuildNum = GetBuildNumFromXml();
-            IsTrue(newBuildNum <= 1);
-            Log();
+            RebuildsIncrement(repeats: 2);
         }
 
-        RebuildsIncrement();
+        LogTitle("Delete XML");
+        {
+            IsTrue(BuildNumXmlExists());
+            DeleteBuildNumXml();
+            IsFalse(BuildNumXmlExists());
+        }
+        
+        LogTitle("Auto-Create XML");
+        {
+            string output = Rebuild();
+            IsTrue(BuildNumXmlExists());
+            ExtractPackageFileName(output);
+        }
+
+        LogTitle("Continues Operation");
+        {
+            RebuildsIncrement(from: 1, till: 3);
+            Log();
+        }
     }
 
     /// <summary>
@@ -86,42 +91,46 @@ public class Case07_AutoRecreateFiles : TestBase
     [TestMethod]
     public void Case07_DeleteBoth_ShowsSimilarEffect()
     {
+        LogTitle("Verify Working State");
         {
             InitInstalledState();
             IsTrue(BuildNumXmlExists());
+            IsTrue(DirPropsExists());
+            Log();
+            RebuildsIncrement();
+            /*
             GetBuildNumFromXml();
             string output = Rebuild();
             ExtractPackageFileName(output);
-            Log();
+            */
         }
+
+        LogTitle("Delete Files");
         {
             DeleteBuildNumXml();
             IsFalse(BuildNumXmlExists());
             DeleteDirProps();
             IsFalse(DirPropsExists());
-            Log();
         }
+
+        LogTitle("Auto-Create Dir.Props");
         {
             RebuildExpectFail();
             IsTrue(DirPropsExists());
-            IsFalse(BuildNumXmlExists()); // Does not auto-create that soon.
-            Log();
+            IsFalse(BuildNumXmlExists()); // Does not auto-create immediately.
         }
+
+        LogTitle("Auto-Create XML");
         {
             string output = Rebuild();
             IsTrue(DirPropsExists());
             IsTrue(BuildNumXmlExists());
             ExtractPackageFileName(output);
-            Log();
         }
+
+        LogTitle("Continues Operation");
         {
-            int newBuildNum = GetBuildNumFromXml();
-            IsTrue(newBuildNum <= 1);
-            Log("BuildNum starts low");
-            Log();
+            RebuildsIncrement(from: 1, till: 3);
         }
-    
-        RebuildsIncrement();
-        
     }
 }
