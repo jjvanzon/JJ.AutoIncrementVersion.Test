@@ -16,21 +16,26 @@ public class Case02_BuildWithoutPackage : TestBase
     [TestMethod]
     public void Case02_BuildWithoutPackage_ProducesVersionEndingWithZero()
     {
-        InitUninstalled();
-        Log();
+        LogTitle("Initialize");
+        {
+            InitUninstalled();
+            IsFalse(DirPropsExists());
+            IsFalse(BuildNumXmlExists());
+            IsFalse(CsprojHasPackageReference());
+        }
+
+        LogTitle("Version Stays .0");
         {
             string buildOutput = Rebuild();
             string packageFileName = ExtractPackageFileName(buildOutput);
             IsNotNull(packageFileName);
             IsTrue(packageFileName.EndsWith(".0.nupkg"));
-            Log();
         }
         {
             string buildOutput = Rebuild();
             string packageFileName = ExtractPackageFileName(buildOutput);
             IsNotNull(packageFileName);
             IsTrue(packageFileName.EndsWith(".0.nupkg"));
-            Log();
         }
     }
 }
