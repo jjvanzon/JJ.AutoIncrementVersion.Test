@@ -3,7 +3,7 @@
     <AllowCodeAnalysis>False</AllowCodeAnalysis>
     <EnableRDI>False</EnableRDI>
     <FastLaneThreads>1</FastLaneThreads>
-    <MaxNumberOfProcessingThreads>2</MaxNumberOfProcessingThreads>
+    <MaxNumberOfProcessingThreads>6</MaxNumberOfProcessingThreads>
     <RdiConfigured>True</RdiConfigured>
     <SlidingBuildDelayInMilliseconds>20000</SlidingBuildDelayInMilliseconds>
     <SolutionConfigured>True</SolutionConfigured>

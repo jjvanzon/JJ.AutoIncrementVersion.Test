@@ -7,7 +7,7 @@ namespace JJ.AutoIncrementVersion.TestSuite;
 /// Each instance creates an isolated copy of the test files under a random
 /// temp folder so that tests do not interfere with each other or the repo.
 /// </summary>
-public class TestBase : IDisposable
+public abstract class TestBase : IDisposable
 {
     /// <summary>
     /// <para>Verbosity is passed to the build processes executed in this helper.</para>
