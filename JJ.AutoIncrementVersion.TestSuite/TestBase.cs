@@ -428,7 +428,12 @@ public abstract class TestBase : IDisposable
         // ncrunch: no coverage start
         if (!process.WaitForExit(timeoutSeconds * 1000))
         {
+            // TODO: Add Shim to JJ.Framework.
+            #if NETFRAMEWORK
+            process.Kill();
+            #else
             process.Kill(entireProcessTree: true);
+            #endif
             throw new TimeoutException($"{fileName} {arguments} timed out after {timeoutSeconds}s");
         }
         // ncrunch: no coverage end
@@ -571,8 +576,8 @@ public abstract class TestBase : IDisposable
     /// </summary>
     public string ExtractPackageFileName(string output)
     {
-        var match = Match(output, @"(JJ\.AutoIncrementVersion\.Test\.\S+\.nupkg)");
-        var packageFileName = match.Success ? match.Groups[1].Value : null;
+        Match match = Match(output, @"(JJ\.AutoIncrementVersion\.Test\.\S+\.nupkg)");
+        string packageFileName = match.Success ? match.Groups[1].Value : "";
 
         // ncrunch: no coverage start
         if (IsNullOrWhiteSpace(packageFileName))
