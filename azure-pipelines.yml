@@ -1,0 +1,31 @@
+pool:
+  name: Azure Pipelines
+  demands: msbuild
+
+#Your build pipeline references an undefined variable named ‘BuildNum’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
+
+steps:
+- task: janjoostvanzon.buildnum.build-num-task.BuildNum@1
+  displayName: BuildNum
+
+- task: MSBuild@1
+  displayName: MSBuild
+  inputs:
+    solution: JJ.AutoIncrementVersion.Test.sln
+    msbuildArchitecture: x64
+    platform: 'Any CPU'
+    configuration: Release
+    msbuildArguments: '/p:BuildNum=$(BuildNum)'
+
+- task: CopyFiles@2
+  displayName: Stage
+  inputs:
+    Contents: |
+     **/JJ.AutoIncrementVersion.*.nupkg
+     **/JJ.AutoIncrementVersion.*.snupkg
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+  enabled: false
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: drop'
+  enabled: false
