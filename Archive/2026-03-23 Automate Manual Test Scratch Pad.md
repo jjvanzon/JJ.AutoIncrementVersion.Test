@@ -530,7 +530,7 @@ More outtakes:
 
 ```
 
-### More
+### Refactoring RebuildsIncrement
 
 ```cs
         return;
@@ -561,4 +561,77 @@ More outtakes:
             string output = Rebuild();
             string packageName = ExtractPackageFileName(output);
             IsTrue(packageName.EndsWith($".{num}.nupkg"));
+
+            int buildNum = GetBuildNumFromXml();
+            IsTrue(buildNum == init);
+            string output = Rebuild();
+            string packageName = ExtractPackageFileName(output);
+            IsTrue(packageName.EndsWith($".{init}.nupkg"));
+
+        int from = GetBuildNumFromXml(nolog);
+        int to = from + repeats - 1;
+        RebuildsIncrement(from, to);
+
+            Rebuild_IncrementsXml_ButNotOutput(2);
+            Rebuild_IncrementsXml_ButNotOutput(3);
+
+    private void Rebuild_IncrementsXml_ButNotOutput(int expectedBuildNum)
+    {
+        RebuildsWith(expectedBuildNum, package: 0);
+        /*
+        int buildNum = GetBuildNumFromXml();
+        IsTrue(buildNum == expectedBuildNum);
+        string output = Rebuild();
+        string packageName = ExtractPackageFileName(output);
+        IsTrue(packageName.EndsWith(".0.nupkg"));
+        */
+        Log();
+    }
+    
+    
+    /*
+    internal void RebuildsWith(int[] buldNums)
+    {
+        foreach (int buldNum in buldNums)
+        {
+            RebuildsWith(buldNum);
+        }
+
+    }
+    */
+
+    // TODO: Params int[] would also be nice, but clash with repoeats param of other overlod.
+
+    /*
+    /// <inheritdoc cref="_rebuildsincrement" />
+    internal void RebuildsIncrement(int from, int to)
+    {
+        ThrowIf(from > to);
+        ThrowIf(to - from > 11);
+
+        for (int num = from; num <= to; num++)
+        {
+            bool isLast = num == to;
+            RebuildsWith(num);
+            if (!isLast) Log();
+        }
+    }
+    */
+        
+    /*
+    /// <inheritdoc cref="_rebuildsincrement" />
+    internal void RebuildIncrements()
+    {
+        int buildNum = GetBuildNumFromXml(nolog);
+        RebuildsWith(buildNum + 1);
+    }
+    */
+
+    /// <inheritdoc cref="_rebuildsincrement" />
+    internal void RebuildsIncrement() 
+        => RebuildsIncrement(DefaultRepeats);
+
+            RebuildsWith(100);
+            RebuildsWith(101);
+            RebuildsWith(102);
 ```

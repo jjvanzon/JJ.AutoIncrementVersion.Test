@@ -43,7 +43,7 @@ public class Case05_Uninstall : TestBase
         
         LogTitle("Version Freezes");
         {
-            RebuildsWithFrozenVersion();
+            RebuildsFreezeVersion();
         }
     }
 }

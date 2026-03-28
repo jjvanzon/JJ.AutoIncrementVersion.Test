@@ -80,7 +80,7 @@ public class Case07_AutoRecreateFiles : TestBase
 
         LogTitle("Continues Operation");
         {
-            RebuildsIncrement(from: 1, to: 3);
+            RebuildsIncrement(from: 1);
             Log();
         }
     }
@@ -130,7 +130,7 @@ public class Case07_AutoRecreateFiles : TestBase
 
         LogTitle("Continues Operation");
         {
-            RebuildsIncrement(from: 1, to: 3);
+            RebuildsIncrement(from: 1);
         }
     }
 }

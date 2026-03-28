@@ -39,7 +39,7 @@ public class Case06_Reinstall : TestBase
 
         LogTitle("Version Freezes");
         {
-            RebuildsWithFrozenVersion(repeats: 2);
+            RebuildsFreezeVersion(repeats: 2);
         }
 
         LogTitle("Reinstall");

@@ -47,19 +47,9 @@ public class Case03_Install : TestBase
 
         LogTitle("Increments Not Used Yet");
         {
-            Rebuild_IncrementsXml_ButNotOutput(1);
-            Rebuild_IncrementsXml_ButNotOutput(2);
-            Rebuild_IncrementsXml_ButNotOutput(3);
+            RebuildsWith(buildNum: 1, packNum: 0);
+            RebuildsWith(buildNum: 2, packNum: 0);
+            RebuildsWith(buildNum: 3, packNum: 0);
         }
-    }
-
-    private void Rebuild_IncrementsXml_ButNotOutput(int expectedBuildNum)
-    {
-        int buildNum = GetBuildNumFromXml();
-        IsTrue(buildNum == expectedBuildNum);
-        string output = Rebuild();
-        string packageName = ExtractPackageFileName(output);
-        IsTrue(packageName.EndsWith(".0.nupkg"));
-        Log();
     }
 }

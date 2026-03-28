@@ -16,8 +16,8 @@ public abstract class TestBase : IDisposable
     /// - <c>Normal</c> and <c>Minimal</c> will only check silently for errors internally.<br/>
     /// - <c>Quiet</c> won't work, because it'll swallow diagnostics used by the logic.
     /// </summary>
-    private const string Verbosity = Verbosities.Minimal;
-    private const int DefaultRepeats = 3;
+    private const string VERBOSITY = Verbosities.Minimal;
+    private const int DEFAULT_REPEATS = 3;
 
     // Paths
 
@@ -224,71 +224,60 @@ public abstract class TestBase : IDisposable
         if (condition) throw new Exception(argExpress);
     }
 
-    internal void RebuildsWithFrozenVersion(int repeats = DefaultRepeats)
+    /// <inheritdoc cref="_rebuildsincrement" />
+    internal void RebuildsWith(int buildNum, int packNum)
     {
-        int init = GetBuildNumFromXml(nolog);
-        for (int i = 0; i < repeats; i++)
-        {
-            bool isLast = i == repeats - 1;
-            RebuildsWithBuildNum(init);
-            if (!isLast) Log();
-        }    
+        int expectedBuildNum = buildNum;
+        int actualBuildNum = GetBuildNumFromXml();
+        IsTrue(actualBuildNum == expectedBuildNum);
+        string output = Rebuild();
+        string packageName = ExtractPackageFileName(output);
+        IsTrue(packageName.EndsWith($".{packNum}.nupkg"));
+    }
+    
+    /// <inheritdoc cref="_rebuildsincrement" />
+    internal void RebuildsWith(int buildNum)
+    {
+        int packNum = buildNum;
+        RebuildsWith(buildNum, packNum);
     }
 
-    // TODO: Params int[] would also be nice, but clash with repoeats param of other overlod.
-    internal void RebuildsIncrement(int from, int to)
+    /// <inheritdoc cref="_rebuildsincrement" />
+    internal void RebuildsIncrement(int repeats = DEFAULT_REPEATS)
     {
-        ThrowIf(from > to);
-        ThrowIf(to - from > 11);
+        int from = GetBuildNumFromXml(nolog);
+        RebuildsIncrement(from, repeats);
+    }
 
+    /// <inheritdoc cref="_rebuildsincrement" />
+    // ReSharper disable once UnusedParameter.Global
+    // ReSharper disable once MethodOverloadWithOptionalParameter
+    internal void RebuildsIncrement(int from, NameOvl nameOvl = default) 
+        => RebuildsIncrement(from, DEFAULT_REPEATS);
+
+    /// <inheritdoc cref="_rebuildsincrement" />
+    private void RebuildsIncrement(int from, int repeats)
+    {
+        ThrowIf(from < 0);
+        ThrowIf(repeats > 10);
+        int to = from + repeats - 1;
         for (int num = from; num <= to; num++)
         {
             bool isLast = num == to;
-            RebuildsWithBuildNum(num);
+            RebuildsWith(num);
             if (!isLast) Log();
         }
     }
-    /// <summary>
-    /// <para>
-    ///   Repeats rebulds and checks BuildNum increases.
-    /// </para>
-    /// <para>
-    ///   <list type="number">
-    ///     <item>Reads the existing BuildNum.xml</item>
-    ///     <item>Rebuilds</item>
-    ///     <item>Gets the output package file name.</item>
-    ///   </list>
-    /// </para>
-    /// <para>
-    ///   Checks:
-    ///   <list type="bullet">
-    ///     <item>If package name has BuidNum.</item>
-    ///     <item>If BuildNum.xml increments by 1.</item>
-    ///   </list>
-    /// </para>
-    /// </summary>
-    internal void RebuildsIncrement(int repeats = DefaultRepeats)
+    
+    internal void RebuildsFreezeVersion(int repeats = DEFAULT_REPEATS)
     {
-        ThrowIf(repeats > 10);
-
-        int init = GetBuildNumFromXml(nolog);
-
-        for (int num = init; num <= init + repeats - 1; num++)
+        int frozen = GetBuildNumFromXml(nolog);
+        for (int i = 0; i < repeats; i++)
         {
-            RebuildsWithBuildNum(num);
-
-            bool isLast = num == init + repeats - 1;
+            bool isLast = i == repeats - 1;
+            RebuildsWith(frozen);
             if (!isLast) Log();
-        }
-    }
-
-    internal void RebuildsWithBuildNum(int expected)
-    {
-        int buildNum = GetBuildNumFromXml();
-        IsTrue(buildNum == expected);
-        string output = Rebuild();
-        string packageName = ExtractPackageFileName(output);
-        IsTrue(packageName.EndsWith($".{expected}.nupkg"));
+        }    
     }
 
     /// <summary>
@@ -329,21 +318,21 @@ public abstract class TestBase : IDisposable
     {
         Log("Rebuild");
         //return RunProcess("dotnet", $"build \"{CsprojFilePath}\" -c Release -v {Verbosity} --no-incremental --no-restore");
-        return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{Verbosity}");
+        return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{VERBOSITY}");
     }
 
     internal string Rebuild(string? extraArgs)
     {
         Log($"Rebuild with {extraArgs}");
         //return RunProcess("dotnet"`, $"build \"{CsprojFilePath}\" -c Release -v {Verbosity} --no-incremental --no-restore {extraArgs}");
-        return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{Verbosity} {extraArgs}");
+        return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{VERBOSITY} {extraArgs}");
     }
 
     internal string RebuildDebug()
     {
         Log("Rebuild Debug");
         //return RunProcess("dotnet", $"build \"{CsprojFilePath}\" -c Debug -v {Verbosity} --no-incremental --no-restore");
-        return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Debug /v:{Verbosity}");
+        return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Debug /v:{VERBOSITY}");
     }
 
     internal void InstallPackage()
@@ -408,8 +397,8 @@ public abstract class TestBase : IDisposable
         var output = outputSB.ToString().TrimEnd();
         var error = errorSB.ToString().Trim();
 
-        if (string.Equals(Verbosity, "Diagnostic", OrdinalIgnoreCase) ||
-            string.Equals(Verbosity, "Detailed", OrdinalIgnoreCase))
+        if (string.Equals(VERBOSITY, "Diagnostic", OrdinalIgnoreCase) ||
+            string.Equals(VERBOSITY, "Detailed", OrdinalIgnoreCase))
         {
             Log($"Exit Code = {process.ExitCode}");
             Log($"Error = {error}");

@@ -33,19 +33,9 @@ public class Case09_Conditionals : TestBase
         }
         LogTitle("But Debug Uses 0");
         {
-            int buildNum = GetBuildNumFromXml();
-            IsTrue(buildNum != 0);
-            string output = RebuildDebug();
-            string packageName = ExtractPackageFileName(output);
-            IsTrue(packageName.EndsWith(".0.nupkg"));
+            RebuildDebugUses0();
             Log();
-        }
-        {
-            int buildNum = GetBuildNumFromXml();
-            IsTrue(buildNum != 0);
-            string output = RebuildDebug();
-            string packageName = ExtractPackageFileName(output);
-            IsTrue(packageName.EndsWith(".0.nupkg"));
+            RebuildDebugUses0();
         }
         LogTitle("Release Continues Incrementing");
         {
@@ -53,19 +43,18 @@ public class Case09_Conditionals : TestBase
         }
         LogTitle("Debug Deactivates BuildNum Again");
         {
-            int buildNum = GetBuildNumFromXml();
-            IsTrue(buildNum != 0);
-            string output = RebuildDebug();
-            string packageName = ExtractPackageFileName(output);
-            IsTrue(packageName.EndsWith(".0.nupkg"));
+            RebuildDebugUses0();
             Log();
+            RebuildDebugUses0();
         }
-        {
-            int buildNum = GetBuildNumFromXml();
-            IsTrue(buildNum != 0);
-            string output = RebuildDebug();
-            string packageName = ExtractPackageFileName(output);
-            IsTrue(packageName.EndsWith(".0.nupkg"));
-        }
+    }
+
+    private void RebuildDebugUses0()
+    {
+        int buildNum = GetBuildNumFromXml();
+        IsTrue(buildNum != 0);
+        string output = RebuildDebug();
+        string packageName = ExtractPackageFileName(output);
+        IsTrue(packageName.EndsWith(".0.nupkg"));
     }
 }

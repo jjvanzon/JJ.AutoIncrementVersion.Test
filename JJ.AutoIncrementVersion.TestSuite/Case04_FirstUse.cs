@@ -48,7 +48,7 @@ public class Case04_FirstUse : TestBase
 
         LogTitle("Next Builds Increment");
         {
-            RebuildsIncrement(from: 1, to: 3);
+            RebuildsIncrement(from: 1);
         }
     }
 }

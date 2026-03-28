@@ -21,13 +21,13 @@ public class Case10_CommandLineBuild : TestBase
         LogTitle("Explicit BuildNum from Command Line");
         {
             GetBuildNumFromXml();
-            string buildOutput = Rebuild("/p:BuildNum=9999");
-            string packageName = ExtractPackageFileName(buildOutput);
+            string output = Rebuild("/p:BuildNum=9999");
+            string packageName = ExtractPackageFileName(output);
             IsTrue(packageName.EndsWith(".9999.nupkg"));
         }
         LogTitle("Continues New Range");
         {
-            RebuildsIncrement(from: 10000, to: 10002);
+            RebuildsIncrement(from: 10000);
         }
     }
 }
