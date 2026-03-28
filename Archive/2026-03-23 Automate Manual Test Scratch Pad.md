@@ -529,3 +529,36 @@ More outtakes:
     }
 
 ```
+
+### More
+
+```cs
+        return;
+        #if DEBUG
+        Debug.WriteLine(message);
+        #else
+        Console.WriteLine(message);
+        #endif
+
+        //int prevBuildNum = default;
+
+
+            int buildNum = GetBuildNumFromXml();
+            string output = Rebuild();
+            string packageName = ExtractPackageFileName(output);
+            IsTrue(packageName.EndsWith($".{buildNum}.nupkg"));
+
+            if (isFirst)
+            {
+                IsTrue(buildNum == prevBuildNum + 1);
+            }
+
+            prevBuildNum = buildNum;
+
+
+            int buildNum = GetBuildNumFromXml();
+            AreEqual(num, buildNum);
+            string output = Rebuild();
+            string packageName = ExtractPackageFileName(output);
+            IsTrue(packageName.EndsWith($".{num}.nupkg"));
+```

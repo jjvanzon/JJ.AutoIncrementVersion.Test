@@ -32,7 +32,7 @@ public abstract class TestBase : IDisposable
 
     // Init / Cleanup
 
-    public TestBase()
+    internal TestBase()
     {
         // Create a random isolated folder in the system temp directory
         // (outside the repo tree, so MSBuild won't pick up the repo's Directory.Build.props).
@@ -48,7 +48,7 @@ public abstract class TestBase : IDisposable
     /// Re-extracts all embedded test files to the isolated folder,
     /// restoring them to their original state (replaces git restore).
     /// </summary>
-    public void InitInstalledState()
+    internal void InitInstalledState()
     {
         Log("Init installed state");
         CreateDir(SolutionDir);
@@ -68,7 +68,7 @@ public abstract class TestBase : IDisposable
     /// uninstall package, delete BuildNum.xml &amp; Directory.Build.props,
     /// replace $(BuildNum) with 0 in csproj.
     /// </summary>
-    public void InitUninstalled()
+    internal void InitUninstalled()
     {
         Log("Init uninstalled");
         CreateDir(SolutionDir);
@@ -107,7 +107,7 @@ public abstract class TestBase : IDisposable
     /// <summary>
     /// Deletes the isolated temp folder and all its contents.
     /// </summary>
-    public void Cleanup()
+    internal void Cleanup()
     {
         #if DEBUG
         return;
@@ -140,7 +140,7 @@ public abstract class TestBase : IDisposable
         #pragma warning restore CS0162 // Unreachable code
     }
 
-    public void Dispose()
+    void IDisposable.Dispose()
     {
         Cleanup();
         GC.SuppressFinalize(this);
@@ -153,12 +153,12 @@ public abstract class TestBase : IDisposable
     /// <summary>
     /// Logs a line to the Debug or Console output.
     /// </summary>
-    public void Log(string message = "")
+    internal void Log(string message = "")
     {
         Trace.WriteLine(message);
     }
 
-    public void LogTitle(string title = "")
+    internal void LogTitle(string title = "")
     {
         Log();
         Log(title);
@@ -168,14 +168,14 @@ public abstract class TestBase : IDisposable
 
     // File Helpers
 
-    public bool   BuildNumXmlExists()              => Exists(BuildNumXmlFilePath);
-    public bool   DirPropsExists()                 => Exists(DirPropsFilePath);
-    public string ReadBuildNumXml()                => ReadAllText(BuildNumXmlFilePath);
-    public string ReadDirProps()                   => ReadAllText(DirPropsFilePath);
-    public void   WriteBuildNumXml(string content) => Save(BuildNumXmlFilePath, content);
-    public void   WriteDirProps(string content)    => Save(DirPropsFilePath, content);
-    public void   DeleteBuildNumXml()              => Delete(BuildNumXmlFilePath);
-    public void   DeleteDirProps()                 => Delete(DirPropsFilePath);
+    internal bool   BuildNumXmlExists()              => Exists(BuildNumXmlFilePath);
+    internal bool   DirPropsExists()                 => Exists(DirPropsFilePath);
+    internal string ReadBuildNumXml()                => ReadAllText(BuildNumXmlFilePath);
+    internal string ReadDirProps()                   => ReadAllText(DirPropsFilePath);
+    internal void   WriteBuildNumXml(string content) => Save(BuildNumXmlFilePath, content);
+    internal void   WriteDirProps(string content)    => Save(DirPropsFilePath, content);
+    internal void   DeleteBuildNumXml()              => Delete(BuildNumXmlFilePath);
+    internal void   DeleteDirProps()                 => Delete(DirPropsFilePath);
 
     private bool Exists(string filePath)
     {
@@ -219,60 +219,35 @@ public abstract class TestBase : IDisposable
     // Run Processes
     
     // TODO: Move to JJ.Framework.
-    public static void ThrowIf(bool condition, [CallerArgumentExpression("condition")] string? argExpress = null)
+    internal static void ThrowIf(bool condition, [CallerArgumentExpression("condition")] string? argExpress = null)
     {
         if (condition) throw new Exception(argExpress);
     }
 
-    public void RebuildsWithFrozenVersion(int repeats = DefaultRepeats)
+    internal void RebuildsWithFrozenVersion(int repeats = DefaultRepeats)
     {
-        int initBuildNum;
-        {
-            initBuildNum = GetBuildNumFromXml();
-            string output = Rebuild();
-            string packageName = ExtractPackageFileName(output);
-            IsTrue(packageName.EndsWith($".{initBuildNum}.nupkg"));
-            Log();
-        }
-
-        for (int i = 1; i < repeats; i++)
+        int init = GetBuildNumFromXml(nolog);
+        for (int i = 0; i < repeats; i++)
         {
             bool isLast = i == repeats - 1;
-            
-            int buildNum = GetBuildNumFromXml();
-            IsTrue(buildNum == initBuildNum);
-            
-            string output = Rebuild();
-
-            string packageName = ExtractPackageFileName(output);
-            IsTrue(packageName.EndsWith($".{initBuildNum}.nupkg"));
-
+            RebuildsWithBuildNum(init);
             if (!isLast) Log();
         }    
     }
 
     // TODO: Params int[] would also be nice, but clash with repoeats param of other overlod.
-    public void RebuildsIncrement(int from, int to)
+    internal void RebuildsIncrement(int from, int to)
     {
         ThrowIf(from > to);
         ThrowIf(to - from > 11);
 
         for (int num = from; num <= to; num++)
         {
-            int buildNum = GetBuildNumFromXml();
-            AreEqual(num, buildNum);
-            string output = Rebuild();
-            string packageName = ExtractPackageFileName(output);
-            IsTrue(packageName.EndsWith($".{num}.nupkg"));
-
             bool isLast = num == to;
-            if (!isLast)
-            {
-                Log();
-            }
+            RebuildsWithBuildNum(num);
+            if (!isLast) Log();
         }
     }
-
     /// <summary>
     /// <para>
     ///   Repeats rebulds and checks BuildNum increases.
@@ -292,40 +267,35 @@ public abstract class TestBase : IDisposable
     ///   </list>
     /// </para>
     /// </summary>
-    public void RebuildsIncrement(int repeats = DefaultRepeats)
+    internal void RebuildsIncrement(int repeats = DefaultRepeats)
     {
         ThrowIf(repeats > 10);
 
-        int prevBuildNum = default;
-        for (int i = 0; i < repeats; i++)
+        int init = GetBuildNumFromXml(nolog);
+
+        for (int num = init; num <= init + repeats - 1; num++)
         {
-            bool isFirst = i != 0;
-            bool isLast = i == repeats - 1;
-            
-            int buildNum = GetBuildNumFromXml();
-            string output = Rebuild();
-            string packageName = ExtractPackageFileName(output);
-            IsTrue(packageName.EndsWith($".{buildNum}.nupkg"));
+            RebuildsWithBuildNum(num);
 
-            if (isFirst)
-            {
-                IsTrue(buildNum == prevBuildNum + 1);
-            }
-
-            prevBuildNum = buildNum;
-
-            if (!isLast)
-            {
-                Log();
-            }
+            bool isLast = num == init + repeats - 1;
+            if (!isLast) Log();
         }
+    }
+
+    internal void RebuildsWithBuildNum(int expected)
+    {
+        int buildNum = GetBuildNumFromXml();
+        IsTrue(buildNum == expected);
+        string output = Rebuild();
+        string packageName = ExtractPackageFileName(output);
+        IsTrue(packageName.EndsWith($".{expected}.nupkg"));
     }
 
     /// <summary>
     /// The first build may fail because $(BuildNum) resolves to empty.
     /// This is expected per the manual plan.
     /// </summary>
-    public void RebuildExpectFail()
+    internal void RebuildExpectFail()
     {
         const string expected = "not a valid version string";
 
@@ -355,28 +325,28 @@ public abstract class TestBase : IDisposable
         Log($"Build succeeded while expecting error: '{expected}'. Output: {output}"); // ncrunch: no coverage
     }
 
-    public string Rebuild()
+    internal string Rebuild()
     {
         Log("Rebuild");
         //return RunProcess("dotnet", $"build \"{CsprojFilePath}\" -c Release -v {Verbosity} --no-incremental --no-restore");
         return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{Verbosity}");
     }
 
-    public string Rebuild(string? extraArgs)
+    internal string Rebuild(string? extraArgs)
     {
         Log($"Rebuild with {extraArgs}");
         //return RunProcess("dotnet"`, $"build \"{CsprojFilePath}\" -c Release -v {Verbosity} --no-incremental --no-restore {extraArgs}");
         return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{Verbosity} {extraArgs}");
     }
 
-    public string RebuildDebug()
+    internal string RebuildDebug()
     {
         Log("Rebuild Debug");
         //return RunProcess("dotnet", $"build \"{CsprojFilePath}\" -c Debug -v {Verbosity} --no-incremental --no-restore");
         return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Debug /v:{Verbosity}");
     }
 
-    public void InstallPackage()
+    internal void InstallPackage()
     {
         Log("Install package");
         string version = GetEmbeddedPackageVersion();
@@ -384,7 +354,7 @@ public abstract class TestBase : IDisposable
         Restore();
       }
 
-    public void UninstallPackage()
+    internal void UninstallPackage()
     {
         Log("Uninstall package");
         RunProcess("dotnet", $"remove \"{CsprojFilePath}\" package {PackageId}");
@@ -464,19 +434,26 @@ public abstract class TestBase : IDisposable
 
     // Inspect/Write Values
 
-    public int GetBuildNumFromXml()
+    internal int GetBuildNumFromXml()
+    {
+        int value = GetBuildNumFromXml(nolog);
+        Log($"BuildNum.xml = {value}");
+        return value;
+    }
+
+    // ReSharper disable once UnusedParameter.Global
+    internal int GetBuildNumFromXml(NoLog nolog)
     {
         var doc = XDocument.Load(BuildNumXmlFilePath);
         var elements = doc.Descendants("BuildNum").ToArray();
         AreEqual(1, elements.Length);
         IsNotNull(elements[0]);
         string str = elements[0].Value;
-        Log($"BuildNum.xml = {str}");
         var value = int.Parse(str);
         return value;
     }
 
-    public void SetBuildNumInXml(int num)
+    internal void SetBuildNumInXml(int num)
     {
         Log("Set BuildNum.xml to " + num);
         var doc = XDocument.Load(BuildNumXmlFilePath);
@@ -524,7 +501,7 @@ public abstract class TestBase : IDisposable
     /// Sets csproj Version to &lt;major&gt;.&lt;minor&gt;.0,
     /// extracting major.minor from the current csproj Version value.
     /// </summary>
-    public void SetProjPatchNum(string patch)
+    internal void SetProjPatchNum(string patch)
     {
         string majorMinor = GetCsprojMajorMinor();
         SetCsprojVersion($"{majorMinor}.{patch}"); // Logs
@@ -533,7 +510,7 @@ public abstract class TestBase : IDisposable
     /// <summary>
     /// Checks whether the csproj currently references the package.
     /// </summary>
-    public bool CsprojHasPackageReference()
+    internal bool CsprojHasPackageReference()
     {
         string text = ReadAllText(CsprojFilePath);
         var hasRef = text.Contains($"Include=\"{PackageId}\"", OrdinalIgnoreCase);
@@ -555,7 +532,7 @@ public abstract class TestBase : IDisposable
     /// Removes the JJ.AutoIncrementVersion PackageReference from the csproj
     /// by editing the file directly (no dotnet CLI needed).
     /// </summary>
-    public void RemovePackageReferenceFromCsproj()
+    internal void RemovePackageReferenceFromCsproj()
     {
         Log("Remove package reference");
         string text = ReadAllText(CsprojFilePath);
@@ -568,7 +545,7 @@ public abstract class TestBase : IDisposable
     /// Extracts the nupkg file name (e.g. "JJ.AutoIncrementVersion.Test.4.3.5.nupkg")
     /// from build output.
     /// </summary>
-    public string ExtractPackageFileName(string output)
+    internal string ExtractPackageFileName(string output)
     {
         Match match = Match(output, @"(JJ\.AutoIncrementVersion\.Test\.\S+\.nupkg)");
         string packageFileName = match.Success ? match.Groups[1].Value : "";
@@ -589,7 +566,7 @@ public abstract class TestBase : IDisposable
     /// Ensures Directory.Build.props imports BuildNum.xml only for Release configuration.
     /// If the Release condition is missing, it is inserted.
     /// </summary>
-    public void EnsureDirPropsReleaseCondition()
+    internal void EnsureDirPropsReleaseCondition()
     {
         string content = ReadDirProps();
 
