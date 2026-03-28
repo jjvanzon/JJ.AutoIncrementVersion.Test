@@ -17,6 +17,7 @@ public abstract class TestBase : IDisposable
     /// - <c>Quiet</c> won't work, because it'll swallow diagnostics used by the logic.
     /// </summary>
     private const string Verbosity = Verbosities.Minimal;
+    private const int DefaultRepeats = 3;
 
     // Paths
 
@@ -155,13 +156,6 @@ public abstract class TestBase : IDisposable
     public void Log(string message = "")
     {
         Trace.WriteLine(message);
-        return;
-
-        #if DEBUG
-        Debug.WriteLine(message);
-        #else
-        Console.WriteLine(message);
-        #endif
     }
 
     public void LogTitle(string title = "")
@@ -230,7 +224,7 @@ public abstract class TestBase : IDisposable
         if (condition) throw new Exception(argExpress);
     }
 
-    public void RebuildsWithFrozenVersion(int repeats = 3)
+    public void RebuildsWithFrozenVersion(int repeats = DefaultRepeats)
     {
         int initBuildNum;
         {
@@ -298,7 +292,7 @@ public abstract class TestBase : IDisposable
     ///   </list>
     /// </para>
     /// </summary>
-    public void RebuildsIncrement(int repeats = 3)
+    public void RebuildsIncrement(int repeats = DefaultRepeats)
     {
         ThrowIf(repeats > 10);
 
@@ -429,7 +423,7 @@ public abstract class TestBase : IDisposable
         if (!process.WaitForExit(timeoutSeconds * 1000))
         {
             // TODO: Add Shim to JJ.Framework.
-            #if NETFRAMEWORK
+            #if !NET5_0_OR_GREATER
             process.Kill();
             #else
             process.Kill(entireProcessTree: true);
