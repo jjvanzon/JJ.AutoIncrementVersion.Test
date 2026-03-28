@@ -36,12 +36,13 @@ Manual Test Plan
       (`D:\Repositories\JJ.AutoIncrementVersion.Test`)
 - [x] Delete `BuildNum.xml` 
 - [x] Delete `Directory.Build.props`
-- [x] Open `JJ.AutoIncrementVersion.Test.csproj`
+- [x] Edit `JJ.AutoIncrementVersion.Test.csproj`
 - [x] Replace `$(BuildNum)` with `0`
 
 ### Run Without Package
 
-- [x] Rebuild project
+- [x] Rebuild
+- [x] NOTE: `Rebuild`, don't just `Build`, or "up-to-date" checks may skip the `BuildNum` increments.
 - [x] `Output` shows
       `Successfully created package {...} JJ.AutoIncrementVersion.Test.4.3.0.nupkg` 
       ending with `.0.nupkg`
@@ -49,28 +50,22 @@ Manual Test Plan
 ### Install
 
 - [x] Install `JJ.AutoIncrementVersion` package
-- [x] Rebuild project
-- [x] Note: Rebuild solution may fail at this point.
+- [x] Rebuild
 - [x] `Output` shows `JJ.AutoIncrementVersion.Test.4.3.0.nupkg`
       at least ends with `.0.nupkg`
-- [x] Auto-creates `BuildNum.xml` with content:  
-      `<Project><PropertyGroup><BuildNum>1</BuildNum><DisableFastUpToDateCheck>True</DisableFastUpToDateCheck><BuildNumWasFromXmljj>True</BuildNumWasFromXmljj></PropertyGroup></Project>`
-- [x] Auto-creates `Directory.Build.props` with content:  
-      `<Project><PropertyGroup><BuildNum>0</BuildNum></PropertyGroup><Import Project="BuildNum.xml" Condition="Exists('BuildNum.xml')" /></Project>`
+- [x] Auto-creates `BuildNum.xml`
+- [x] Auto-creates `Directory.Build.props`
 
 ### First Use
 
 - [x] Prepare [Initial State](#set-initial-state) again
 - [x] Install `JJ.AutoIncrementVersion` package.
-- [x] Open `JJ.AutoIncrementVersion.Test.csproj`
+- [x] Edit `JJ.AutoIncrementVersion.Test.csproj`
 - [x] Use `$(BuildNum)` in `<Version>` e.g. `<Version>4.3.$(BuildNum)</Version>`
-- [x] 1st project rebuild should fail:
-      `Invalid NuGet version string: '4.3.'`
+- [x] 1st project rebuild should fail: `Invalid NuGet version string`
 - [x] 2nd project rebuild succeeds.
-- [x] Auto-creates `BuildNum.xml` with content:  
-      `<Project><PropertyGroup><BuildNum>1</BuildNum><DisableFastUpToDateCheck>True</DisableFastUpToDateCheck><BuildNumWasFromXmljj>True</BuildNumWasFromXmljj></PropertyGroup></Project>`
-- [x] Auto-creates `Directory.Build.props` with content:  
-      `<Project><PropertyGroup><BuildNum>0</BuildNum></PropertyGroup><Import Project="BuildNum.xml" Condition="Exists('BuildNum.xml')" /></Project>`
+- [x] Auto-creates `BuildNum.xml`
+- [x] Auto-creates `Directory.Build.props`
 - [x] `Output` shows `Successfully created package .. JJ.AutoIncrementVersion.Test.4.3.0.nupkg` 
 - [x] Subsequent project rebuilds should auto-increment with output showing:  
       `Successfully created package .. JJ.AutoIncrementVersion.Test.4.3.1.nupkg`  
@@ -80,23 +75,22 @@ Manual Test Plan
 
 - [x] Uninstall package
 - [x] .xml and .Build.props should remain
-- [x] Rebuild project should succeed
+- [x] Rebuild should succeed
 - [x] Ver should stay frozen
 
 ### Reinstall
 
 - [x] Reinstall package
-- [x] Rebuild project should succeed, incrementing ver each time.
+- [x] Rebuild should succeed, incrementing ver each time.
 
 ### Auto-Recreate Files
 
 - [x] Delete `Directory.Build.props`
-- [x] Build solution should fail with error:  
-      `NETSDK1018: Invalid NuGet version string: '4.3.'.`
+- [x] Rebuild solution should fail with error: `NETSDK1018: Invalid NuGet version string`
 - [x] But recreated `Directory.Build.props`
 - [x] Subsequent builds succeed, incrementing ver each time.
 - [x] Delete `BuildNum.xml`
-- [x] Build
+- [x] Rebuild
 - [x] `BuildNum.xml` should be recreated
 - [x] Versions will start at `BuildNum` `0` or `1` again.
 - [x] Deleting both shows similar effect.
@@ -104,12 +98,12 @@ Manual Test Plan
 ### Manual Edit
 
 - [x] Restore original `BuildNum.xml`
-- [x] Build
+- [x] Rebuild
 - [x] Versions should continue to increment where it left off.
 - [x] Edit `BuildNum.xml`, setting the `BuildNum` value manually.
-- [x] Build
+- [x] Rebuild
 - [x] Versions start counting at new `BuildNum`
-- [x] And they increment each build.
+- [x] And they increment each rebuild.
 
 ### Conditionals
 
@@ -145,19 +139,20 @@ This tests conditional `BuildNum.xml` inclusion from the `Directory.Build.props`
 
 ### Upgrade Regression
 
-- [x] Test what happens if `BuildNumWasFromXmljj` is removed from `BuildNum.xml` (simulating upgrade path)
+- [x] Test what happens if the `<BuildNumWasFromXmljj>` element is removed from `BuildNum.xml`
+      (simulating upgrade path)
 - [x] Restores `BuildNumWasFromXmljj`
 - [x] Continues to increment build numbers.
 
 ### CI Integration
 
-- [x] Build project(s) (preferably in parallel) in CI
-- [x] See what the version numbers do.
-- [x] If they flip between current and next BuildNum arbitrarily:
-- [x] Use `BuildNum` task from Visual Studio Marketplace
-- [x] Add `/p:BuildNum=$(BuildNum)` to build args.
-- [x] This freezes the BuildNum for the whole pipeline run to the initial value.
+- [ ] Build project(s) (preferably in parallel) in CI
+- [ ] See what the version numbers do.
+- [ ] If they flip between current and next BuildNum arbitrarily:
+- [ ] Use `BuildNum` task from Visual Studio Marketplace
+- [ ] Add `/p:BuildNum=$(BuildNum)` to build args.
+- [ ] This freezes the BuildNum for the whole pipeline run to the initial value.
 
 ### Real-Life Test
 
-- [x] Check if it functions in real-life projects before publishing to NuGet.
+- [ ] Check if it functions in real-life projects before publishing to NuGet.
