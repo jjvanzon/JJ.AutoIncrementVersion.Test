@@ -5,11 +5,21 @@ pool:
   name: Self-Hosted Agent Pool
   demands: msbuild
 
-#Your build pipeline references an undefined variable named ‘BuildNum’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
-
 steps:
 - task: janjoostvanzon.buildnum.build-num-task.BuildNum@1
   displayName: BuildNum
+
+- task: NuGetToolInstaller@1
+  displayName: 'Use NuGet'
+  inputs:
+    checkLatest: true
+
+- task: NuGetCommand@2
+  displayName: 'Restore with Dev-Feed'
+  inputs:
+    restoreSolution: 'JJ.AutoIncrementVersion.Test.sln'
+    vstsFeed: '1de16010-421a-41a5-90f1-86e9513f2c5b/9ca4377d-62fa-4ac5-9da7-59fe48a43b8c'
+  continueOnError: true
 
 - task: MSBuild@1
   displayName: MSBuild
