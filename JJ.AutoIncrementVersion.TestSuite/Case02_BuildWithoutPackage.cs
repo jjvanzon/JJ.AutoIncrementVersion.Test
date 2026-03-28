@@ -30,6 +30,7 @@ public class Case02_BuildWithoutPackage : TestBase
             string packageFileName = ExtractPackageFileName(buildOutput);
             IsNotNull(packageFileName);
             IsTrue(packageFileName.EndsWith(".0.nupkg"));
+            Log();
         }
         {
             string buildOutput = Rebuild();

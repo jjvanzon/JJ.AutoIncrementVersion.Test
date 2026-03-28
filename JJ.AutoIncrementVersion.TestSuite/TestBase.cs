@@ -17,7 +17,12 @@ public abstract class TestBase : IDisposable
     /// - <c>Quiet</c> won't work, because it'll swallow diagnostics used by the logic.
     /// </summary>
     private const string VERBOSITY = Verbosities.Minimal;
+
+    #if NCRUNCH
+    private const int DEFAULT_REPEATS = 2;
+    #else
     private const int DEFAULT_REPEATS = 3;
+    #endif
 
     // Paths
 
@@ -89,12 +94,12 @@ public abstract class TestBase : IDisposable
         Directory.CreateDirectory(path);
     }
 
-    private void InitCsproj             () => ExtractResource(ProjectDir, TestProjectName + ".csproj");
+    private void InitCsproj()              => ExtractResource(ProjectDir, TestProjectName + ".csproj");
     private void InitDirectoryBuildProps() => ExtractResource(SolutionDir, "Directory.Build.props");
-    private void InitBuildNumXml        () => ExtractResource(SolutionDir, "BuildNum.xml");
-    private void InitDummyTxt           () => ExtractResource(ProjectDir, "Dummy.txt");
-    private void InitReadMe             () => ExtractResource(SolutionDir, "README.md");
-    private void InitNuGetConfig        () => ExtractResource(SolutionDir, "NuGet.config");
+    private void InitBuildNumXml()         => ExtractResource(SolutionDir, "BuildNum.xml");
+    private void InitDummyTxt()            => ExtractResource(ProjectDir, "Dummy.txt");
+    private void InitReadMe()              => ExtractResource(SolutionDir, "README.md");
+    private void InitNuGetConfig()         => ExtractResource(SolutionDir, "NuGet.config");
 
     private void ExtractResource(string targetFolder, string fileName)
     {
@@ -153,10 +158,7 @@ public abstract class TestBase : IDisposable
     /// <summary>
     /// Logs a line to the Debug or Console output.
     /// </summary>
-    internal void Log(string message = "")
-    {
-        Trace.WriteLine(message);
-    }
+    internal void Log(string message = "") => Trace.WriteLine(message);
 
     internal void LogTitle(string title = "")
     {
@@ -252,7 +254,7 @@ public abstract class TestBase : IDisposable
     /// <inheritdoc cref="_rebuildsincrement" />
     // ReSharper disable once UnusedParameter.Global
     // ReSharper disable once MethodOverloadWithOptionalParameter
-    internal void RebuildsIncrement(int from, NameOvl nameOvl = default) 
+    internal void RebuildsIncrement(int from, OverloadByName nameOvl = default) 
         => RebuildsIncrement(from, DEFAULT_REPEATS);
 
     /// <inheritdoc cref="_rebuildsincrement" />
