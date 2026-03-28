@@ -1,0 +1,12 @@
+﻿<SolutionConfiguration>
+  <Settings>
+    <AllowCodeAnalysis>False</AllowCodeAnalysis>
+    <DefaultTestTimeout>100000</DefaultTestTimeout>
+    <EnableRDI>False</EnableRDI>
+    <FastLaneThreads>1</FastLaneThreads>
+    <MaxNumberOfProcessingThreads>11</MaxNumberOfProcessingThreads>
+    <RdiConfigured>True</RdiConfigured>
+    <SlidingBuildDelayInMilliseconds>20000</SlidingBuildDelayInMilliseconds>
+    <SolutionConfigured>True</SolutionConfigured>
+  </Settings>
+</SolutionConfiguration>
