@@ -17,14 +17,14 @@ steps:
 - task: NuGetCommand@2
   displayName: 'Restore with Dev-Feed'
   inputs:
-    restoreSolution: 'JJ.AutoIncrementVersion.Test.sln'
+    restoreSolution: 'JJ.AutoIncrementVersion.Dummy.sln'
     vstsFeed: '1de16010-421a-41a5-90f1-86e9513f2c5b/9ca4377d-62fa-4ac5-9da7-59fe48a43b8c'
   continueOnError: true
 
 - task: MSBuild@1
   displayName: MSBuild
   inputs:
-    solution: JJ.AutoIncrementVersion.Test.sln
+    solution: JJ.AutoIncrementVersion.Dummy.sln
     msbuildArchitecture: x64
     platform: 'Any CPU'
     configuration: Release

@@ -1,4 +1,4 @@
-JJ.AutoIncrementVersion.Test
+JJ.AutoIncrementVersion.Dummy
 ============================
 
 Isolated repo with tests for `JJ.AutoIncrementVersion` ([NuGet](https://www.nuget.org/packages/JJ.AutoIncrementVersion), [GitHub](https://github.com/jjvanzon/JJ.AutoIncrementVersion))
@@ -29,14 +29,14 @@ Manual Test Plan
 
 ### Set Initial State
 
-- [x] Open `JJ.AutoIncrementVersion.Test.sln`
+- [x] Open `JJ.AutoIncrementVersion.Dummy.sln`
 - [x] Uninstall existing `JJ.AutoIncrementVersion` package.
 - [x] Go to File Explorer (not Solution Explorer).
 - [x] Go to the repository folder 
-      (`D:\Repositories\JJ.AutoIncrementVersion.Test`)
+      (`D:\Repositories\JJ.AutoIncrementVersion.Dummy`)
 - [x] Delete `BuildNum.xml` 
 - [x] Delete `Directory.Build.props`
-- [x] Edit `JJ.AutoIncrementVersion.Test.csproj`
+- [x] Edit `JJ.AutoIncrementVersion.Dummy.csproj`
 - [x] Replace `$(BuildNum)` with `0`
 
 ### Run Without Package
@@ -44,14 +44,14 @@ Manual Test Plan
 - [x] Rebuild
 - [x] NOTE: `Rebuild`, don't just `Build`, or "up-to-date" checks may skip the `BuildNum` increments.
 - [x] `Output` shows
-      `Successfully created package {...} JJ.AutoIncrementVersion.Test.4.3.0.nupkg` 
+      `Successfully created package {...} JJ.AutoIncrementVersion.Dummy.4.3.0.nupkg` 
       ending with `.0.nupkg`
 
 ### Install
 
 - [x] Install `JJ.AutoIncrementVersion` package
 - [x] Rebuild
-- [x] `Output` shows `JJ.AutoIncrementVersion.Test.4.3.0.nupkg`
+- [x] `Output` shows `JJ.AutoIncrementVersion.Dummy.4.3.0.nupkg`
       at least ends with `.0.nupkg`
 - [x] Auto-creates `BuildNum.xml`
 - [x] Auto-creates `Directory.Build.props`
@@ -60,16 +60,16 @@ Manual Test Plan
 
 - [x] Prepare [Initial State](#set-initial-state) again
 - [x] Install `JJ.AutoIncrementVersion` package.
-- [x] Edit `JJ.AutoIncrementVersion.Test.csproj`
+- [x] Edit `JJ.AutoIncrementVersion.Dummy.csproj`
 - [x] Use `$(BuildNum)` in `<Version>` e.g. `<Version>4.3.$(BuildNum)</Version>`
 - [x] 1st project rebuild should fail: `Invalid NuGet version string`
 - [x] 2nd project rebuild succeeds.
 - [x] Auto-creates `BuildNum.xml`
 - [x] Auto-creates `Directory.Build.props`
-- [x] `Output` shows `Successfully created package .. JJ.AutoIncrementVersion.Test.4.3.0.nupkg` 
+- [x] `Output` shows `Successfully created package .. JJ.AutoIncrementVersion.Dummy.4.3.0.nupkg` 
 - [x] Subsequent project rebuilds should auto-increment with output showing:  
-      `Successfully created package .. JJ.AutoIncrementVersion.Test.4.3.1.nupkg`  
-      `Successfully created package .. JJ.AutoIncrementVersion.Test.4.3.2.nupkg` etc.
+      `Successfully created package .. JJ.AutoIncrementVersion.Dummy.4.3.1.nupkg`  
+      `Successfully created package .. JJ.AutoIncrementVersion.Dummy.4.3.2.nupkg` etc.
 
 ### Uninstall
 

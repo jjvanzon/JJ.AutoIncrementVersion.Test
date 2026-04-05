@@ -10,18 +10,18 @@
 
   <ItemGroup>
     <PackageReference Include="JJ.Framework.Common.Legacy" Version="0.251.5752" />
-    <PackageReference Include="JJ.Framework.PlatformCompatibility.Core.NuGet" Version="4.1.5756" />
+    <PackageReference Include="JJ.Framework.PlatformCompatibility.Core" Version="4.4.6001" />
     <PackageReference Include="JJ.Framework.Testing.Core" Version="4.1.5752" />
     <PackageReference Include="MSTest" Version="3.7.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="..\JJ.AutoIncrementVersion.Test\JJ.AutoIncrementVersion.Test.csproj" Link="TestResources\JJ.AutoIncrementVersion.Test.csproj" />
+    <EmbeddedResource Include="..\JJ.AutoIncrementVersion.Dummy\JJ.AutoIncrementVersion.Dummy.csproj" Link="TestResources\JJ.AutoIncrementVersion.Dummy.csproj" />
     <EmbeddedResource Include="..\Directory.Build.props" Link="TestResources\Directory.Build.props" />
     <EmbeddedResource Include="..\BuildNum.xml" Link="TestResources\BuildNum.xml" />
     <EmbeddedResource Include="..\NuGet.config" Link="TestResources\NuGet.config" />
     <EmbeddedResource Include="..\README.md" Link="TestResources\README.md" />
-    <EmbeddedResource Include="..\JJ.AutoIncrementVersion.Test\Dummy.txt" Link="TestResources\Dummy.txt" />
+    <EmbeddedResource Include="..\JJ.AutoIncrementVersion.Dummy\Dummy.txt" Link="TestResources\Dummy.txt" />
   </ItemGroup>
 
 </Project>

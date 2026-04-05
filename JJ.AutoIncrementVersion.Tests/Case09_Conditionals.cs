@@ -1,4 +1,4 @@
-namespace JJ.AutoIncrementVersion.TestSuite;
+namespace JJ.AutoIncrementVersion.Tests;
 
 [TestClass]
 public class Case09_Conditionals : TestBase

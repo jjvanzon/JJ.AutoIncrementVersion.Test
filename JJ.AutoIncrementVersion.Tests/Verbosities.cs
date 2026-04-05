@@ -1,4 +1,4 @@
-namespace JJ.AutoIncrementVersion.TestSuite;
+namespace JJ.AutoIncrementVersion.Tests;
 
 // ReSharper disable once UnusedType.Local
 internal static class Verbosities

@@ -1,4 +1,4 @@
-namespace JJ.AutoIncrementVersion.TestSuite;
+namespace JJ.AutoIncrementVersion.Tests;
 
 /// <summary>
 /// Helpers for running dotnet CLI commands, manipulating project files,
@@ -33,7 +33,7 @@ public abstract class TestBase : IDisposable
     private string DirPropsFilePath { get; }
 
     private const string PackageId = "JJ.AutoIncrementVersion";
-    private const string TestProjectName = "JJ.AutoIncrementVersion.Test";
+    private const string TestProjectName = "JJ.AutoIncrementVersion.Dummy";
 
     // Init / Cleanup
 
@@ -533,12 +533,12 @@ public abstract class TestBase : IDisposable
     }
 
     /// <summary>
-    /// Extracts the nupkg file name (e.g. "JJ.AutoIncrementVersion.Test.4.3.5.nupkg")
+    /// Extracts the nupkg file name (e.g. "JJ.AutoIncrementVersion.Dummy.4.3.5.nupkg")
     /// from build output.
     /// </summary>
     internal string ExtractPackageFileName(string output)
     {
-        Match match = Match(output, @"(JJ\.AutoIncrementVersion\.Test\.\S+\.nupkg)");
+        Match match = Match(output, @"(JJ\.AutoIncrementVersion\.Dummy\.\S+\.nupkg)");
         string packageFileName = match.Success ? match.Groups[1].Value : "";
 
         // ncrunch: no coverage start

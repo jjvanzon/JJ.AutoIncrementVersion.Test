@@ -1,4 +1,4 @@
-﻿namespace JJ.AutoIncrementVersion.TestSuite.docs;
+﻿namespace JJ.AutoIncrementVersion.Tests.docs;
 
 /// <summary>
 /// <para>
