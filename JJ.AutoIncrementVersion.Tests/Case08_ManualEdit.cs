@@ -36,7 +36,6 @@ public class Case08_ManualEdit : TestBase
         LogTitle("Continues from Manual BuildNum");
         {
             RebuildsIncrement(from: 100);
-            Log();
         }
     }
 }

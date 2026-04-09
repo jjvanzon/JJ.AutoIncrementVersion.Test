@@ -40,7 +40,6 @@ public class Case07_AutoRecreateFiles : TestBase
         LogTitle("Continues Operation");
         {
             RebuildsIncrement();
-            Log();
         }
     }
 
@@ -81,7 +80,6 @@ public class Case07_AutoRecreateFiles : TestBase
         LogTitle("Continues Operation");
         {
             RebuildsIncrement(from: 1);
-            Log();
         }
     }
 
