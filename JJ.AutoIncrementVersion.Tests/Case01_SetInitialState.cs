@@ -9,6 +9,6 @@ public class Case01_SetInitialState : TestBase
         LogTitle("Initial State");
         Log("Should not crash");
         InitUninstalled();
-        Log("Did no crash");
+        Log("Did not crash");
     }
 }
