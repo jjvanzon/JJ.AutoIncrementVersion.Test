@@ -9,8 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JJ.Framework.Common.Legacy" Version="0.253.6073" />
-    <PackageReference Include="JJ.Framework.PlatformCompatibility.Core" Version="4.5.6073" />
+    <PackageReference Include="JJ.Framework.Common.Core" Version="4.6.6251" />
+    <PackageReference Include="JJ.Framework.Common.Legacy" Version="0.254.6251" />
+    <PackageReference Include="JJ.Framework.Existence.Core" Version="4.6.6251" />
+    <PackageReference Include="JJ.Framework.PlatformCompatibility.Core" Version="4.6.6251" />
+    <PackageReference Include="JJ.Framework.Reflection.Legacy" Version="0.254.6251" />
     <PackageReference Include="JJ.Framework.Testing.Core" Version="4.1.5752" />
     <PackageReference Include="MSTest" Version="3.7.3" />
   </ItemGroup>

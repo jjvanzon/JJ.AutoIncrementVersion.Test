@@ -61,7 +61,7 @@ Manual Test Plan
 - [x] Prepare [Initial State](#set-initial-state) again
 - [x] Install `JJ.AutoIncrementVersion` package.
 - [x] Edit `JJ.AutoIncrementVersion.Dummy.csproj`
-- [x] Use `$(BuildNum)` in `<Version>` e.g. `<Version>4.3.$(BuildNum)</Version>`
+- [x] Use `$(BuildNum)` in `<Version>` e.g. `<Version>4.7.$(BuildNum)</Version>`
 - [x] 1st project rebuild should fail: `Invalid NuGet version string`
 - [x] 2nd project rebuild succeeds.
 - [x] Auto-creates `BuildNum.xml`
