@@ -15,6 +15,9 @@ global using static System.Text.RegularExpressions.Regex;
 global using static System.Text.RegularExpressions.RegexOptions;
 global using static System.IO.File;
 global using static System.Reflection.Assembly;
+global using static JJ.Framework.Exceptions.Core.Throw;
 global using static JJ.Framework.Common.Legacy.EmbeddedResourceHelper;
 global using static JJ.Framework.Testing.Core.AssertCore;
 global using static JJ.AutoIncrementVersion.Tests.NoLog;
+global using static JJ.AutoIncrementVersion.Tests.Logger;
+
