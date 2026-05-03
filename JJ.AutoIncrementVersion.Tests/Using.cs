@@ -2,7 +2,6 @@
 global using System.Text;
 global using System.Text.RegularExpressions;
 global using System.Xml.Linq;
-global using System.Runtime.CompilerServices;
 global using Microsoft.VisualStudio.TestTools.UnitTesting;
 global using JJ.Framework.Common.Legacy;
 global using JJ.Framework.Common.Core;
@@ -10,7 +9,7 @@ global using JJ.Framework.Text.Core;
 global using JJ.AutoIncrementVersion.Tests.docs;
 global using static System.String;
 global using static System.StringComparison;
-global using static System.Guid;
+global using static System.Environment;
 global using static System.Text.RegularExpressions.Regex;
 global using static System.Text.RegularExpressions.RegexOptions;
 global using static System.IO.File;

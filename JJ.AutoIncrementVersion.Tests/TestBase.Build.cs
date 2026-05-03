@@ -3,7 +3,7 @@
 public partial class TestBase
 {
     private const int CmdTimeOutSeconds = 120;
-        
+    
     // Run Processes
 
     /// <inheritdoc cref="_rebuildsincrement" />
@@ -99,51 +99,68 @@ public partial class TestBase
     internal string Rebuild()
     {
         Log("Rebuild");
-        //return RunProcess("dotnet", $"build \"{CsprojFilePath}\" -c Release -v {Verbosity} --no-incremental --no-restore");
-        return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{VERBOSITY}");
+        //return RunDotNet($"build \"{CsprojFilePath}\" -c Release -v {Verbosity} --no-incremental --no-restore");
+        return RunDotNet($"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{VERBOSITY}");
     }
 
     internal string Rebuild(string? extraArgs)
     {
         Log($"Rebuild with {extraArgs}");
-        //return RunProcess("dotnet"`, $"build \"{CsprojFilePath}\" -c Release -v {Verbosity} --no-incremental --no-restore {extraArgs}");
-        return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{VERBOSITY} {extraArgs}");
+        //return RunDotNet("dotnet"`, $"build \"{CsprojFilePath}\" -c Release -v {Verbosity} --no-incremental --no-restore {extraArgs}");
+        return RunDotNet($"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{VERBOSITY} {extraArgs}");
     }
 
     internal string RebuildDebug()
     {
         Log("Rebuild Debug");
-        //return RunProcess("dotnet", $"build \"{CsprojFilePath}\" -c Debug -v {Verbosity} --no-incremental --no-restore");
-        return RunProcess("dotnet", $"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Debug /v:{VERBOSITY}");
+        //return RunDotNet($"build \"{CsprojFilePath}\" -c Debug -v {Verbosity} --no-incremental --no-restore");
+        return RunDotNet($"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Debug /v:{VERBOSITY}");
     }
 
     internal void InstallPackage()
     {
         Log("Install package");
         string version = GetEmbeddedPackageVersion();
-        RunProcess("dotnet", $"add \"{CsprojFilePath}\" package {PackageId} --version {version}");
+        RunDotNet($"add \"{CsprojFilePath}\" package {PackageId} --version {version}");
         Restore();
       }
 
     internal void UninstallPackage()
     {
         Log("Uninstall package");
-        RunProcess("dotnet", $"remove \"{CsprojFilePath}\" package {PackageId}");
+        RunDotNet($"remove \"{CsprojFilePath}\" package {PackageId}");
         Restore(); // Or uninstall isn't finalized somehow.
     }
     
     private void Restore()
     {
         Log("Restore");
-        RunProcess("dotnet", $"restore \"{CsprojFilePath}\"");
+        RunDotNet($"restore \"{CsprojFilePath}\"");
     }
 
-    private string RunProcess(string fileName, string arguments)
+    private string RunDotNet(string args)
     {
+        string output = RunDotNetNoLog(args);
+
+        if (string.Equals(VERBOSITY, "Diagnostic", OrdinalIgnoreCase) ||
+            string.Equals(VERBOSITY, "Detailed", OrdinalIgnoreCase))
+        // ncrunch: no coverage start
+        {
+            Log(output);
+        }
+        // ncrunch: no coverage end
+
+        return output;
+    }
+
+    private string RunDotNetNoLog(string args)
+    {
+        const string fileName = "dotnet";
+
         using Process process = Process.Start(new ProcessStartInfo
         {
             FileName = fileName,
-            Arguments = arguments,
+            Arguments = args,
             WorkingDirectory = ProjectDir,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
@@ -158,6 +175,7 @@ public partial class TestBase
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
 
+        string timeOutMessage = "";
         if (!process.WaitForExit(CmdTimeOutSeconds * 1000))
         // ncrunch: no coverage start
         {
@@ -167,7 +185,7 @@ public partial class TestBase
             #else
             process.Kill(entireProcessTree: true);
             #endif
-            throw new TimeoutException($"{fileName} {arguments} timed out after {CmdTimeOutSeconds}s");
+            timeOutMessage = $"{fileName} {args} timed out after {CmdTimeOutSeconds}s";
         }
         // ncrunch: no coverage end
 
@@ -177,29 +195,29 @@ public partial class TestBase
         var output = outputSB.ToString().TrimEnd();
         var error = errorSB.ToString().Trim();
 
-        if (string.Equals(VERBOSITY, "Diagnostic", OrdinalIgnoreCase) ||
-            string.Equals(VERBOSITY, "Detailed", OrdinalIgnoreCase))
-        // ncrunch: no coverage start
-        {
-            Log($"Exit Code = {process.ExitCode}");
-            Log($"Error = {error}");
-            Log($"Output = {output}");
-        }
-        // ncrunch: no coverage end
-
         bool hasExitCode = process.ExitCode != 0;
         bool hasErrorText = !IsNullOrWhiteSpace(error);
+        bool hasOutput = !IsNullOrWhiteSpace(output);
         bool hasErrorInOutput = output.Contains("[error]");
+        bool hasTimeOut = !IsNullOrWhiteSpace(timeOutMessage);
         bool hasError = hasExitCode || hasErrorInOutput; // Don't consider error text, which has welcome messages and such in it these days.
 
         if (hasError)
         {
             throw new Exception(
-                $"{fileName} {arguments} failed " +
-                $"{new { hasExitCode, hasErrorText, hasErrorInOutput }}: " +
-                $"Exit code {process.ExitCode} {error} {output}");
+                $"{fileName} {args} failed " +
+                $"{new { hasExitCode, hasErrorText, hasErrorInOutput, hasTimeOut }}: " +
+                $"{timeOutMessage} " +
+                $"Exit code {process.ExitCode} {error} {output}"); // ncrunch: no coverage
         }
 
-        return $"{error} {output}";
+        //string result = $"{error} {output}";
+        string result = 
+            Join(NewLine,
+                 hasExitCode  ? $"Exit Code = {process.ExitCode}" : "",
+                 hasErrorText ? $"Error = {error}" : "",
+                 hasOutput    ? $"Output = {output}" : "");
+
+        return result;
     }
 }
