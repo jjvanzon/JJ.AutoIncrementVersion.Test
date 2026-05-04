@@ -107,21 +107,21 @@ public partial class TestBase
     {
         Log("Rebuild");
         //return DotNetBuild($"-c Release -v {Verbosity} --no-incremental --no-restore");
-        return MSBuild($"/t:Rebuild /p:Configuration=Release /v:{VERBOSITY}");
+        return MSRebuild($"/p:Configuration=Release /v:{VERBOSITY}");
     }
 
     internal string Rebuild(string extraArgs)
     {
         Log($"Rebuild with {extraArgs}");
         //return DotNetBuild($"-c Release -v {Verbosity} --no-incremental --no-restore {extraArgs}");
-        return MSBuild($"/t:Rebuild /p:Configuration=Release /v:{VERBOSITY} {extraArgs}");
+        return MSRebuild($"/p:Configuration=Release /v:{VERBOSITY} {extraArgs}");
     }
 
     internal string RebuildDebug()
     {
         Log("Rebuild Debug");
         //return DotNetBuild($"-c Debug -v {Verbosity} --no-incremental --no-restore");
-        return MSBuild($"/t:Rebuild /p:Configuration=Debug /v:{VERBOSITY}");
+        return MSRebuild($"/p:Configuration=Debug /v:{VERBOSITY}");
     }
 
     internal void InstallPackage()
@@ -148,6 +148,9 @@ public partial class TestBase
     private string MSBuild(string args)
         => LogIfNeeded(DotNet.MSBuild(Options with { Args = args }));
 
+    private string MSRebuild(string args)
+        => LogIfNeeded(DotNet.MSRebuild(Options with { Args = args }));
+
     //private string DotNetBuild(string args)
     //    => LogIfNeeded(DotNet.Build(Options with { Args = args }));
 
@@ -155,14 +158,13 @@ public partial class TestBase
     //    => LogIfNeeded(DotNet.Exe(Options with { Args = args }));
 
     private string DotNetRestore()
-        => LogIfNeeded(DotNet.Exe("restore", Options));
+        => LogIfNeeded(DotNet.Restore(Options));
 
     private string DotNetInstallPackage(string args)
         => LogIfNeeded(DotNet.Exe("add", Options with { Args = args }));
 
     private string DotNetUninstallPackage(string args)
         => LogIfNeeded(DotNet.Exe("remove", Options with { Args = args }));
-
 
     private static string LogIfNeeded(string output)
     {
