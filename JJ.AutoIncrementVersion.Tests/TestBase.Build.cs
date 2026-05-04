@@ -4,8 +4,13 @@ namespace JJ.AutoIncrementVersion.Tests;
 
 public partial class TestBase
 {
-    private const int CmdTimeOutSec = 120;
-    
+    private DotNetOptions Options { get; set; }
+
+    private void InitDotNetOptions()
+    {
+        Options = new() { Dir = ProjectDir, File = CsprojFilePath, TimeOutSec = 120 };
+    }
+
     // Run Processes
 
     /// <inheritdoc cref="_rebuildsincrement" />
@@ -101,47 +106,63 @@ public partial class TestBase
     internal string Rebuild()
     {
         Log("Rebuild");
-        //return DotNetExe($"build \"{CsprojFilePath}\" -c Release -v {Verbosity} --no-incremental --no-restore");
-        return MSBuild($"\"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{VERBOSITY}");
+        //return DotNetBuild($"-c Release -v {Verbosity} --no-incremental --no-restore");
+        return MSBuild($"/t:Rebuild /p:Configuration=Release /v:{VERBOSITY}");
     }
 
     internal string Rebuild(string extraArgs)
     {
         Log($"Rebuild with {extraArgs}");
-        //return DotNetExe("dotnet"`, $"build \"{CsprojFilePath}\" -c Release -v {Verbosity} --no-incremental --no-restore {extraArgs}");
-        return MSBuild($"\"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{VERBOSITY} {extraArgs}");
+        //return DotNetBuild($"-c Release -v {Verbosity} --no-incremental --no-restore {extraArgs}");
+        return MSBuild($"/t:Rebuild /p:Configuration=Release /v:{VERBOSITY} {extraArgs}");
     }
 
     internal string RebuildDebug()
     {
         Log("Rebuild Debug");
-        //return DotNetExe($"build \"{CsprojFilePath}\" -c Debug -v {Verbosity} --no-incremental --no-restore");
-        return MSBuild($"\"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Debug /v:{VERBOSITY}");
+        //return DotNetBuild($"-c Debug -v {Verbosity} --no-incremental --no-restore");
+        return MSBuild($"/t:Rebuild /p:Configuration=Debug /v:{VERBOSITY}");
     }
 
     internal void InstallPackage()
     {
         Log("Install package");
         string version = GetEmbeddedPackageVersion();
-        DotNetExe($"add \"{CsprojFilePath}\" package {PackageId} --version {version}");
+        DotNetInstallPackage($"package {PackageId} --version {version}");
         Restore();
       }
 
     internal void UninstallPackage()
     {
         Log("Uninstall package");
-        DotNetExe($"remove \"{CsprojFilePath}\" package {PackageId}");
+        DotNetUninstallPackage($"package {PackageId}");
         Restore(); // Or uninstall isn't finalized somehow.
     }
     
     private void Restore()
     {
         Log("Restore");
-        DotNetExe($"restore \"{CsprojFilePath}\"");
+        DotNetRestore();
     }
 
-    private string MSBuild  (string args) => LogIfNeeded(DotNet.MSBuild(new DotNetOptions { Dir = ProjectDir, Args = args, TimeOutSec = CmdTimeOutSec }));
-    private string DotNetExe(string args) => LogIfNeeded(DotNet.Exe(new DotNetOptions { Dir = ProjectDir, Args = args, TimeOutSec = CmdTimeOutSec }));
+    private string MSBuild(string args)
+        => LogIfNeeded(DotNet.MSBuild(Options with { Args = args }));
+
+    private string DotNetBuild(string args)
+        => LogIfNeeded(DotNet.Build(Options with { Args = args }));
+
+    private string DotNetExe(string args)
+        => LogIfNeeded(DotNet.Exe(Options with { Args = args }));
+
+    private string DotNetRestore()
+        => LogIfNeeded(DotNet.Exe(Options with { Command = "restore" }));
+
+    private string DotNetInstallPackage(string args)
+        => LogIfNeeded(DotNet.Exe(Options with { Command = "add", Args = args }));
+
+    private string DotNetUninstallPackage(string args)
+        => LogIfNeeded(DotNet.Exe(Options with { Command = "remove", Args = args }));
+
 
     private static string LogIfNeeded(string output)
     {

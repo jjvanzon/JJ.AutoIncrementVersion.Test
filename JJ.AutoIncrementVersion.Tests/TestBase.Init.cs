@@ -47,6 +47,7 @@ public abstract partial class TestBase : IDisposable
         CsprojFilePath      = Path.Combine(ProjectDir, $"{TestProjectName}.csproj");
         BuildNumXmlFilePath = Path.Combine(SolutionDir, "BuildNum.xml");
         DirPropsFilePath    = Path.Combine(SolutionDir, "Directory.Build.props");
+        InitDotNetOptions();
     }
 
     /// <summary>
