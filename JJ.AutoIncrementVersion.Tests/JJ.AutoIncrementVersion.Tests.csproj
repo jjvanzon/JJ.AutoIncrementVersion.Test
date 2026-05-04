@@ -11,7 +11,7 @@
   <ItemGroup>
     <PackageReference Include="JJ.Framework.Common.Core" Version="4.6.6305" />
     <PackageReference Include="JJ.Framework.Common.Legacy" Version="0.254.6305" />
-    <PackageReference Include="JJ.Framework.Compilation.Core" Version="4.6.6337" />
+    <PackageReference Include="JJ.Framework.Compilation.Core" Version="4.6.6341" />
     <PackageReference Include="JJ.Framework.Existence.Core" Version="4.6.6305" />
     <PackageReference Include="JJ.Framework.PlatformCompatibility.Core" Version="4.6.6305" />
     <PackageReference Include="JJ.Framework.Reflection.Legacy" Version="0.254.6305" />

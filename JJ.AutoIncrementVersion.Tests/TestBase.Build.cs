@@ -4,7 +4,7 @@ namespace JJ.AutoIncrementVersion.Tests;
 
 public partial class TestBase
 {
-    private const int CmdTimeOutSeconds = 120;
+    private const int CmdTimeOutSec = 120;
     
     // Run Processes
 
@@ -140,8 +140,8 @@ public partial class TestBase
         DotNetExe($"restore \"{CsprojFilePath}\"");
     }
 
-    private string MSBuild  (string args) => LogIfNeeded(DotNet.MSBuild(ProjectDir, args, CmdTimeOutSeconds));
-    private string DotNetExe(string args) => LogIfNeeded(DotNet.Execute(ProjectDir, args, CmdTimeOutSeconds));
+    private string MSBuild  (string args) => LogIfNeeded(DotNet.MSBuild(new DotNetOptions { Dir = ProjectDir, Args = args, TimeOutSec = CmdTimeOutSec }));
+    private string DotNetExe(string args) => LogIfNeeded(DotNet.Exe(new DotNetOptions { Dir = ProjectDir, Args = args, TimeOutSec = CmdTimeOutSec }));
 
     private static string LogIfNeeded(string output)
     {
