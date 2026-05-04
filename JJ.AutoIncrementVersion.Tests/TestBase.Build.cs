@@ -148,20 +148,20 @@ public partial class TestBase
     private string MSBuild(string args)
         => LogIfNeeded(DotNet.MSBuild(Options with { Args = args }));
 
-    private string DotNetBuild(string args)
-        => LogIfNeeded(DotNet.Build(Options with { Args = args }));
+    //private string DotNetBuild(string args)
+    //    => LogIfNeeded(DotNet.Build(Options with { Args = args }));
 
-    private string DotNetExe(string args)
-        => LogIfNeeded(DotNet.Exe(Options with { Args = args }));
+    //private string DotNetExe(string args)
+    //    => LogIfNeeded(DotNet.Exe(Options with { Args = args }));
 
     private string DotNetRestore()
-        => LogIfNeeded(DotNet.Exe(Options with { Command = "restore" }));
+        => LogIfNeeded(DotNet.Exe("restore", Options));
 
     private string DotNetInstallPackage(string args)
-        => LogIfNeeded(DotNet.Exe(Options with { Command = "add", Args = args }));
+        => LogIfNeeded(DotNet.Exe("add", Options with { Args = args }));
 
     private string DotNetUninstallPackage(string args)
-        => LogIfNeeded(DotNet.Exe(Options with { Command = "remove", Args = args }));
+        => LogIfNeeded(DotNet.Exe("remove", Options with { Args = args }));
 
 
     private static string LogIfNeeded(string output)
