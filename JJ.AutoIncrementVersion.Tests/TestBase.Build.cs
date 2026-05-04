@@ -102,21 +102,21 @@ public partial class TestBase
     {
         Log("Rebuild");
         //return DotNetExe($"build \"{CsprojFilePath}\" -c Release -v {Verbosity} --no-incremental --no-restore");
-        return DotNetExe($"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{VERBOSITY}");
+        return MSBuild($"\"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{VERBOSITY}");
     }
 
-    internal string Rebuild(string? extraArgs)
+    internal string Rebuild(string extraArgs)
     {
         Log($"Rebuild with {extraArgs}");
         //return DotNetExe("dotnet"`, $"build \"{CsprojFilePath}\" -c Release -v {Verbosity} --no-incremental --no-restore {extraArgs}");
-        return DotNetExe($"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{VERBOSITY} {extraArgs}");
+        return MSBuild($"\"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{VERBOSITY} {extraArgs}");
     }
 
     internal string RebuildDebug()
     {
         Log("Rebuild Debug");
         //return DotNetExe($"build \"{CsprojFilePath}\" -c Debug -v {Verbosity} --no-incremental --no-restore");
-        return DotNetExe($"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Debug /v:{VERBOSITY}");
+        return MSBuild($"\"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Debug /v:{VERBOSITY}");
     }
 
     internal void InstallPackage()
@@ -140,10 +140,11 @@ public partial class TestBase
         DotNetExe($"restore \"{CsprojFilePath}\"");
     }
 
-    private string DotNetExe(string args = "")
+    private string MSBuild  (string args) => LogIfNeeded(DotNet.MSBuild(ProjectDir, args, CmdTimeOutSeconds));
+    private string DotNetExe(string args) => LogIfNeeded(DotNet.Execute(ProjectDir, args, CmdTimeOutSeconds));
+
+    private static string LogIfNeeded(string output)
     {
-        string output = DotNet.Execute(ProjectDir, args, CmdTimeOutSeconds);
-    
         if (string.Equals(VERBOSITY, "Diagnostic", OrdinalIgnoreCase) ||
             string.Equals(VERBOSITY, "Detailed", OrdinalIgnoreCase))
         // ncrunch: no coverage start
