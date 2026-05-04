@@ -1,4 +1,6 @@
-﻿namespace JJ.AutoIncrementVersion.Tests;
+﻿using JJ.Framework.Compilation.Core;
+
+namespace JJ.AutoIncrementVersion.Tests;
 
 public partial class TestBase
 {
@@ -99,49 +101,49 @@ public partial class TestBase
     internal string Rebuild()
     {
         Log("Rebuild");
-        //return RunDotNet($"build \"{CsprojFilePath}\" -c Release -v {Verbosity} --no-incremental --no-restore");
-        return RunDotNet($"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{VERBOSITY}");
+        //return DotNetExe($"build \"{CsprojFilePath}\" -c Release -v {Verbosity} --no-incremental --no-restore");
+        return DotNetExe($"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{VERBOSITY}");
     }
 
     internal string Rebuild(string? extraArgs)
     {
         Log($"Rebuild with {extraArgs}");
-        //return RunDotNet("dotnet"`, $"build \"{CsprojFilePath}\" -c Release -v {Verbosity} --no-incremental --no-restore {extraArgs}");
-        return RunDotNet($"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{VERBOSITY} {extraArgs}");
+        //return DotNetExe("dotnet"`, $"build \"{CsprojFilePath}\" -c Release -v {Verbosity} --no-incremental --no-restore {extraArgs}");
+        return DotNetExe($"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Release /v:{VERBOSITY} {extraArgs}");
     }
 
     internal string RebuildDebug()
     {
         Log("Rebuild Debug");
-        //return RunDotNet($"build \"{CsprojFilePath}\" -c Debug -v {Verbosity} --no-incremental --no-restore");
-        return RunDotNet($"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Debug /v:{VERBOSITY}");
+        //return DotNetExe($"build \"{CsprojFilePath}\" -c Debug -v {Verbosity} --no-incremental --no-restore");
+        return DotNetExe($"msbuild \"{CsprojFilePath}\" /t:Rebuild /p:Configuration=Debug /v:{VERBOSITY}");
     }
 
     internal void InstallPackage()
     {
         Log("Install package");
         string version = GetEmbeddedPackageVersion();
-        RunDotNet($"add \"{CsprojFilePath}\" package {PackageId} --version {version}");
+        DotNetExe($"add \"{CsprojFilePath}\" package {PackageId} --version {version}");
         Restore();
       }
 
     internal void UninstallPackage()
     {
         Log("Uninstall package");
-        RunDotNet($"remove \"{CsprojFilePath}\" package {PackageId}");
+        DotNetExe($"remove \"{CsprojFilePath}\" package {PackageId}");
         Restore(); // Or uninstall isn't finalized somehow.
     }
     
     private void Restore()
     {
         Log("Restore");
-        RunDotNet($"restore \"{CsprojFilePath}\"");
+        DotNetExe($"restore \"{CsprojFilePath}\"");
     }
 
-    private string RunDotNet(string args)
+    private string DotNetExe(string args = "")
     {
-        string output = RunDotNetNoLog(args);
-
+        string output = DotNet.Execute(ProjectDir, args, CmdTimeOutSeconds);
+    
         if (string.Equals(VERBOSITY, "Diagnostic", OrdinalIgnoreCase) ||
             string.Equals(VERBOSITY, "Detailed", OrdinalIgnoreCase))
         // ncrunch: no coverage start
@@ -151,73 +153,5 @@ public partial class TestBase
         // ncrunch: no coverage end
 
         return output;
-    }
-
-    private string RunDotNetNoLog(string args)
-    {
-        const string fileName = "dotnet";
-
-        using Process process = Process.Start(new ProcessStartInfo
-        {
-            FileName = fileName,
-            Arguments = args,
-            WorkingDirectory = ProjectDir,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        })!;
-
-        var outputSB = new StringBuilder();
-        var errorSB = new StringBuilder();
-        process.OutputDataReceived += (_, e) => outputSB.AppendLine(e.Data ?? "");
-        process.ErrorDataReceived += (_, e) => errorSB.AppendLine(e.Data ?? "");
-        process.BeginOutputReadLine();
-        process.BeginErrorReadLine();
-
-        string timeOutMessage = "";
-        if (!process.WaitForExit(CmdTimeOutSeconds * 1000))
-        // ncrunch: no coverage start
-        {
-            // TODO: Add Shim to JJ.Framework.
-            #if !NET5_0_OR_GREATER
-            process.Kill();
-            #else
-            process.Kill(entireProcessTree: true);
-            #endif
-            timeOutMessage = $"{fileName} {args} timed out after {CmdTimeOutSeconds}s";
-        }
-        // ncrunch: no coverage end
-
-        // .NET may flush async after WaitForExit(int); call the parameterless overload.
-        process.WaitForExit();
-
-        var output = outputSB.ToString().TrimEnd();
-        var error = errorSB.ToString().Trim();
-
-        bool hasExitCode = process.ExitCode != 0;
-        bool hasErrorText = !IsNullOrWhiteSpace(error);
-        bool hasOutput = !IsNullOrWhiteSpace(output);
-        bool hasErrorInOutput = output.Contains("[error]");
-        bool hasTimeOut = !IsNullOrWhiteSpace(timeOutMessage);
-        bool hasError = hasExitCode || hasErrorInOutput; // Don't consider error text, which has welcome messages and such in it these days.
-
-        if (hasError)
-        {
-            throw new Exception(
-                $"{fileName} {args} failed " +
-                $"{new { hasExitCode, hasErrorText, hasErrorInOutput, hasTimeOut }}: " +
-                $"{timeOutMessage} " +
-                $"Exit code {process.ExitCode} {error} {output}"); // ncrunch: no coverage
-        }
-
-        //string result = $"{error} {output}";
-        string result = 
-            Join(NewLine,
-                 hasExitCode  ? $"Exit Code = {process.ExitCode}" : "",
-                 hasErrorText ? $"Error = {error}" : "",
-                 hasOutput    ? $"Output = {output}" : "");
-
-        return result;
     }
 }
