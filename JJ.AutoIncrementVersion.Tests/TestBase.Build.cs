@@ -1,4 +1,5 @@
 ﻿using JJ.Framework.Compilation.Core;
+using JJ.Framework.Existence.Core;
 
 namespace JJ.AutoIncrementVersion.Tests;
 
@@ -130,7 +131,7 @@ public partial class TestBase
         string version = GetEmbeddedPackageVersion();
         DotNetInstallPackage($"package {PackageId} --version {version}");
         Restore();
-      }
+    }
 
     internal void UninstallPackage()
     {
@@ -145,31 +146,34 @@ public partial class TestBase
         DotNetRestore();
     }
 
-    private string MSBuild(string args)
-        => LogIfNeeded(DotNet.MSBuild(Options with { Args = args }));
+    //private string MSBuild(string args)
+    //    => LogIfNeeded(DotNet.MSBuild(args, Options));
 
     private string MSRebuild(string args)
-        => LogIfNeeded(DotNet.MSRebuild(Options with { Args = args }));
+    {
+        // This didn't work, because in many cases no explicit restore is done, and a restore of all TargetFrameworks seems necessary.
+        //args += $" -p:TargetFramework={DotNet.RunningTargetFramework}";
+        return LogIfNeeded(DotNet.MSRebuild(args, Options));
+    }
 
     //private string DotNetBuild(string args)
-    //    => LogIfNeeded(DotNet.Build(Options with { Args = args }));
+    //    => LogIfNeeded(DotNet.Build(args, Options));
 
     //private string DotNetExe(string args)
-    //    => LogIfNeeded(DotNet.Exe(Options with { Args = args }));
+    //    => LogIfNeeded(DotNet.Exe(args, Options));
 
     private string DotNetRestore()
         => LogIfNeeded(DotNet.Restore(Options));
 
     private string DotNetInstallPackage(string args)
-        => LogIfNeeded(DotNet.Exe("add", Options with { Args = args }));
+        => LogIfNeeded(DotNet.Exe("add", args, Options));
 
     private string DotNetUninstallPackage(string args)
-        => LogIfNeeded(DotNet.Exe("remove", Options with { Args = args }));
+        => LogIfNeeded(DotNet.Exe("remove", args, Options));
 
     private static string LogIfNeeded(string output)
     {
-        if (string.Equals(VERBOSITY, "Diagnostic", OrdinalIgnoreCase) ||
-            string.Equals(VERBOSITY, "Detailed", OrdinalIgnoreCase))
+        if (VERBOSITY.In("Diagnostic", "Detailed"))
         // ncrunch: no coverage start
         {
             Log(output);
