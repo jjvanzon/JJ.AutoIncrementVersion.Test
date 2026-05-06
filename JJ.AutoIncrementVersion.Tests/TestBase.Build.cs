@@ -9,7 +9,12 @@ public partial class TestBase
 
     private void InitDotNetOptions()
     {
-        Options = new() { Dir = ProjectDir, File = CsprojFilePath, TimeOutSec = 120 };
+        Options = new() 
+        { 
+            Dir = ProjectDir, 
+            File = CsprojFilePath, 
+            TimeOutSec = 120, 
+         };
     }
 
     // Run Processes
