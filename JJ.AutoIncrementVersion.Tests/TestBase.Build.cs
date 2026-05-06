@@ -13,6 +13,7 @@ public partial class TestBase
         { 
             Dir = ProjectDir, 
             File = CsprojFilePath, 
+            Conf = "Release",
             TimeOutSec = 120, 
          };
     }
@@ -112,21 +113,21 @@ public partial class TestBase
     internal string Rebuild()
     {
         Log("Rebuild");
-        //return DotNetBuild($"-c Release -v {Verbosity} --no-incremental --no-restore");
-        return MSRebuild($"/p:Configuration=Release /v:{VERBOSITY}");
+        //return DotNetBuild($"-v {Verbosity} --no-incremental");
+        return MSRebuild($"/v:{VERBOSITY}");
     }
 
     internal string Rebuild(string extraArgs)
     {
         Log($"Rebuild with {extraArgs}");
-        //return DotNetBuild($"-c Release -v {Verbosity} --no-incremental --no-restore {extraArgs}");
-        return MSRebuild($"/p:Configuration=Release /v:{VERBOSITY} {extraArgs}");
+        //return DotNetBuild($"-v {Verbosity} --no-incremental {extraArgs}");
+        return MSRebuild($"/v:{VERBOSITY} {extraArgs}");
     }
 
     internal string RebuildDebug()
     {
         Log("Rebuild Debug");
-        //return DotNetBuild($"-c Debug -v {Verbosity} --no-incremental --no-restore");
+        //return DotNetBuild($"-c Debug -v {Verbosity} --no-incremental");
         return MSRebuild($"/p:Configuration=Debug /v:{VERBOSITY}");
     }
 
@@ -167,13 +168,13 @@ public partial class TestBase
     //private string DotNetExe(string args)
     //    => LogIfNeeded(DotNet.Exe(args, Options));
 
-    private string DotNetRestore()
+    private void DotNetRestore()
         => LogIfNeeded(DotNet.Restore(Options));
 
-    private string DotNetInstallPackage(string id, string ver)
+    private void DotNetInstallPackage(string id, string ver)
         => LogIfNeeded(DotNet.InstallPackage(id, ver, Options));
 
-    private string DotNetUninstallPackage(string args)
+    private void DotNetUninstallPackage(string args)
         => LogIfNeeded(DotNet.Exe("remove", args, Options));
 
     private static string LogIfNeeded(string output)
