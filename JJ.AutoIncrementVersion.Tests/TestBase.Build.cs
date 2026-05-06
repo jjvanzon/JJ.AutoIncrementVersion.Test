@@ -142,7 +142,7 @@ public partial class TestBase
     internal void UninstallPackage()
     {
         Log("Uninstall package");
-        DotNetUninstallPackage($"package {PackageId}");
+        DotNetUninstallPackage(PackageId);
         Restore(); // Or uninstall isn't finalized somehow.
     }
     
@@ -174,8 +174,8 @@ public partial class TestBase
     private void DotNetInstallPackage(string id, string ver)
         => LogIfNeeded(DotNet.InstallPackage(id, ver, Options));
 
-    private void DotNetUninstallPackage(string args)
-        => LogIfNeeded(DotNet.Exe("remove", args, Options));
+    private void DotNetUninstallPackage(string id)
+        => LogIfNeeded(DotNet.UninstallPackage(id, Options));
 
     private static string LogIfNeeded(string output)
     {
