@@ -13,7 +13,7 @@ public partial class TestBase
         { 
             Dir = ProjectDir, 
             File = CsprojFilePath, 
-            Conf = "Release",
+            BuildConf = "Release",
             TimeOutSec = 120, 
          };
     }
