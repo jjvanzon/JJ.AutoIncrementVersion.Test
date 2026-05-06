@@ -129,7 +129,7 @@ public partial class TestBase
     {
         Log("Install package");
         string version = GetEmbeddedPackageVersion();
-        DotNetInstallPackage($"package {PackageId} --version {version}");
+        DotNetInstallPackage(PackageId, version);
         Restore();
     }
 
@@ -165,8 +165,8 @@ public partial class TestBase
     private string DotNetRestore()
         => LogIfNeeded(DotNet.Restore(Options));
 
-    private string DotNetInstallPackage(string args)
-        => LogIfNeeded(DotNet.Exe("add", args, Options));
+    private string DotNetInstallPackage(string id, string ver)
+        => LogIfNeeded(DotNet.InstallPackage(id, ver, Options));
 
     private string DotNetUninstallPackage(string args)
         => LogIfNeeded(DotNet.Exe("remove", args, Options));
