@@ -13,7 +13,8 @@ public partial class TestBase
             File = CsprojFilePath, 
             BuildConf = "Release",
             TimeOutSec = 120,
-            Verbosity = Detailed
+            Verbosity = Detailed,
+            Log = Log
          };
     }
 
@@ -152,39 +153,27 @@ public partial class TestBase
     }
 
     //private string MSBuild(string args)
-    //    => LogIfNeeded(DotNet.MSBuild(args, Options));
+    //    => DotNet.MSBuild(args, Options);
 
     private string MSRebuild(string args = "")
     {
         // This didn't work, because in many cases no explicit restore is done, and a restore of all TargetFrameworks seems necessary.
         //args += $" -p:TargetFramework={DotNet.RunningTargetFramework}";
-        return LogIfNeeded(DotNet.MSRebuild(args, Options));
+        return DotNet.MSRebuild(args, Options);
     }
 
     //private string DotNetBuild(string args)
-    //    => LogIfNeeded(DotNet.Build(args, Options));
+    //    => DotNet.Build(args, Options);
 
     //private string DotNetExe(string args)
-    //    => LogIfNeeded(DotNet.Exe(args, Options));
+    //    => DotNet.Exe(args, Options);
 
     private void DotNetRestore()
-        => LogIfNeeded(DotNet.Restore(Options));
+        => DotNet.Restore(Options);
 
     private void DotNetInstallPackage(string id, string ver)
-        => LogIfNeeded(DotNet.InstallPackage(id, ver, Options));
+        => DotNet.InstallPackage(id, ver, Options);
 
     private void DotNetUninstallPackage(string id)
-        => LogIfNeeded(DotNet.UninstallPackage(id, Options));
-
-    private string LogIfNeeded(string output)
-    {
-        if (Options.Verbosity.In(Diagnostic, Detailed))
-        // ncrunch: no coverage start
-        {
-            Log(output);
-        }
-        // ncrunch: no coverage end
-
-        return output;
-    }
+        => DotNet.UninstallPackage(id, Options);
 }
