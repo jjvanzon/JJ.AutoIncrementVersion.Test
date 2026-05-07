@@ -1,6 +1,4 @@
-﻿using JJ.Framework.Compilation.Core;
-using JJ.Framework.Existence.Core;
-
+﻿
 namespace JJ.AutoIncrementVersion.Tests;
 
 public partial class TestBase
@@ -14,7 +12,8 @@ public partial class TestBase
             Dir = ProjectDir, 
             File = CsprojFilePath, 
             BuildConf = "Release",
-            TimeOutSec = 120, 
+            TimeOutSec = 120,
+            Verbosity = Detailed
          };
     }
 
@@ -113,22 +112,22 @@ public partial class TestBase
     internal string Rebuild()
     {
         Log("Rebuild");
-        //return DotNetBuild($"-v {Verbosity} --no-incremental");
-        return MSRebuild($"/v:{VERBOSITY}");
+        //return DotNetBuild($"--no-incremental");
+        return MSRebuild();
     }
 
     internal string Rebuild(string extraArgs)
     {
         Log($"Rebuild with {extraArgs}");
-        //return DotNetBuild($"-v {Verbosity} --no-incremental {extraArgs}");
-        return MSRebuild($"/v:{VERBOSITY} {extraArgs}");
+        //return DotNetBuild($"--no-incremental {extraArgs}");
+        return MSRebuild(extraArgs);
     }
 
     internal string RebuildDebug()
     {
         Log("Rebuild Debug");
-        //return DotNetBuild($"-c Debug -v {Verbosity} --no-incremental");
-        return MSRebuild($"/p:Configuration=Debug /v:{VERBOSITY}");
+        //return DotNetBuild($"-c Debug --no-incremental");
+        return MSRebuild($"/p:Configuration=Debug");
     }
 
     internal void InstallPackage()
@@ -155,7 +154,7 @@ public partial class TestBase
     //private string MSBuild(string args)
     //    => LogIfNeeded(DotNet.MSBuild(args, Options));
 
-    private string MSRebuild(string args)
+    private string MSRebuild(string args = "")
     {
         // This didn't work, because in many cases no explicit restore is done, and a restore of all TargetFrameworks seems necessary.
         //args += $" -p:TargetFramework={DotNet.RunningTargetFramework}";
@@ -177,9 +176,9 @@ public partial class TestBase
     private void DotNetUninstallPackage(string id)
         => LogIfNeeded(DotNet.UninstallPackage(id, Options));
 
-    private static string LogIfNeeded(string output)
+    private string LogIfNeeded(string output)
     {
-        if (VERBOSITY.In("Diagnostic", "Detailed"))
+        if (Options.Verbosity.In(Diagnostic, Detailed))
         // ncrunch: no coverage start
         {
             Log(output);

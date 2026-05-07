@@ -9,15 +9,6 @@ namespace JJ.AutoIncrementVersion.Tests;
 /// </summary>
 public abstract partial class TestBase : IDisposable
 {
-    /// <summary>
-    /// <para>Verbosity is passed to the build processes executed in this helper.</para>
-    /// Plus:<br/>
-    /// - <c>Diagnostic</c> or <c>Detailed</c> will log all build output.<br/>
-    /// - <c>Normal</c> and <c>Minimal</c> will only check silently for errors internally.<br/>
-    /// - <c>Quiet</c> won't work, because it'll swallow diagnostics used by the logic.
-    /// </summary>
-    private const string VERBOSITY = Verbosities.Minimal;
-
     #if NCRUNCH
     private const int DEFAULT_REPEATS = 2;
     #else
@@ -41,8 +32,7 @@ public abstract partial class TestBase : IDisposable
     {
         // Create a random isolated folder in the system temp directory
         // (outside the repo tree, so MSBuild won't pick up the repo's Directory.Build.props).
-        //SolutionDir       = Path.Combine(Environment.CurrentDirectory, Guid.NewGuid().ToString());
-        SolutionDir         = Path.Combine(Path.GetTempPath(), "JJ.AutoIncrementVersion.TestRuns", Path.GetRandomFileName());
+        SolutionDir         = Path.Combine(Path.GetTempPath(), "JJ.AutoIncrementVersion.TestRuns", Path.GetRandomFileName().Replace(".", ""));
         ProjectDir          = Path.Combine(SolutionDir, TestProjectName);
         CsprojFilePath      = Path.Combine(ProjectDir, $"{TestProjectName}.csproj");
         BuildNumXmlFilePath = Path.Combine(SolutionDir, "BuildNum.xml");
