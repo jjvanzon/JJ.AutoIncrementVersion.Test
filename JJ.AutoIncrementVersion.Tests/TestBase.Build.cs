@@ -13,7 +13,7 @@ public partial class TestBase
             File = CsprojFilePath, 
             BuildConf = "Release",
             TimeOutSec = 120,
-            Verbosity = Detailed,
+            //Verbosity = Detailed,
             Log = Log
          };
     }
@@ -114,22 +114,22 @@ public partial class TestBase
     internal string Rebuild()
     {
         Log("Rebuild");
-        //return DotNet.Build($"--no-incremental", Options);
-        return MSRebuild();
+        //return DotNet.Build("--no-incremental", Options);
+        return DotNet.MSRebuild("", Options);
     }
 
     internal string Rebuild(string extraArgs)
     {
         Log($"Rebuild with {extraArgs}");
         //return DotNet.Build($"--no-incremental {extraArgs}", Options);
-        return MSRebuild(extraArgs);
+        return DotNet.MSRebuild(extraArgs, Options);
     }
 
     internal string RebuildDebug()
     {
         Log("Rebuild Debug");
-        //return DotNet.Build($"-c Debug --no-incremental", Options);
-        return MSRebuild($"/p:Configuration=Debug");
+        //return DotNet.Build("--no-incremental", Options with { BuildConf = "Debug" });
+        return DotNet.MSRebuild(Options with { BuildConf = "Debug" });
     }
 
     internal void InstallPackage()
@@ -153,10 +153,12 @@ public partial class TestBase
         DotNet.Restore(Options);
     }
 
-    private string MSRebuild(string args = "")
+    private string GetTargetFrameworkArg()
     {
-        // This didn't work, because in many cases no explicit restore is done, and a restore of all TargetFrameworks seems necessary.
-        //args += $" -p:TargetFramework={DotNet.RunningTargetFramework}";
-        return DotNet.MSRebuild(args, Options);
+        return "";
+        // This didn't work, because in many cases no explicit restore is done, 
+        // and a restore of all TargetFrameworks seems necessary.
+        // Explicit restores however make the test less representative of what happens in practice.
+        return $" -p:TargetFramework={DotNet.RunningTargetFramework}";
     }
 }
