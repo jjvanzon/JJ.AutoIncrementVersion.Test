@@ -11,3 +11,17 @@ AutoInc ScratchPad
     /// </summary>
     private const string VERBOSITY = Verbosities.Minimal;
 ```
+
+```cs
+
+
+    //private string MSBuild(string args)
+    //    => DotNet.MSBuild(args, Options);
+
+    //private string DotNetBuild(string args)
+    //    => DotNet.Build(args, Options);
+
+    //private string DotNetExe(string args)
+    //    => DotNet.Exe(args, Options);
+
+```

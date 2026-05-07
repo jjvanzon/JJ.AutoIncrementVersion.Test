@@ -105,29 +105,30 @@ public partial class TestBase
             Log($"Build failed: '{expected}'");
             return;
 
-        } // ncrunch: no coverage
+        }
 
-        Log($"Build succeeded while expecting error: '{expected}'. Output: {output}"); // ncrunch: no coverage
+        Log($"Build succeeded while expecting error: '{expected}'. Output: {output}"); 
+        // ncrunch: no coverage end
     }
 
     internal string Rebuild()
     {
         Log("Rebuild");
-        //return DotNetBuild($"--no-incremental");
+        //return DotNet.Build($"--no-incremental", Options);
         return MSRebuild();
     }
 
     internal string Rebuild(string extraArgs)
     {
         Log($"Rebuild with {extraArgs}");
-        //return DotNetBuild($"--no-incremental {extraArgs}");
+        //return DotNet.Build($"--no-incremental {extraArgs}", Options);
         return MSRebuild(extraArgs);
     }
 
     internal string RebuildDebug()
     {
         Log("Rebuild Debug");
-        //return DotNetBuild($"-c Debug --no-incremental");
+        //return DotNet.Build($"-c Debug --no-incremental", Options);
         return MSRebuild($"/p:Configuration=Debug");
     }
 
@@ -135,25 +136,22 @@ public partial class TestBase
     {
         Log("Install package");
         string version = GetEmbeddedPackageVersion();
-        DotNetInstallPackage(PackageId, version);
+        DotNet.InstallPackage(PackageId, version, Options);
         Restore();
     }
 
     internal void UninstallPackage()
     {
         Log("Uninstall package");
-        DotNetUninstallPackage(PackageId);
+        DotNet.UninstallPackage(PackageId, Options);
         Restore(); // Or uninstall isn't finalized somehow.
     }
     
     private void Restore()
     {
         Log("Restore");
-        DotNetRestore();
+        DotNet.Restore(Options);
     }
-
-    //private string MSBuild(string args)
-    //    => DotNet.MSBuild(args, Options);
 
     private string MSRebuild(string args = "")
     {
@@ -161,19 +159,4 @@ public partial class TestBase
         //args += $" -p:TargetFramework={DotNet.RunningTargetFramework}";
         return DotNet.MSRebuild(args, Options);
     }
-
-    //private string DotNetBuild(string args)
-    //    => DotNet.Build(args, Options);
-
-    //private string DotNetExe(string args)
-    //    => DotNet.Exe(args, Options);
-
-    private void DotNetRestore()
-        => DotNet.Restore(Options);
-
-    private void DotNetInstallPackage(string id, string ver)
-        => DotNet.InstallPackage(id, ver, Options);
-
-    private void DotNetUninstallPackage(string id)
-        => DotNet.UninstallPackage(id, Options);
 }
