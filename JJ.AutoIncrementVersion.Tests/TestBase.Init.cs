@@ -125,7 +125,7 @@ public abstract partial class TestBase : IDisposable
         }
         // ncrunch: no coverage end
 
-        Log(); // Extra for CI
+        LogLine(); // Extra for CI
     }
 
     void IDisposable.Dispose()

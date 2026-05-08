@@ -19,9 +19,9 @@ public class Case08_ManualEdit : TestBase
         LogTitle("Verify Initial State");
         {
             InitInstalledState();
-            Log();
+            LogLine();
             RebuildsIncrement(repeats: 2);
-            Log();
+            LogLine();
             var xml = ReadBuildNumXml();
             Log("BuildNum.xml = " + xml.TrimEnd());
         }

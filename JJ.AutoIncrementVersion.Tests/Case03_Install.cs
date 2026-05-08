@@ -48,9 +48,9 @@ public class Case03_Install : TestBase
         LogTitle("Increments Not Used Yet");
         {
             RebuildsWith(buildNum: 1, packNum: 0);
-            Log();
+            LogLine();
             RebuildsWith(buildNum: 2, packNum: 0);
-            Log();
+            LogLine();
             RebuildsWith(buildNum: 3, packNum: 0);
         }
     }

@@ -34,7 +34,7 @@ public class Case09_Conditionals : TestBase
         LogTitle("But Debug Uses 0");
         {
             RebuildDebugUses0();
-            Log();
+            LogLine();
             RebuildDebugUses0();
         }
         LogTitle("Release Continues Incrementing");
@@ -44,7 +44,7 @@ public class Case09_Conditionals : TestBase
         LogTitle("Debug Deactivates BuildNum Again");
         {
             RebuildDebugUses0();
-            Log();
+            LogLine();
             RebuildDebugUses0();
         }
     }

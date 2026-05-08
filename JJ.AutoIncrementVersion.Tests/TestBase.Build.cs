@@ -61,7 +61,7 @@ public partial class TestBase
         {
             bool isLast = num == to;
             RebuildsWith(num);
-            if (!isLast) Log();
+            if (!isLast) LogLine();
         }
     }
     
@@ -72,7 +72,7 @@ public partial class TestBase
         {
             bool isLast = i == repeats - 1;
             RebuildsWith(frozen);
-            if (!isLast) Log();
+            if (!isLast) LogLine();
         }    
     }
 

@@ -20,7 +20,7 @@ public class Case07_AutoRecreateFiles : TestBase
         {
             InitInstalledState();
             IsTrue(DirPropsExists());
-            Log();
+            LogLine();
             RebuildsIncrement(repeats: 2);
         }
 
@@ -59,7 +59,7 @@ public class Case07_AutoRecreateFiles : TestBase
         {
             InitInstalledState();
             IsTrue(BuildNumXmlExists());
-            Log();
+            LogLine();
             RebuildsIncrement(repeats: 2);
         }
 
@@ -94,7 +94,7 @@ public class Case07_AutoRecreateFiles : TestBase
             InitInstalledState();
             IsTrue(BuildNumXmlExists());
             IsTrue(DirPropsExists());
-            Log();
+            LogLine();
             RebuildsIncrement();
             /*
             GetBuildNumFromXml();

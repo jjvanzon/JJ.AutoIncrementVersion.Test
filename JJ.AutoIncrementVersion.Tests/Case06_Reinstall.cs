@@ -16,11 +16,11 @@ public class Case06_Reinstall : TestBase
         LogTitle("Verify Installed State");
         {
             InitInstalledState();
-            Log();
+            LogLine();
             IsTrue(BuildNumXmlExists());
             IsTrue(DirPropsExists());
             IsTrue(CsprojHasPackageReference());
-            Log();
+            LogLine();
             RebuildsIncrement(repeats: 2);
         }
         

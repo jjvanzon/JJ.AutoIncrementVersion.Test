@@ -2,15 +2,14 @@
 
 internal static class Logger
 {
-    // Logging
-
-    internal static void Log(string message = "") => Trace.WriteLine(message);
+    internal static void LogLine() => Log("");
+    internal static void Log(string message) => Trace.WriteLine(message);
 
     internal static void LogTitle(string title = "")
     {
-        Log();
+        LogLine();
         Log(title);
-        string line = "-".Repeat(title.Length);
-        Log(line);
+        string underLine = "-".Repeat(title.Length);
+        Log(underLine);
     }
 }

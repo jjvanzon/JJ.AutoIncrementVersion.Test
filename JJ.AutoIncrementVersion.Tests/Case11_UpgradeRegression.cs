@@ -24,7 +24,7 @@ public class Case11_UpgradeRegression : TestBase
         LogTitle("Verify Working State");
         {
             RebuildsIncrement(repeats: 2);
-            Log();
+            LogLine();
         
             string xml = ReadBuildNumXml();
             IsTrue(xml.Contains("BuildNumWasFromXmljj"));
