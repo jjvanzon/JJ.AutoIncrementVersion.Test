@@ -1,5 +1,4 @@
-﻿
-namespace JJ.AutoIncrementVersion.Tests;
+﻿namespace JJ.AutoIncrementVersion.Tests;
 
 public partial class TestBase
 {
@@ -111,46 +110,22 @@ public partial class TestBase
         // ncrunch: no coverage end
     }
 
-    internal string Rebuild()
-    {
-        Log("Rebuild");
-        //return DotNet.Build("--no-incremental", Options);
-        return DotNet.MSRebuild("", Options);
-    }
-
-    internal string Rebuild(string extraArgs)
-    {
-        Log($"Rebuild with {extraArgs}");
-        //return DotNet.Build($"--no-incremental {extraArgs}", Options);
-        return DotNet.MSRebuild(extraArgs, Options);
-    }
-
-    internal string RebuildDebug()
-    {
-        Log("Rebuild Debug");
-        //return DotNet.Build("--no-incremental", Options with { BuildConf = "Debug" });
-        return DotNet.MSRebuild(Options with { BuildConf = "Debug" });
-    }
+    internal string Rebuild()                 => DotNet.MSRebuild(Options);
+    internal string Rebuild(string extraArgs) => DotNet.MSRebuild(extraArgs, Options);
+    internal string RebuildDebug()            => DotNet.MSRebuild(Options with { BuildConf = "Debug" });
+    private  void   Restore()                 => DotNet.Restore(Options);
 
     internal void InstallPackage()
     {
-        Log("Install package");
-        string version = GetEmbeddedPackageVersion();
-        DotNet.InstallPackage(PackageId, version, Options);
+        string ver = GetEmbeddedPackageVersion();
+        DotNet.InstallPackage(PackageId, ver, Options);
         Restore();
     }
 
     internal void UninstallPackage()
     {
-        Log("Uninstall package");
         DotNet.UninstallPackage(PackageId, Options);
         Restore(); // Or uninstall isn't finalized somehow.
-    }
-    
-    private void Restore()
-    {
-        Log("Restore");
-        DotNet.Restore(Options);
     }
 
     private string GetTargetFrameworkArg()
