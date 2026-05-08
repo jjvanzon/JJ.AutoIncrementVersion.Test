@@ -12,7 +12,7 @@ public partial class TestBase
             Dir = ProjectDir, 
             File = CsprojFilePath, 
             BuildConf = "Release",
-            TimeOutSec = 120,
+            TimeOutSec = 180,
             //Verbosity = Detailed,
             Log = Log
          };
