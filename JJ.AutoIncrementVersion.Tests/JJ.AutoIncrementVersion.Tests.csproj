@@ -10,13 +10,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JJ.Framework.Common.Core" Version="4.6.6433" />
-    <PackageReference Include="JJ.Framework.Common.Legacy" Version="0.254.6433" />
-    <PackageReference Include="JJ.Framework.Compilation.Core" Version="4.6.6433" />
-    <PackageReference Include="JJ.Framework.Existence.Core" Version="4.6.6433" />
-    <PackageReference Include="JJ.Framework.PlatformCompatibility.Core" Version="4.6.6433" />
-    <PackageReference Include="JJ.Framework.Reflection.Legacy" Version="0.254.6433" />
-    <PackageReference Include="JJ.Framework.Testing.Core" Version="4.6.6433" />
+    <PackageReference Include="JJ.Framework.Common.Core" Version="4.6.6442" />
+    <PackageReference Include="JJ.Framework.Common.Legacy" Version="0.254.6442" />
+    <PackageReference Include="JJ.Framework.Compilation.Core" Version="4.6.6442" />
+    <PackageReference Include="JJ.Framework.Existence.Core" Version="4.6.6442" />
+    <PackageReference Include="JJ.Framework.PlatformCompatibility.Core" Version="4.6.6442" />
+    <PackageReference Include="JJ.Framework.Reflection.Legacy" Version="0.254.6442" />
+    <PackageReference Include="JJ.Framework.Testing.Core" Version="4.6.6442" />
     <PackageReference Include="MSTest" Version="3.7.3" />
   </ItemGroup>
 
