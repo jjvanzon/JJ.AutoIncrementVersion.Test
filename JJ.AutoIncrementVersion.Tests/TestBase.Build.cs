@@ -12,7 +12,7 @@ public partial class TestBase
             File = CsprojFilePath, 
             BuildConf = "Release",
             TimeOutSec = 180,
-            Verbosity = Minimal,
+            //Verbosity = Minimal,
             Log = Log
          };
     }
@@ -128,12 +128,9 @@ public partial class TestBase
         Restore(); // Or uninstall isn't finalized somehow.
     }
 
-    private string GetTargetFrameworkArg()
-    {
-        return "";
+    private string FrameworkArg =>
         // This didn't work, because in many cases no explicit restore is done, 
         // and a restore of all TargetFrameworks seems necessary.
         // Explicit restores however make the test less representative of what happens in practice.
-        return $" -p:TargetFramework={DotNet.RunningTargetFramework}";
-    }
+        $" -p:TargetFramework={DotNet.RunningTargetFramework}";
 }
