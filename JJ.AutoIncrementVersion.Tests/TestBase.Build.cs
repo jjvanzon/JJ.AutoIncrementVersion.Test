@@ -1,4 +1,5 @@
-﻿namespace JJ.AutoIncrementVersion.Tests;
+﻿
+namespace JJ.AutoIncrementVersion.Tests;
 
 public partial class TestBase
 {
@@ -12,8 +13,8 @@ public partial class TestBase
             File = CsprojFilePath, 
             BuildConf = "Release",
             TimeOutSec = 180,
-            //Verbosity = Minimal,
-            Log = Log
+            Verbosity = Minimal,
+            LogAction = Log
          };
     }
 

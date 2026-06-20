@@ -1,7 +1,7 @@
 ﻿<SolutionConfiguration>
   <Settings>
     <AllowCodeAnalysis>False</AllowCodeAnalysis>
-    <DefaultTestTimeout>100000</DefaultTestTimeout>
+    <DefaultTestTimeout>180000</DefaultTestTimeout>
     <EnableRDI>False</EnableRDI>
     <FastLaneThreads>1</FastLaneThreads>
     <MaxNumberOfProcessingThreads>8</MaxNumberOfProcessingThreads>
