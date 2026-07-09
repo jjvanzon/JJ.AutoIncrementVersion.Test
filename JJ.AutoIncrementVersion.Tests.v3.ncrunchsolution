@@ -4,7 +4,7 @@
     <DefaultTestTimeout>180000</DefaultTestTimeout>
     <EnableRDI>False</EnableRDI>
     <FastLaneThreads>1</FastLaneThreads>
-    <MaxNumberOfProcessingThreads>8</MaxNumberOfProcessingThreads>
+    <MaxNumberOfProcessingThreads>13</MaxNumberOfProcessingThreads>
     <RdiConfigured>True</RdiConfigured>
     <SlidingBuildDelayInMilliseconds>20000</SlidingBuildDelayInMilliseconds>
     <SolutionConfigured>True</SolutionConfigured>
