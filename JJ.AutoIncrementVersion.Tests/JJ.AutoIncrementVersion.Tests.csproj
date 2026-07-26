@@ -8,12 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JJ.Framework.Common.Core" Version="5.1.7239" />
-    <PackageReference Include="JJ.Framework.Common.Legacy" Version="0.259.7239" />
-    <PackageReference Include="JJ.Framework.Compilation.Core" Version="5.1.7239-preview" />
-    <PackageReference Include="JJ.Framework.Existence.Core" Version="5.1.7239" />
-    <PackageReference Include="JJ.Framework.PlatformCompatibility.Core" Version="5.1.7239" />
-    <PackageReference Include="JJ.Framework.Reflection.Legacy" Version="0.259.7239" />
+    <PackageReference Include="JJ.Framework.Common.Core" Version="5.2.7438" />
+    <PackageReference Include="JJ.Framework.Common.Legacy" Version="0.260.7438" />
+    <PackageReference Include="JJ.Framework.Text.Legacy" Version="0.260.7438" />
+    <PackageReference Include="JJ.Framework.Compilation.Core" Version="5.2.7438-preview" />
+    <PackageReference Include="JJ.Framework.Existence.Core" Version="5.2.7438" />
+    <PackageReference Include="JJ.Framework.PlatformCompatibility.Core" Version="5.2.7438" />
+    <PackageReference Include="JJ.Framework.Reflection.Legacy" Version="0.260.7438" />
     <PackageReference Include="JJ.Framework.Testing.Core" Version="4.6.6975" />
     <PackageReference Include="MSTest" Version="3.7.3" />
   </ItemGroup>

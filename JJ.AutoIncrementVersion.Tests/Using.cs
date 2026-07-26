@@ -7,7 +7,7 @@ global using JJ.Framework.Common.Legacy;
 global using JJ.Framework.Common.Core;
 global using JJ.Framework.Compilation.Core;
 global using JJ.Framework.Compilation.Core.Primitives;
-global using JJ.Framework.Text.Core;
+global using JJ.Framework.Text.Legacy;
 global using JJ.Framework.Existence.Core;
 global using JJ.AutoIncrementVersion.Tests.docs;
 global using static System.String;
